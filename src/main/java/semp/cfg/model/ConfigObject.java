@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigObject {
@@ -37,7 +34,7 @@ public class ConfigObject {
     }
 
     protected Map<String, ?> toMap(){
-        Map<String, Object> result = new HashMap<>(properties);
+        Map<String, Object> result = new TreeMap<>(properties);
         children.forEach((k, l)->{
             List<Map<String, ?>> childrenList = l.stream()
                 .map(ConfigObject::toMap)
