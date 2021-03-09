@@ -1,17 +1,16 @@
 package semp.cfg.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConfigObject {
-    private String collectionName;
-    protected Map<String, Object> properties;
-    protected Map<String, List<ConfigObject>> children;
-    static private ObjectMapper objectMapper = new ObjectMapper();
+    private final String collectionName;
+    protected TreeMap<String, Object> properties;
+    private TreeMap<String, List<ConfigObject>> children;
+    static private ObjectMapper mapper = new ObjectMapper();
 
     public ConfigObject(){
         this(null);
@@ -19,34 +18,73 @@ public class ConfigObject {
 
     private ConfigObject(String collectionName){
         this.collectionName = collectionName;
-        properties = new HashMap<>();
-        children = new HashMap<>();
+        properties = new TreeMap<>();
+        children = new TreeMap<>();
     }
 
     public static ConfigObject ofProperties(String collectionName, Map<String, Object> properties){
         ConfigObject configObject = new ConfigObject(collectionName);
-        configObject.properties = properties;
+        configObject.properties = new TreeMap<>(properties);
         return configObject;
     }
 
-    public void addChild(ConfigObject configObject){
-        children.computeIfAbsent(configObject.collectionName, k -> new LinkedList<>()).add(configObject);
+    public void addChild(ConfigObject child){
+        children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
     }
 
-    protected Map<String, ?> toMap(){
-        Map<String, Object> result = new TreeMap<>(properties);
-        children.forEach((k, l)->{
-            List<Map<String, ?>> childrenList = l.stream()
-                .map(ConfigObject::toMap)
-                .collect(Collectors.toList());
-            result.put(k, childrenList);
-        });
-        return result;
+    private boolean hasChildren(){
+        if (Objects.isNull(children)){
+            return false;
+        }
+        return !children.isEmpty();
     }
+
+    private static final String TAB_SPACE=" ".repeat(2);
+    private StringBuilder toJsonString(int level) throws JsonProcessingException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s{%n", TAB_SPACE.repeat(level)));
+        sb.append(propertiesToJsonString(level+1));
+        sb.append(childrenToJsonString(level+1));
+        sb.append(String.format("%s}", TAB_SPACE.repeat(level)));
+        return sb;
+    }
+
+    private StringBuilder propertiesToJsonString(int level) throws JsonProcessingException {
+        StringBuilder sb = new StringBuilder();
+        Iterator<String > names = properties.navigableKeySet().iterator();
+        while (names.hasNext()){
+            String name = names.next();
+            sb.append(String.format(
+                    "%s%s: %s%s%n",
+                    TAB_SPACE.repeat(level),
+                    mapper.writeValueAsString(name),
+                    mapper.writeValueAsString(properties.get(name)),
+                    names.hasNext() || hasChildren() ?",":""
+            ));
+        }
+        return sb;
+    }
+
+    private StringBuilder childrenToJsonString(int level) throws JsonProcessingException {
+        StringBuilder sb = new StringBuilder();
+        Iterator<String > names = children.navigableKeySet().iterator();
+        while (names.hasNext()){
+            String name = names.next();
+            sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), mapper.writeValueAsString(name)));
+            Iterator<ConfigObject> list = children.get(name).iterator();
+            while (list.hasNext()){
+                sb.append(list.next().toJsonString(level + 1));
+                sb.append(String.format("%s%n", list.hasNext()?",":""));
+            }
+            sb.append(String.format("%s]%s%n", TAB_SPACE.repeat(level), names.hasNext()?",":""));
+        }
+        return sb;
+    }
+
 
     @SneakyThrows
     @Override
     public String toString() {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(toMap());
+        return toJsonString(0).toString();
     }
 }
