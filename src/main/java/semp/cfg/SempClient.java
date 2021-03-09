@@ -20,7 +20,6 @@ import java.util.*;
 public class SempClient {
     private static final String CONFIG_BASE_PATH ="/SEMP/v2/config";
     private final String baseUrl;
-    private final String base64Auth;
     private final HttpClient httpClient;
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -29,8 +28,13 @@ public class SempClient {
         httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(10))
+                .authenticator(new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(adminUser, adminPwd.toCharArray());
+                    }
+                })
                 .build();
-        base64Auth = "Basic " + Base64.getEncoder().encodeToString((adminUser + ":" + adminPwd).getBytes());
     }
 
     public SempVersion getSempVersion(){
@@ -74,7 +78,6 @@ public class SempClient {
         HttpRequest request = HttpRequest.newBuilder()
                 .method(method, Objects.isNull(payload)? BodyPublishers.noBody() : BodyPublishers.ofString(payload))
                 .uri(URI.create(absUri))
-                .header("Authorization", base64Auth)
                 .header("content-type", "application/json")
                 .build();
         JsonNode node = null;
