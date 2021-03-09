@@ -8,6 +8,7 @@ import java.util.*;
 
 public class ConfigObject {
     private final String collectionName;
+    private String collectionPath;
     protected TreeMap<String, Object> properties;
     private TreeMap<String, List<ConfigObject>> children;
     static private ObjectMapper mapper = new ObjectMapper();
@@ -18,6 +19,7 @@ public class ConfigObject {
 
     private ConfigObject(String collectionName){
         this.collectionName = collectionName;
+        collectionPath = "";
         properties = new TreeMap<>();
         children = new TreeMap<>();
     }
@@ -29,6 +31,7 @@ public class ConfigObject {
     }
 
     public void addChild(ConfigObject child){
+        child.collectionPath = collectionPath+"/"+child.collectionName;
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
     }
 
