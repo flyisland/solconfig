@@ -32,7 +32,7 @@ public class Commander {
         childrenLinks.entrySet().stream()
             .filter(e -> !e.getKey().equals("uri"))
             .forEach(e -> {
-                String collectionName = "msgVpns"; // TODO: should get from the link
+                String collectionName = Utils.getCollectionNameFromUri(e.getValue());
                 Optional<SempResponse> sempResponse = sempClient.getCollectionWithAbsoluteUri(e.getValue());
                 if (sempResponse.isEmpty() || sempResponse.get().isEmpty()){
                     return;
