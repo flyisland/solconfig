@@ -59,6 +59,7 @@ public class JsonSpec {
         }
         return result;
     }
+
 /*
 Turn below description into a Map
 
@@ -94,12 +95,7 @@ Map:
 
  */
     protected Map<String, List<String>> findSpecialAttributes(String collectionPath){
-        String objectPath = getObjectPath(collectionPath);
-        var description = getDescription(objectPath, "patch");
-        if (description.equals("")) {
-            description = getDescription(collectionPath, "post");
-        }
-
+        var description = getPatchOrPostDescription(collectionPath);
         var table = description.lines()
                 .map(line -> line.split("\\|", -1))
                 .filter(array -> array.length>=5)
@@ -119,6 +115,15 @@ Map:
             result.put(headers.get(i), attributes);
         }
 
+        return result;
+    }
+
+    private String getPatchOrPostDescription(String collectionPath) {
+        String objectPath = getObjectPath(collectionPath);
+        var result = getDescription(objectPath, "patch");
+        if (result.equals("")) {
+            result = getDescription(collectionPath, "post");
+        }
         return result;
     }
 
