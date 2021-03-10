@@ -1,5 +1,6 @@
 package semp.cfg.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,29 +12,22 @@ public class SempSpec {
     static public final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
     static public final String SEMP_VERSION = "sempVersion";
 
+    static private JsonSpec jsonSpec;
     static private Map<String, SempSpec> sempSpecMap = new TreeMap<>();
-    static private Map<String, Object> specPathsMap;
 
-    static public void ofMap(Map<String, Object> spec){
-        specPathsMap = (Map<String, Object>) spec.get("paths");
-        TOP_RESOURCES.values().forEach(s -> {
-            buildSempSpec("", s);
+    private boolean deprecated = false;
 
-        });
+    public static void ofJsonNode(JsonNode root){
+        jsonSpec = JsonSpec.ofJsonNode(root);
+        TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
     }
 
-    private static void buildSempSpec(String parentSpecPath, String collectionName){
+    private static void buildSempSpec(String parentObjectPath, String collectionName){
         SempSpec sempSpec = new SempSpec();
-        String thiSpecPath = parentSpecPath + "/" + collectionName;
-
-        sempSpecMap.put(thiSpecPath, sempSpec);
-    }
-
-    private void assertPathExist(String specPath){
-        if (! specPathsMap.containsKey(specPath)){
-            logger.error("Path '{}' is NOT found inside the SEMP specification!", specPath);
-            System.exit(1);
-        }
+        String specCollectionPath = parentObjectPath + "/" + collectionName;
+        jsonSpec.assertPathExist(specCollectionPath);
+        sempSpec.deprecated = jsonSpec.isDeprecatedCollection(specCollectionPath);
+//        sempSpecMap.put(collectionPath, sempSpec);
     }
 
     public boolean isDeprecatedObject(){

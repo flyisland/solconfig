@@ -3,14 +3,12 @@ package semp.cfg.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JsonSpecTest {
     static private ObjectMapper objectMapper = new ObjectMapper();
@@ -23,19 +21,27 @@ public class JsonSpecTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "/",
-            "/dmrClusters/{dmrClusterName}/links/{remoteNodeName}",
-            "/msgVpns" })
-    void testPathExist(String path){
-        assertTrue(jsonSpec.isPathExist(path));
+    @CsvSource({
+            "/certAuthorities, true",
+            "/dmrClusters/{dmrClusterName}/links/{remoteNodeName}/tlsTrustedCommonNames, true",
+            "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions, true",
+            "/this is a test, false",
+            "/queues, false",
+            "/dmrClusters/links, false"
+    })
+    void testPathExist(String path, boolean isExist){
+        assertEquals(isExist, jsonSpec.isPathExist(path));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "this is a test",
-            "/dmrClusters/links",
-            "/queues" })
-    void testPathNotExist(String path){
-        assertFalse(jsonSpec.isPathExist(path));
+    @CsvSource({
+            "/certAuthorities, true",
+            "/dmrClusters/{dmrClusterName}/links/{remoteNodeName}/tlsTrustedCommonNames, true",
+            "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeExceptions, true",
+            "/msgVpns, false",
+            "/msgVpns/{msgVpnName}/aclProfiles, false"
+    })
+    void testisDeprecatedCollection(String path, boolean isDeprecated) {
+        assertEquals(isDeprecated, jsonSpec.isDeprecatedCollection(path));
     }
-
 }

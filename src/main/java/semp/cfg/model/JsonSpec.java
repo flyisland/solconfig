@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class JsonSpec {
     static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
@@ -29,5 +30,11 @@ public class JsonSpec {
             logger.error("Path '{}' is NOT found inside the SEMP specification!", specPath);
             System.exit(1);
         }
+    }
+
+    protected boolean isDeprecatedCollection(String collectionPath){
+        return Optional.of(root.get("paths").get(collectionPath).get("get"))
+                .map(jsonNode -> jsonNode.get("deprecated"))
+                .map(jsonNode -> jsonNode.asBoolean(false)).orElse(false);
     }
 }
