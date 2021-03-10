@@ -4,19 +4,27 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class JsonSpecTest {
-    static private ObjectMapper objectMapper = new ObjectMapper();
+    static private final ObjectMapper objectMapper = new ObjectMapper();
     static private JsonSpec jsonSpec;
 
-    @BeforeAll static void setup() throws IOException {
+    @BeforeAll
+    static void setup() throws IOException {
         JsonNode jsonNode = objectMapper.readTree(
                 JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
         jsonSpec = JsonSpec.ofJsonNode(jsonNode);
@@ -31,7 +39,7 @@ public class JsonSpecTest {
             "/queues, false",
             "/dmrClusters/links, false"
     })
-    void testPathExist(String path, boolean isExist){
+    void testPathExist(String path, boolean isExist) {
         assertEquals(isExist, jsonSpec.isPathExist(path));
     }
 
@@ -54,7 +62,7 @@ public class JsonSpecTest {
             "/msgVpns/{msgVpnName}/aclProfiles, /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}",
             "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions, '/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions/{publishTopicExceptionSyntax},{publishTopicException}'"
     })
-    void testGetObjectPath(String collectionPath, String objectPath){
+    void testGetObjectPath(String collectionPath, String objectPath) {
         assertEquals(objectPath, jsonSpec.getObjectPath(collectionPath));
     }
 
@@ -63,7 +71,25 @@ public class JsonSpecTest {
             "/dmrClusters---",
             "/msgVpns/{msgV{pnName}/aclProfiles"
     })
-    void testGetObjectPathException(String collectionPath){
+    void testGetObjectPathException(String collectionPath) {
         assertThrows(NoSuchElementException.class, () -> jsonSpec.getObjectPath(collectionPath));
+    }
+
+    static Stream<Arguments> stringIntAndListProvider() {
+        return Stream.of(
+                arguments("/dmrClusters/{dmrClusterName}",
+                        Collections.singletonList("dmrClusterName")),
+                arguments("/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}",
+                        Collections.singletonList("aclProfileName")),
+                arguments("/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions/{publishTopicExceptionSyntax},{publishTopicException}",
+                        Arrays.asList("publishTopicExceptionSyntax", "publishTopicException")),
+                arguments("/msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}",
+                        Arrays.asList("remoteMsgVpnName", "remoteMsgVpnLocation", "remoteMsgVpnInterface"))
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("stringIntAndListProvider")
+    void testGenerateIdentifiers(String objectPath, List<String> idsList) {
+        assertEquals(idsList, JsonSpec.generateIdentifiers(objectPath));
     }
 }

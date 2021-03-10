@@ -28,7 +28,7 @@ public class JsonSpec {
 
     protected void assertPathExist(String specPath){
         if (! isPathExist(specPath)){
-            logger.error("Path '{}' is NOT found inside the SEMP specification!", specPath);
+            logger.error("Path '{}' is NOT found inside the SEMPv2 specification!", specPath);
             System.exit(1);
         }
     }
@@ -48,5 +48,16 @@ public class JsonSpec {
                 .filter(p -> objRe.matcher(p).matches())
                 .findFirst()
                 .orElseThrow();
+    }
+
+    protected static List<String> generateIdentifiers(String objectPath) {
+        List<String> result = new LinkedList<>();
+        var items = objectPath.split("/");
+        var idsInPath = items[items.length-1];
+        var m = Pattern.compile("\\{([^}]+)}").matcher(idsInPath);
+        while (m.find()) {
+            result.add(m.group(1));
+        }
+        return result;
     }
 }
