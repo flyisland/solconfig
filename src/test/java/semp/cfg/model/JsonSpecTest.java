@@ -1,18 +1,17 @@
 package semp.cfg.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,7 +74,7 @@ public class JsonSpecTest {
         assertThrows(NoSuchElementException.class, () -> jsonSpec.getObjectPath(collectionPath));
     }
 
-    static Stream<Arguments> stringIntAndListProvider() {
+    static Stream<Arguments> testGenerateIdentifiersProvider() {
         return Stream.of(
                 arguments("/dmrClusters/{dmrClusterName}",
                         Collections.singletonList("dmrClusterName")),
@@ -88,8 +87,49 @@ public class JsonSpecTest {
         );
     }
     @ParameterizedTest
-    @MethodSource("stringIntAndListProvider")
+    @MethodSource("testGenerateIdentifiersProvider")
     void testGenerateIdentifiers(String objectPath, List<String> idsList) {
         assertEquals(idsList, JsonSpec.generateIdentifiers(objectPath));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "/msgVpns, '{\n" +
+                    "  \"Read-Only\" : [ \"msgVpnName\" ],\n" +
+                    "  \"Requires-Disable\" : [ ],\n" +
+                    "  \"Deprecated\" : [ \"bridgingTlsServerCertEnforceTrustedCommonNameEnabled\", \"restTlsServerCertEnforceTrustedCommonNameEnabled\" ],\n" +
+                    "  \"Opaque\" : [ \"replicationBridgeAuthenticationBasicPassword\", \"replicationBridgeAuthenticationClientCertContent\" ],\n" +
+                    "  \"Identifying\" : [ \"msgVpnName\" ],\n" +
+                    "  \"Write-Only\" : [ \"replicationBridgeAuthenticationBasicPassword\", \"replicationBridgeAuthenticationClientCertContent\", \"replicationBridgeAuthenticationClientCertPassword\", \"replicationEnabledQueueBehavior\" ]\n" +
+                    "}'",
+            "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions, '{\n" +
+                    "  \"Read-Only\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
+                    "  \"Required\" : [ \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
+                    "  \"Deprecated\" : [ ],\n" +
+                    "  \"Opaque\" : [ ],\n" +
+                    "  \"Identifying\" : [ \"aclProfileName\", \"msgVpnName\", \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
+                    "  \"Write-Only\" : [ ]\n" +
+                    "}'",
+            "/dmrClusters, '{\n" +
+                    "  \"Read-Only\" : [ \"directOnlyEnabled\", \"dmrClusterName\", \"nodeName\" ],\n" +
+                    "  \"Requires-Disable\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\", \"authenticationClientCertPassword\" ],\n" +
+                    "  \"Deprecated\" : [ \"tlsServerCertEnforceTrustedCommonNameEnabled\" ],\n" +
+                    "  \"Opaque\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\" ],\n" +
+                    "  \"Identifying\" : [ \"dmrClusterName\" ],\n" +
+                    "  \"Write-Only\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\", \"authenticationClientCertPassword\" ]\n" +
+                    "}'",
+            "/dmrClusters/{dmrClusterName}/links, '{\n" +
+                    "  \"Read-Only\" : [ \"dmrClusterName\", \"remoteNodeName\" ],\n" +
+                    "  \"Requires-Disable\" : [ \"authenticationBasicPassword\", \"authenticationScheme\", \"egressFlowWindowSize\", \"initiator\", \"span\", \"transportCompressedEnabled\", \"transportTlsEnabled\" ],\n" +
+                    "  \"Deprecated\" : [ ],\n" +
+                    "  \"Opaque\" : [ \"authenticationBasicPassword\" ],\n" +
+                    "  \"Identifying\" : [ \"dmrClusterName\", \"remoteNodeName\" ],\n" +
+                    "  \"Write-Only\" : [ \"authenticationBasicPassword\" ]\n" +
+                    "}'"
+    })
+    void testFindSpecialAttributes(String path, String expected) throws JsonProcessingException {
+        var m1 = jsonSpec.findSpecialAttributes(path);
+        var m2 = objectMapper.readValue(expected, Map.class);
+        assertEquals(m2, m1);
     }
 }

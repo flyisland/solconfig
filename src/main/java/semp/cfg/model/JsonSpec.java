@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class JsonSpec {
     static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
@@ -59,5 +58,74 @@ public class JsonSpec {
             result.add(m.group(1));
         }
         return result;
+    }
+/*
+Turn below description into a Map
+
+Description:
+```
+    Update a Message VPN object. Any attribute missing from the request will be left unchanged.
+
+    Message VPNs (Virtual Private Networks) allow for the segregation of topic space and clients. They also group clients connecting to a network of message brokers, such that messages published within a particular group are only visible to that group's clients.
+
+
+    Attribute|Identifying|Read-Only|Write-Only|Requires-Disable|Deprecated|Opaque
+    :---|:---:|:---:|:---:|:---:|:---:|:---:
+    bridgingTlsServerCertEnforceTrustedCommonNameEnabled|||||x|
+    msgVpnName|x|x||||
+    replicationBridgeAuthenticationBasicPassword|||x|||x
+    replicationBridgeAuthenticationClientCertContent|||x|||x
+    replicationBridgeAuthenticationClientCertPassword|||x|||
+    replicationEnabledQueueBehavior|||x|||
+    restTlsServerCertEnforceTrustedCommonNameEnabled|||||x|
+
+    ...
+```
+
+Map:
+{
+  "Read-Only" : [ "msgVpnName" ],
+  "Requires-Disable" : [ ],
+  "Deprecated" : [ "bridgingTlsServerCertEnforceTrustedCommonNameEnabled", "restTlsServerCertEnforceTrustedCommonNameEnabled" ],
+  "Opaque" : [ "replicationBridgeAuthenticationBasicPassword", "replicationBridgeAuthenticationClientCertContent" ],
+  "Identifying" : [ "msgVpnName" ],
+  "Write-Only" : [ "replicationBridgeAuthenticationBasicPassword", "replicationBridgeAuthenticationClientCertContent", "replicationBridgeAuthenticationClientCertPassword", "replicationEnabledQueueBehavior" ]
+}
+
+ */
+    protected Map<String, List<String>> findSpecialAttributes(String collectionPath){
+        String objectPath = getObjectPath(collectionPath);
+        var description = getDescription(objectPath, "patch");
+        if (description.equals("")) {
+            description = getDescription(collectionPath, "post");
+        }
+
+        var table = description.lines()
+                .map(line -> line.split("\\|", -1))
+                .filter(array -> array.length>=5)
+                .map(Arrays::asList)
+                .collect(Collectors.toList());
+
+        var headers = table.get(0);
+        var result = new HashMap<String, List<String>>();
+        for (int i = 1; i < headers.size(); i++) { // start from second column
+            var attributes = new LinkedList<String>();
+            for (int j = 2; j < table.size(); j++) { // start from third row
+                var x = table.get(j).get(i);
+                if (x.equalsIgnoreCase("x")){
+                    attributes.add(table.get(j).get(0)); // first column is the attribute name
+                }
+            }
+            result.put(headers.get(i), attributes);
+        }
+
+        return result;
+    }
+
+    private String getDescription(String path, String action) {
+        return Optional.of(root.get("paths").get(path))
+                .map(jsonNode -> jsonNode.get(action))
+                .map(jsonNode -> jsonNode.get("description"))
+                .map(JsonNode::asText).orElse("");
     }
 }
