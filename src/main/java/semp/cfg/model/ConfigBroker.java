@@ -8,6 +8,6 @@ public class ConfigBroker extends ConfigObject{
     }
 
     public void setSempVersion(SempVersion sempVersion){
-        properties.put(SempSpec.SEMP_VERSION, sempVersion.getText());
+        attributes.put(SempSpec.SEMP_VERSION, sempVersion.getText());
     }
 }
