@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class JsonSpec {
     static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
@@ -36,5 +37,16 @@ public class JsonSpec {
         return Optional.of(root.get("paths").get(collectionPath).get("get"))
                 .map(jsonNode -> jsonNode.get("deprecated"))
                 .map(jsonNode -> jsonNode.asBoolean(false)).orElse(false);
+    }
+
+    protected String getObjectPath(String collectionPath) {
+        var escapesPath = collectionPath
+                .replace("{", "\\{")
+                .replace("}", "\\}");
+        var objRe = Pattern.compile("^" + escapesPath + "/([^/]+)$");
+        return pathsList.stream()
+                .filter(p -> objRe.matcher(p).matches())
+                .findFirst()
+                .orElseThrow();
     }
 }

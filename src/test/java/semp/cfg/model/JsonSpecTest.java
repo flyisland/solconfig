@@ -7,8 +7,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JsonSpecTest {
     static private ObjectMapper objectMapper = new ObjectMapper();
@@ -43,5 +45,25 @@ public class JsonSpecTest {
     })
     void testisDeprecatedCollection(String path, boolean isDeprecated) {
         assertEquals(isDeprecated, jsonSpec.isDeprecatedCollection(path));
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "/dmrClusters, /dmrClusters/{dmrClusterName}",
+            "/msgVpns/{msgVpnName}/aclProfiles, /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}",
+            "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions, '/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions/{publishTopicExceptionSyntax},{publishTopicException}'"
+    })
+    void testGetObjectPath(String collectionPath, String objectPath){
+        assertEquals(objectPath, jsonSpec.getObjectPath(collectionPath));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "/dmrClusters---",
+            "/msgVpns/{msgV{pnName}/aclProfiles"
+    })
+    void testGetObjectPathException(String collectionPath){
+        assertThrows(NoSuchElementException.class, () -> jsonSpec.getObjectPath(collectionPath));
     }
 }
