@@ -1,0 +1,33 @@
+package semp.cfg.model;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedList;
+import java.util.List;
+
+public class JsonSpec {
+    static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
+    private JsonNode root;
+    private List<String> pathsList;
+
+    public static JsonSpec ofJsonNode(JsonNode root){
+        JsonSpec jsonSpec = new JsonSpec();
+        jsonSpec.root = root;
+        jsonSpec.pathsList = new LinkedList<>();
+        root.get("paths").fieldNames().forEachRemaining(name -> jsonSpec.pathsList.add(name));
+        return jsonSpec;
+    }
+
+    protected boolean isPathExist(String specPath){
+        return pathsList.contains(specPath);
+    }
+
+    protected void assertPathExist(String specPath){
+        if (! isPathExist(specPath)){
+            logger.error("Path '{}' is NOT found inside the SEMP specification!", specPath);
+            System.exit(1);
+        }
+    }
+}
