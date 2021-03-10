@@ -8,7 +8,7 @@ import java.util.*;
 
 public class ConfigObject {
     private final String collectionName;
-    protected TreeMap<String, Object> properties;
+    protected TreeMap<String, Object> attributes;
     private TreeMap<String, List<ConfigObject>> children;
     static private ObjectMapper mapper = new ObjectMapper();
 
@@ -18,13 +18,13 @@ public class ConfigObject {
 
     private ConfigObject(String collectionName){
         this.collectionName = collectionName;
-        properties = new TreeMap<>();
+        attributes = new TreeMap<>();
         children = new TreeMap<>();
     }
 
-    public static ConfigObject ofProperties(String collectionName, Map<String, Object> properties){
+    public static ConfigObject ofAttributes(String collectionName, Map<String, Object> attributes){
         ConfigObject configObject = new ConfigObject(collectionName);
-        configObject.properties = new TreeMap<>(properties);
+        configObject.attributes = new TreeMap<>(attributes);
         return configObject;
     }
 
@@ -43,22 +43,22 @@ public class ConfigObject {
     private StringBuilder toJsonString(int level) throws JsonProcessingException {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s{%n", TAB_SPACE.repeat(level)));
-        sb.append(propertiesToJsonString(level+1));
+        sb.append(attributesToJsonString(level+1));
         sb.append(childrenToJsonString(level+1));
         sb.append(String.format("%s}", TAB_SPACE.repeat(level)));
         return sb;
     }
 
-    private StringBuilder propertiesToJsonString(int level) throws JsonProcessingException {
+    private StringBuilder attributesToJsonString(int level) throws JsonProcessingException {
         StringBuilder sb = new StringBuilder();
-        Iterator<String > names = properties.navigableKeySet().iterator();
+        Iterator<String > names = attributes.navigableKeySet().iterator();
         while (names.hasNext()){
             String name = names.next();
             sb.append(String.format(
                     "%s%s: %s%s%n",
                     TAB_SPACE.repeat(level),
                     mapper.writeValueAsString(name),
-                    mapper.writeValueAsString(properties.get(name)),
+                    mapper.writeValueAsString(attributes.get(name)),
                     names.hasNext() || hasChildren() ?",":""
             ));
         }
