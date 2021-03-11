@@ -3,6 +3,8 @@ package semp.cfg;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import semp.cfg.model.SempResponse;
 import semp.cfg.model.SempVersion;
 
@@ -21,6 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class SempClient {
+    static final Logger logger = LoggerFactory.getLogger(SempClient.class);
     private static final String CONFIG_BASE_PATH ="/SEMP/v2/config";
     private final String baseUrl;
     private final HttpClient httpClient;
@@ -79,7 +82,7 @@ public class SempClient {
 
     private JsonNode sendWithAbsoluteURI(String method, String absUri, String payload) {
         HttpRequest request = HttpRequest.newBuilder()
-                .method(method, Objects.isNull(payload)? BodyPublishers.noBody() : BodyPublishers.ofString(payload))
+                .method(method.toUpperCase(), Objects.isNull(payload)? BodyPublishers.noBody() : BodyPublishers.ofString(payload))
                 .uri(URI.create(absUri))
                 .header("content-type", "application/json")
                 .build();
@@ -88,12 +91,13 @@ public class SempClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             node = objectMapper.readTree(response.body());
         } catch (InterruptedException|IOException e) {
-            e.printStackTrace();
+            logger.error("{} on [{}] with playload:\n{}\n{}", method.toUpperCase(), absUri,
+                    payload, e.toString());
             System.exit(1);
         }
         return node;
     }
-    private JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
+    protected JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
 }
