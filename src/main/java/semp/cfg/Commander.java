@@ -4,15 +4,26 @@ import lombok.Setter;
 import semp.cfg.model.ConfigBroker;
 import semp.cfg.model.ConfigObject;
 import semp.cfg.model.SempResponse;
+import semp.cfg.model.SempSpec;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Commander {
-    @Setter
     private SempClient sempClient;
     @Setter
     private boolean curlOnly;
+
+    public static Commander ofSempClient(SempClient sempClient){
+        Commander commander = new Commander();
+        commander.sempClient = sempClient;
+        commander.setupSempSpec();
+        return commander;
+    }
+
+    private void setupSempSpec() {
+        SempSpec.ofJsonNode(sempClient.sendWithResourcePath("get", "/spec", null));
+    }
 
     public void backup(String resourceType, String[] objectNames){
         ConfigBroker configBroker = new ConfigBroker();
@@ -21,7 +32,8 @@ public class Commander {
         Map<String, String> childrenLinks = Arrays.stream(objectNames)
                 .map(objectName -> Map.entry(objectName,
                         sempClient.buildAbsoluteUri(
-                                String.format("/%s?where=msgVpnName==%s", resourceType, objectName))))
+                                String.format("/%s?where=%s==%s",
+                                        resourceType, SempSpec.getTopResourceIdentifierKey(resourceType), objectName))))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         getChildrenRecursively(configBroker, childrenLinks);

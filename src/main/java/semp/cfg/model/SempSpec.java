@@ -61,6 +61,16 @@ public class SempSpec {
         return sb.toString();
     }
 
+    public static String getTopResourceIdentifierKey(String resourceName) {
+        if (TOP_RESOURCES.containsValue(resourceName)){
+            return sempSpecMap.get("/"+resourceName).identifiers.get(0);
+        }else{
+            throw new IllegalArgumentException(
+                    String.format("%s is NOT one of [%s]!",
+                            resourceName, TOP_RESOURCES.values()));
+        }
+    }
+
     public boolean isDeprecatedObject(){
         return deprecated;
     }

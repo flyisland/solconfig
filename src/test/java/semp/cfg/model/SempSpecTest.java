@@ -22,6 +22,7 @@ public class SempSpecTest {
     static void setup() throws IOException {
         jsonNode = objectMapper.readTree(
                 JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
+        SempSpec.ofJsonNode(jsonNode);
     }
 
     @ParameterizedTest
@@ -37,7 +38,17 @@ public class SempSpecTest {
 
     @Test
     void testOfJsonNode() {
-        SempSpec.ofJsonNode(jsonNode);
         SempSpec.sempSpecMap.keySet().forEach(System.out::println);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "dmrClusters, dmrClusterName",
+            "msgVpns, msgVpnName",
+            "certAuthorities, certAuthorityName"
+    })
+    void testGetTopResourceIdentifierKey(String topName, String expected) {
+        assertEquals(expected, SempSpec.getTopResourceIdentifierKey(topName));
+    }
+
 }

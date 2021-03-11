@@ -37,9 +37,9 @@ public class SempCfgCommand implements Callable<Integer> {
         throw new CommandLine.ParameterException(spec.commandLine(), "Missing required subcommand!");
     }
 
-    protected Commander commander = new Commander();
+    protected Commander commander;
     protected void init(){
-        commander.setSempClient(new SempClient(adminHost, adminUser, adminPwd));
+        commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd));
         commander.setCurlOnly(curlOnly);
     }
 
