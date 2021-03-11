@@ -9,7 +9,7 @@ import java.util.*;
 public class ConfigObject {
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
-    private String collectionPath;
+    private String specPath;
     private TreeMap<String, List<ConfigObject>> children;
     static private ObjectMapper mapper = new ObjectMapper();
 
@@ -19,7 +19,7 @@ public class ConfigObject {
 
     private ConfigObject(String collectionName){
         this.collectionName = collectionName;
-        collectionPath = "";
+        specPath = "";
         attributes = new TreeMap<>();
         children = new TreeMap<>();
     }
@@ -31,7 +31,7 @@ public class ConfigObject {
     }
 
     public void addChild(ConfigObject child){
-        child.collectionPath = collectionPath+"/"+child.collectionName;
+        child.specPath = specPath +"/"+child.collectionName;
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
     }
 
