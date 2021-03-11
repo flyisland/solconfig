@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 public class Utils {
     static private ObjectMapper objectMapper = new ObjectMapper();
@@ -35,4 +36,12 @@ public class Utils {
         return node;
     }
 
+    public static Optional<String> getFirstMatch(String input, Pattern re) {
+        var m = re.matcher(input);
+        if (m.find()) {
+            return Optional.of(m.group(1));
+        }else {
+            return Optional.empty();
+        }
+    }
 }

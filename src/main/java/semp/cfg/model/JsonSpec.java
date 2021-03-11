@@ -194,11 +194,18 @@ Map:
 
     protected static Optional<String> findDefaultValue(String description) {
         var re = Pattern.compile("The default value is `([^`]+)`");
-        var m = re.matcher(description);
-        if (m.find()) {
-            return Optional.of(m.group(1));
-        }else {
-            return Optional.empty();
-        }
+        return Utils.getFirstMatch(description, re);
+    }
+
+    protected List<String> getChildrenNames(String objectPath) {
+        var escapesPath = objectPath
+                .replace("{", "\\{")
+                .replace("}", "\\}");
+        var re = Pattern.compile("^" + escapesPath + "/([^/]+)$");
+        return pathsList.stream()
+                .map(p -> Utils.getFirstMatch(p, re))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }

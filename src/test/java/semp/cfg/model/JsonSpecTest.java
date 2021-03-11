@@ -161,4 +161,13 @@ public class JsonSpecTest {
     void testFindDefaultValue(String description, String expected) {
         assertEquals(Optional.of(expected), JsonSpec.findDefaultValue(description));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "/msgVpns/{msgVpnName}, '[aclProfiles, authenticationOauthProviders, authorizationGroups, bridges, clientProfiles, clientUsernames, distributedCaches, dmrBridges, jndiConnectionFactories, jndiQueues, jndiTopics, mqttRetainCaches, mqttSessions, queueTemplates, queues, replayLogs, replicatedTopics, restDeliveryPoints, sequencedTopics, topicEndpointTemplates, topicEndpoints]'",
+            "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}, '[clientConnectExceptions, publishExceptions, publishTopicExceptions, subscribeExceptions, subscribeShareNameExceptions, subscribeTopicExceptions]'"
+    })
+    void testGetChildrenNames(String objectPath, String expected) {
+        assertEquals(expected, jsonSpec.getChildrenNames(objectPath).toString());
+    }
 }
