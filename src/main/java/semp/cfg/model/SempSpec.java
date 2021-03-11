@@ -31,7 +31,7 @@ public class SempSpec {
     }
 
     public boolean isDeprecatedObject(){
-        return false;
+        return deprecated;
     }
 
     public boolean isDeprecatedAttribute(String name){
