@@ -1,6 +1,7 @@
 package semp.cfg.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ public class SempSpec {
 
     private String specPath;
     private boolean deprecated = false;
+    @Getter
     private List<String> identifiers;
     private Map<String, List<String>> specialAttributes;
     private Map<String, ?> defaultValues;
@@ -73,13 +75,5 @@ public class SempSpec {
 
     protected static SempSpec get(String specPath) {
         return sempSpecMap.get(specPath);
-    }
-
-    public boolean isDeprecatedObject(){
-        return deprecated;
-    }
-
-    public boolean isDeprecatedAttribute(String name){
-        return false;
     }
 }

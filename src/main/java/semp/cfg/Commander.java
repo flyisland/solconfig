@@ -37,6 +37,7 @@ public class Commander {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         getChildrenRecursively(configBroker, childrenLinks);
+        configBroker.removeReservedObjects();
         System.out.println(configBroker.toString());
     }
 

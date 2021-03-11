@@ -4,16 +4,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ConfigObject {
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
     private String specPath;
-    private TreeMap<String, List<ConfigObject>> children;
+    private final TreeMap<String, List<ConfigObject>> children;
     private SempSpec sempSpec;
 
-    static private ObjectMapper mapper = new ObjectMapper();
+    static private final ObjectMapper mapper = new ObjectMapper();
 
     public ConfigObject(){
         this(null);
@@ -91,6 +94,43 @@ public class ConfigObject {
         return sb;
     }
 
+    /**
+     * Names starting with '#' are reserved. Reserved object can not be created or delete by users.
+     * %23 is the url encoded '#'
+     *
+     * @return if this object is a reserved object.
+     */
+    private boolean isReservedObject() {
+        return getObjectId().startsWith("%23");
+    }
+
+    /**
+     *  /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions/{publishTopicExceptionSyntax},{publishTopicException}
+     *  Obj-id must be url encoded and join with "," as above example.
+     * @return the obj-id
+     */
+    private String getObjectId() {
+        var idList = sempSpec.getIdentifiers().stream()
+                .map(id -> attributes.get(id).toString())
+                .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
+                .collect(Collectors.toList());
+        return String.join(",", idList);
+
+    }
+
+    /**
+     * Removes all reserved object in children objects.
+     */
+    public void removeReservedObjects() {
+        for (Iterator<List<ConfigObject>> iterator = children.values().iterator(); iterator.hasNext(); ) {
+            var list =  iterator.next();
+            list.removeIf(ConfigObject::isReservedObject);
+            if (list.isEmpty()) {
+                iterator.remove();
+            }
+        }
+        children.values().forEach(list -> list.forEach(ConfigObject::removeReservedObjects));
+    }
 
     @SneakyThrows
     @Override
