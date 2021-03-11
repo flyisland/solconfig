@@ -11,6 +11,8 @@ public class ConfigObject {
     protected TreeMap<String, Object> attributes;
     private String specPath;
     private TreeMap<String, List<ConfigObject>> children;
+    private SempSpec sempSpec;
+
     static private ObjectMapper mapper = new ObjectMapper();
 
     public ConfigObject(){
@@ -31,8 +33,13 @@ public class ConfigObject {
     }
 
     public void addChild(ConfigObject child){
-        child.specPath = specPath +"/"+child.collectionName;
+        child.setSpecPath(specPath + "/" + child.collectionName);
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
+    }
+
+    private void setSpecPath(String path) {
+        this.specPath = path;
+        this.sempSpec = SempSpec.get(specPath);
     }
 
     private boolean hasChildren(){

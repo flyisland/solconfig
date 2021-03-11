@@ -71,6 +71,10 @@ public class SempSpec {
         }
     }
 
+    protected static SempSpec get(String specPath) {
+        return sempSpecMap.get(specPath);
+    }
+
     public boolean isDeprecatedObject(){
         return deprecated;
     }
