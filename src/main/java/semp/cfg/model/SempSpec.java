@@ -14,12 +14,14 @@ public class SempSpec {
     static public final String SEMP_VERSION = "sempVersion";
 
     static private JsonSpec jsonSpec;
-    static private Map<String, SempSpec> sempSpecMap = new TreeMap<>();
+    protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
 
+    private String specPath;
     private boolean deprecated = false;
     private List<String> identifiers;
     private Map<String, List<String>> specialAttributes;
     private Map<String, ?> defaultValues;
+    private List<String> childrenNames;
 
     public static void ofJsonNode(JsonNode root){
         jsonSpec = JsonSpec.ofJsonNode(root);
@@ -27,23 +29,36 @@ public class SempSpec {
     }
 
     private static void buildSempSpec(String parentObjectPath, String collectionName){
-        new SempSpec().build(parentObjectPath, collectionName);
+         var spec = SempSpec.of(parentObjectPath, collectionName);
+        sempSpecMap.put(spec.specPath, spec);
+
+        var objectPath = jsonSpec.getObjectPath(parentObjectPath + "/" + collectionName);
+        spec.childrenNames.forEach(name -> buildSempSpec(objectPath, name));
     }
 
-    private void build(String parentObjectPath, String collectionName) {
+    private static SempSpec of(String parentObjectPath, String collectionName) {
+        var spec = new SempSpec();
         var collectionPath = parentObjectPath + "/" + collectionName;
         var objectPath = jsonSpec.getObjectPath(collectionPath);
         jsonSpec.assertPathExist(collectionPath);
 
-        deprecated = jsonSpec.isDeprecatedCollection(collectionPath);
-        identifiers = JsonSpec.generateIdentifiers(objectPath);
-        specialAttributes = jsonSpec.findSpecialAttributes(collectionPath);
-        defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
+        spec.specPath = generateSpecPath(collectionPath);
+        spec.deprecated = jsonSpec.isDeprecatedCollection(collectionPath);
+        spec.identifiers = JsonSpec.generateIdentifiers(objectPath);
+        spec.specialAttributes = jsonSpec.findSpecialAttributes(collectionPath);
+        spec.defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
+        spec.childrenNames = jsonSpec.getChildrenNames(objectPath);
 
-        var childrenNames = jsonSpec.getChildrenNames(objectPath);
+        return spec;
+    }
 
-//        sempSpecMap.put(collectionPath, sempSpec);
-
+    protected static String generateSpecPath(String path) {
+        var names = path.split("/");
+        var sb = new StringBuilder();
+        for (int i = 1; i < names.length; i++) {
+            if (i%2 == 1) sb.append("/").append(names[i]);
+        }
+        return sb.toString();
     }
 
     public boolean isDeprecatedObject(){

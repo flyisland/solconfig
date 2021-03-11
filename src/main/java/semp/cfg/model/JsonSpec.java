@@ -85,9 +85,6 @@ Description:
 ```
     Update a Message VPN object. Any attribute missing from the request will be left unchanged.
 
-    Message VPNs (Virtual Private Networks) allow for the segregation of topic space and clients. They also group clients connecting to a network of message brokers, such that messages published within a particular group are only visible to that group's clients.
-
-
     Attribute|Identifying|Read-Only|Write-Only|Requires-Disable|Deprecated|Opaque
     :---|:---:|:---:|:---:|:---:|:---:|:---:
     bridgingTlsServerCertEnforceTrustedCommonNameEnabled|||||x|
