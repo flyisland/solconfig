@@ -29,6 +29,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
     implementation 'info.picocli:picocli:4.6.1'
     implementation 'ch.qos.logback:logback-classic:1.3.0-alpha5'
+    implementation 'com.jayway.jsonpath:json-path:2.5.0'
 }
 
 application {

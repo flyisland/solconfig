@@ -3,13 +3,19 @@ package semp.cfg.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -21,8 +27,13 @@ public class JsonSpecTest {
     static private final ObjectMapper objectMapper = new ObjectMapper();
     static private JsonSpec jsonSpec;
 
+    static Object jsonDocument;
+
     @BeforeAll
     static void setup() throws IOException {
+        var jsonString = Files.readString(Path.of(JsonSpecTest.class.getResource("/semp-v2-config-2.19.json").getPath()));
+        jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
+
         JsonNode jsonNode = objectMapper.readTree(
                 JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
         jsonSpec = JsonSpec.ofJsonNode(jsonNode);
@@ -130,5 +141,24 @@ public class JsonSpecTest {
         var m1 = jsonSpec.findSpecialAttributes(path);
         var m2 = objectMapper.readValue(expected, Map.class);
         assertEquals(m2, m1);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "$.paths./msgVpns.post.parameters[?(@.name=='body')].schema.$ref",
+            "$.definitions.MsgVpn.properties"
+    })
+    void testGetAttributesWithDefaultValue(String path){
+        Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
+        System.out.println(path + " -> " + JsonPath.using(conf).parse(jsonDocument).read(path));
+    }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "'The audience claim name, indicating which part of the object to use for determining the audience. The default value is `\"aud\"`.', \"aud\""
+    })
+    void testFindDefaultValue(String description, String expected) {
+        assertEquals(Optional.of(expected), JsonSpec.findDefaultValue(description));
     }
 }

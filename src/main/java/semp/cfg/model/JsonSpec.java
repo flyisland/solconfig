@@ -1,6 +1,11 @@
 package semp.cfg.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import semp.cfg.Utils;
@@ -12,7 +17,9 @@ import java.util.stream.Collectors;
 public class JsonSpec {
     static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     private JsonNode root;
+    private Object jsonDocument;
     private List<String> pathsList;
 
     public static JsonSpec ofJsonNode(JsonNode root){
@@ -20,6 +27,15 @@ public class JsonSpec {
         jsonSpec.root = root;
         jsonSpec.pathsList = new LinkedList<>();
         root.get("paths").fieldNames().forEachRemaining(name -> jsonSpec.pathsList.add(name));
+
+        String jsonString;
+        try {
+            jsonString = objectMapper.writeValueAsString(root);
+        } catch (JsonProcessingException e) {
+            jsonString = "";
+        }
+        jsonSpec.jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
+
         return jsonSpec;
     }
 
@@ -128,5 +144,61 @@ Map:
         return optionalS.orElse(
                 Utils.jsonSafeGetValue(root, String.class, "paths", collectionPath, "post", "description")
                         .orElse(""));
+    }
+
+    protected Map<String, ?> getMapOfAttributesWithDefaultValue(String collectionPath) {
+        var propMap = getDefinitionProperties(collectionPath);
+        return getAttributesWithDefaultValueFromJProperties(propMap);
+    }
+
+    protected Map<String, Map<String, ?>> getDefinitionProperties(String collectionPath){
+        var conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
+        var refPath = "$.paths." + collectionPath + ".post.parameters[?(@.name=='body')].schema.$ref";
+        List<String> ref = JsonPath.using(conf).parse(jsonDocument).read(refPath);
+        if (Objects.isNull(ref)){
+            logger.warn("Unable to find path:{}", refPath);
+            return null;
+        }
+
+        // "#/definitions/MsgVpn" -> "$.definitions.MsgVpn.properties"
+        var propertiesPath = ref.get(0).replace("#", "$").replace("/", ".") + ".properties";
+        Map<String, Map<String, ?>> result = JsonPath.using(conf).parse(jsonDocument).read(propertiesPath);
+        if (Objects.isNull(result)){
+            logger.warn("Unable to find path:{}", propertiesPath);
+        }
+        return result;
+    }
+
+    protected Map<String, ?> getAttributesWithDefaultValueFromJProperties(Map<String, Map<String, ?>> propMap) {
+        Map<String, Object> result = new HashMap<>();
+        propMap.forEach((attr, def)->{
+            if (!def.containsKey("description")) return;
+            String description = (String) def.get("description");
+            var defaultValue = findDefaultValue(description);
+            if (defaultValue.isEmpty()) return;
+
+            String value = defaultValue.get();
+            var type = (String) def.get("type");
+            // remove quote marks at both the begin and the end
+            switch (type) {
+                case "string" -> result.put(attr, value.substring(1, value.length() - 1));
+                case "integer" -> result.put(attr, Integer.parseInt(value));
+                case "boolean" -> result.put(attr, Boolean.parseBoolean(value));
+                default -> logger.error("Unknown type '{}' of property '{}', the default value is {}",
+                        type, attr, value);
+            }
+        });
+
+        return result;
+    }
+
+    protected static Optional<String> findDefaultValue(String description) {
+        var re = Pattern.compile("The default value is `([^`]+)`");
+        var m = re.matcher(description);
+        if (m.find()) {
+            return Optional.of(m.group(1));
+        }else {
+            return Optional.empty();
+        }
     }
 }
