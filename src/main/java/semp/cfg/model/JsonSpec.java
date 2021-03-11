@@ -3,6 +3,7 @@ package semp.cfg.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import semp.cfg.Utils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 
 public class JsonSpec {
     static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
+
     private JsonNode root;
     private List<String> pathsList;
 
@@ -120,17 +122,11 @@ Map:
 
     private String getPatchOrPostDescription(String collectionPath) {
         String objectPath = getObjectPath(collectionPath);
-        var result = getDescription(objectPath, "patch");
-        if (result.equals("")) {
-            result = getDescription(collectionPath, "post");
-        }
-        return result;
-    }
+        var optionalS = Utils.jsonSafeGetValue(
+                root, String.class, "paths", objectPath, "patch", "description");
 
-    private String getDescription(String path, String action) {
-        return Optional.of(root.get("paths").get(path))
-                .map(jsonNode -> jsonNode.get(action))
-                .map(jsonNode -> jsonNode.get("description"))
-                .map(JsonNode::asText).orElse("");
+        return optionalS.orElse(
+                Utils.jsonSafeGetValue(root, String.class, "paths", collectionPath, "post", "description")
+                        .orElse(""));
     }
 }
