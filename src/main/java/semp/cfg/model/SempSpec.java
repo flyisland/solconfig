@@ -24,8 +24,7 @@ public class SempSpec {
     private Map<String, ?> defaultValues;
     private List<String> childrenNames;
 
-    // TODO: rename to stup
-    public static void ofJsonNode(JsonNode root){
+    public static void setup(JsonNode root){
         jsonSpec = JsonSpec.ofJsonNode(root);
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
 

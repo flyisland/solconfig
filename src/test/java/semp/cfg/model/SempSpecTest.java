@@ -2,15 +2,12 @@ package semp.cfg.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,7 +19,7 @@ public class SempSpecTest {
     static void setup() throws IOException {
         jsonNode = objectMapper.readTree(
                 JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
-        SempSpec.ofJsonNode(jsonNode);
+        SempSpec.setup(jsonNode);
     }
 
     @ParameterizedTest

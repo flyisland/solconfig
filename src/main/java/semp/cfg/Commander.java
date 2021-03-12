@@ -22,7 +22,7 @@ public class Commander {
     }
 
     private void setupSempSpec() {
-        SempSpec.ofJsonNode(sempClient.sendWithResourcePath("get", "/spec", null));
+        SempSpec.setup(sempClient.sendWithResourcePath("get", "/spec", null));
     }
 
     public void backup(String resourceType, String[] objectNames){
