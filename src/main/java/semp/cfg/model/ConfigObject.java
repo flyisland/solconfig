@@ -162,4 +162,8 @@ public class ConfigObject {
     public String toString() {
         return toJsonString(0).toString();
     }
+
+    public void generateDeleteCommands() {
+
+    }
 }
