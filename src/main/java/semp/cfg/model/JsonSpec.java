@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class JsonSpec {
     private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final Configuration jsonPathConf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
 
     private JsonNode root;
     private Object jsonDocument;
@@ -110,15 +111,54 @@ Map:
 
  */
     protected Map<String, List<String>> findSpecialAttributes(String collectionPath){
-        var description = getPatchOrPostDescription(collectionPath);
+        // "Required" only exists in POST action
+        var result = findSpecialAttributesFromDescription(
+                getDescriptionOfAction(collectionPath, "post"));
+
+        // "Requires-Disable" only exists in PATCH/PUT action
+        var mPatch = findSpecialAttributesFromDescription(
+                getDescriptionOfAction(getObjectPath(collectionPath), "patch"));
+        // combine two maps
+        mPatch.keySet().forEach(k ->{
+            var source = mPatch.get(k);
+            if (result.containsKey(k)) {
+                var target = result.get(k);
+                source.replaceAll(n ->target.contains(n)? null : n);
+                source.removeIf(Objects::isNull);
+                target.addAll(source);
+            } else {
+                result.put(k, mPatch.get(k));
+            }
+        });
+        sortOutpecialAttributes(collectionPath, result);
+        return result;
+    }
+
+    private void sortOutpecialAttributes(String collectionPath, Map<String, List<String>> input) {
+        var uriIds = generateIdentifiers(getObjectPath(collectionPath));
+        var cloneIds = new LinkedList<>(input.get(AttributeType.IDENTIFYING.toString()));
+        cloneIds.removeAll(uriIds);
+        input.put(AttributeType.PARENT_IDENTIFIERS.toString(), cloneIds);
+
+        // Identifiers must be ordered as same as the uri, like
+        // "/msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns/{remoteMsgVpnName},{remoteMsgVpnLocation},{remoteMsgVpnInterface}"
+        input.put(AttributeType.IDENTIFYING.toString(), uriIds);
+    }
+
+    private HashMap<String, List<String>> findSpecialAttributesFromDescription(String description) {
         var table = description.lines()
                 .map(line -> line.split("\\|", -1))
                 .filter(array -> array.length>=5)
                 .map(Arrays::asList)
                 .collect(Collectors.toList());
 
-        var headers = table.get(0);
         var result = new HashMap<String, List<String>>();
+        if (table.size() == 0) {
+            // return empty Map
+            return result;
+        }
+
+        var headers = table.get(0);
         for (int i = 1; i < headers.size(); i++) { // start from second column
             var attributes = new LinkedList<String>();
             for (int j = 2; j < table.size(); j++) { // start from third row
@@ -131,6 +171,15 @@ Map:
         }
 
         return result;
+    }
+
+    private String getDescriptionOfAction(String path, String action) {
+        var descriptionPath = String.format("$.paths.%s.%s.description",
+                path, action);
+        Optional<String> result = Optional.ofNullable(
+                JsonPath.using(jsonPathConf).parse(jsonDocument).read(descriptionPath));
+        return result.orElse("");
+
     }
 
     private String getPatchOrPostDescription(String collectionPath) {
@@ -149,9 +198,8 @@ Map:
     }
 
     protected Map<String, Map<String, ?>> getDefinitionProperties(String collectionPath){
-        var conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
         var refPath = "$.paths." + collectionPath + ".post.parameters[?(@.name=='body')].schema.$ref";
-        List<String> ref = JsonPath.using(conf).parse(jsonDocument).read(refPath);
+        List<String> ref = JsonPath.using(jsonPathConf).parse(jsonDocument).read(refPath);
         if (Objects.isNull(ref)){
             logger.warn("Unable to find path:{}", refPath);
             return null;
@@ -159,7 +207,7 @@ Map:
 
         // "#/definitions/MsgVpn" -> "$.definitions.MsgVpn.properties"
         var propertiesPath = ref.get(0).replace("#", "$").replace("/", ".") + ".properties";
-        Map<String, Map<String, ?>> result = JsonPath.using(conf).parse(jsonDocument).read(propertiesPath);
+        Map<String, Map<String, ?>> result = JsonPath.using(jsonPathConf).parse(jsonDocument).read(propertiesPath);
         if (Objects.isNull(result)){
             logger.warn("Unable to find path:{}", propertiesPath);
         }

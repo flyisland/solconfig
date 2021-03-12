@@ -86,20 +86,6 @@ public class SempSpec {
         return sempSpecMap.get(specPath);
     }
 
-    public enum AttributeType {
-        DEPRECATED("Deprecated");
-
-        private final String type;
-        AttributeType(String type) {
-            this.type = type;
-        }
-
-        @Override
-        public String toString() {
-            return type;
-        }
-    }
-
     public List<String> getSpecialAttributes(AttributeType type) {
         var result = specialAttributes.get(type.toString());
         if (Objects.nonNull(result)) {

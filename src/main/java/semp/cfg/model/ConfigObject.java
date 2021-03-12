@@ -154,7 +154,7 @@ public class ConfigObject {
     }
 
     public void removeDeprecatedAttributes() {
-        var attributesToRemove = sempSpec.getSpecialAttributes(SempSpec.AttributeType.DEPRECATED);
+        var attributesToRemove = sempSpec.getSpecialAttributes(AttributeType.DEPRECATED);
         attributesToRemove.forEach(attrName -> attributes.remove(attrName));
         children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedAttributes));
     }

@@ -106,6 +106,8 @@ public class JsonSpecTest {
             "/msgVpns, '{\n" +
                     "  \"Read-Only\" : [ \"msgVpnName\" ],\n" +
                     "  \"Requires-Disable\" : [ ],\n" +
+                    "  \"Parent-Identifiers\" : [ ],\n" +
+                    "  \"Required\" : [ \"msgVpnName\" ],\n" +
                     "  \"Deprecated\" : [ \"bridgingTlsServerCertEnforceTrustedCommonNameEnabled\", \"restTlsServerCertEnforceTrustedCommonNameEnabled\" ],\n" +
                     "  \"Opaque\" : [ \"replicationBridgeAuthenticationBasicPassword\", \"replicationBridgeAuthenticationClientCertContent\" ],\n" +
                     "  \"Identifying\" : [ \"msgVpnName\" ],\n" +
@@ -113,41 +115,37 @@ public class JsonSpecTest {
                     "}'",
             "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions, '{\n" +
                     "  \"Read-Only\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
+                    "  \"Parent-Identifiers\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
                     "  \"Required\" : [ \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
                     "  \"Opaque\" : [ ],\n" +
-                    "  \"Identifying\" : [ \"aclProfileName\", \"msgVpnName\", \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
+                    "  \"Identifying\" : [ \"subscribeTopicExceptionSyntax\", \"subscribeTopicException\" ],\n" +
                     "  \"Write-Only\" : [ ]\n" +
                     "}'",
-            "/dmrClusters, '{\n" +
-                    "  \"Read-Only\" : [ \"directOnlyEnabled\", \"dmrClusterName\", \"nodeName\" ],\n" +
-                    "  \"Requires-Disable\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\", \"authenticationClientCertPassword\" ],\n" +
-                    "  \"Deprecated\" : [ \"tlsServerCertEnforceTrustedCommonNameEnabled\" ],\n" +
-                    "  \"Opaque\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\" ],\n" +
-                    "  \"Identifying\" : [ \"dmrClusterName\" ],\n" +
-                    "  \"Write-Only\" : [ \"authenticationBasicPassword\", \"authenticationClientCertContent\", \"authenticationClientCertPassword\" ]\n" +
-                    "}'",
-            "/dmrClusters/{dmrClusterName}/links, '{\n" +
-                    "  \"Read-Only\" : [ \"dmrClusterName\", \"remoteNodeName\" ],\n" +
-                    "  \"Requires-Disable\" : [ \"authenticationBasicPassword\", \"authenticationScheme\", \"egressFlowWindowSize\", \"initiator\", \"span\", \"transportCompressedEnabled\", \"transportTlsEnabled\" ],\n" +
+            "'/msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns', '{\n" +
+                    "  \"Read-Only\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
+                    "  \"Requires-Disable\" : [ \"clientUsername\", \"compressedDataEnabled\", \"egressFlowWindowSize\", \"password\", \"tlsEnabled\" ],\n" +
+                    "  \"Parent-Identifiers\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\" ],\n" +
+                    "  \"Required\" : [ \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
-                    "  \"Opaque\" : [ \"authenticationBasicPassword\" ],\n" +
-                    "  \"Identifying\" : [ \"dmrClusterName\", \"remoteNodeName\" ],\n" +
-                    "  \"Write-Only\" : [ \"authenticationBasicPassword\" ]\n" +
+                    "  \"Opaque\" : [ \"password\" ],\n" +
+                    "  \"Identifying\" : [ \"remoteMsgVpnName\", \"remoteMsgVpnLocation\", \"remoteMsgVpnInterface\" ],\n" +
+                    "  \"Write-Only\" : [ \"password\" ]\n" +
                     "}'"
     })
     void testFindSpecialAttributes(String path, String expected) throws JsonProcessingException {
         var m1 = jsonSpec.findSpecialAttributes(path);
         var m2 = objectMapper.readValue(expected, Map.class);
-        assertEquals(m2, m1);
+        assertEquals(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m2),
+                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m1));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
             "$.paths./msgVpns.post.parameters[?(@.name=='body')].schema.$ref",
-            "$.definitions.MsgVpn.properties"
+            "$.paths./msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}.patch.description"
     })
-    void testGetAttributesWithDefaultValue(String path){
+    void testJsonPath(String path){
         Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
         System.out.println(path + " -> " + JsonPath.using(conf).parse(jsonDocument).read(path));
     }
