@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ConfigObject {
@@ -94,16 +95,6 @@ public class ConfigObject {
     }
 
     /**
-     * Names starting with '#' are reserved. Reserved object can not be created or delete by users.
-     * %23 is the url encoded '#'
-     *
-     * @return if this object is a reserved object.
-     */
-    private boolean isReservedObject() {
-        return getObjectId().startsWith("%23");
-    }
-
-    /**
      *  /msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/publishTopicExceptions/{publishTopicExceptionSyntax},{publishTopicException}
      *  Obj-id must be url encoded and join with "," as above example.
      * @return the obj-id
@@ -118,30 +109,39 @@ public class ConfigObject {
     }
 
     /**
-     * Removes all reserved object in children objects.
+     * Remove all children objects if it meets the filter's test
+     * @param filter  a predicate which returns true for objects to be removed
      */
-    public void removeReservedObjects() {
+    public void removeChildrenObjects(Predicate<ConfigObject> filter) {
         for (Iterator<List<ConfigObject>> iterator = children.values().iterator(); iterator.hasNext(); ) {
             var list =  iterator.next();
-            list.removeIf(ConfigObject::isReservedObject);
+            list.removeIf(filter);
             if (list.isEmpty()) {
                 iterator.remove();
             }
         }
-        children.values().forEach(list -> list.forEach(ConfigObject::removeReservedObjects));
+        children.values().forEach(list -> list.forEach(configObject -> configObject.removeChildrenObjects(filter)));
     }
 
-    public void removeDeprecatedObjects() {
-        for (Iterator<List<ConfigObject>> iterator = children.values().iterator(); iterator.hasNext(); ) {
-            var list =  iterator.next();
-            list.removeIf(configObject -> configObject.sempSpec.isDeprecated());
-            if (list.isEmpty()) {
-                iterator.remove();
-            }
-        }
-        children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedObjects));
+    public boolean isDeprecatedObject() {
+        return sempSpec.isDeprecated();
     }
 
+    /**
+     * Names starting with '#' are reserved. Reserved object can not be created or delete by users.
+     * %23 is the url encoded '#'
+     *
+     * @return if this object is a reserved object.
+     */
+    public boolean isReservedObject() {
+        return getObjectId().startsWith("%23");
+    }
+
+
+    /**
+     * Removes 'type' of attributes of all objects
+     * @param type of attributes to remove
+     */
     public void removeAttributes(AttributeType type) {
         var attributesToRemove = sempSpec.getSpecialAttributes(type);
         attributesToRemove.forEach(attrName -> attributes.remove(attrName));

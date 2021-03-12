@@ -25,8 +25,8 @@ public class Commander {
 
     public void backup(String resourceType, String[] objectNames){
         ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
-        configBroker.removeReservedObjects();
-        configBroker.removeDeprecatedObjects();
+        configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
+        configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
         configBroker.removeAttributes(AttributeType.DEPRECATED);
         configBroker.removeAttributesWithDefaultValue();
