@@ -87,9 +87,17 @@ public class Commander {
 
     public void restore(File confFile) {
         var confMap = SempClient.mapFromJsonFile(confFile);
-
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.fromMap(confMap);
-        Utils.log(configBroker.toString());
+
+        var commandList = new RestCommandList();
+        configBroker.getChildren().values().forEach(
+                list -> list.forEach(
+                        configObject -> configObject.generatRestoreCommands(commandList, "")));
+        if (curlOnly) {
+            System.err.println(commandList);
+        } else {
+            commandList.exectue(sempClient);
+        }
     }
 }

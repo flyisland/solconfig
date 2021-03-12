@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import semp.cfg.RestCommandList;
+import semp.cfg.Utils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -56,43 +57,71 @@ public class ConfigObject {
     }
 
     private static final String TAB_SPACE=" ".repeat(2);
-    private StringBuilder toJsonString(int level) throws JsonProcessingException {
+    private StringBuilder toJsonString() {
+        return toJsonString(0, false);
+    }
+
+    private String toJsonStringAttributeOnly(){
+        return toJsonString(0, true).toString();
+    }
+
+    private StringBuilder toJsonString(int level, boolean attributeOnly){
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%s{%n", TAB_SPACE.repeat(level)));
-        sb.append(attributesToJsonString(level+1));
-        sb.append(childrenToJsonString(level+1));
+        sb.append(attributesToJsonString(level+1, attributeOnly));
+        if (!attributeOnly) {
+            sb.append(childrenToJsonString(level+1));
+        }
         sb.append(String.format("%s}", TAB_SPACE.repeat(level)));
         return sb;
     }
 
-    private StringBuilder attributesToJsonString(int level) throws JsonProcessingException {
+    private StringBuilder attributesToJsonString(int level, boolean attributeOnly) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String > names = attributes.navigableKeySet().iterator();
-        while (names.hasNext()){
+        Iterator<String> names = attributes.navigableKeySet().iterator();
+        while (names.hasNext()) {
             String name = names.next();
-            sb.append(String.format(
-                    "%s%s: %s%s%n",
-                    TAB_SPACE.repeat(level),
-                    mapper.writeValueAsString(name),
-                    mapper.writeValueAsString(attributes.get(name)),
-                    names.hasNext() || hasChildren() ?",":""
-            ));
+            try {
+                sb.append(String.format(
+                        "%s%s: %s",
+                        TAB_SPACE.repeat(level),
+                        mapper.writeValueAsString(name),
+                        mapper.writeValueAsString(attributes.get(name))));
+            } catch (JsonProcessingException e) {
+                Utils.log(String.format("Unable to convert %s: %s to JSON format.%n",
+                        name, attributes.get(name)));
+                e.printStackTrace();
+                System.exit(1);
+            }
+            if (names.hasNext()) {
+                sb.append(",");
+            } else if (!attributeOnly && hasChildren()) {
+                sb.append(",");
+            }
+            sb.append("\n");
         }
         return sb;
     }
 
-    private StringBuilder childrenToJsonString(int level) throws JsonProcessingException {
+
+    private StringBuilder childrenToJsonString(int level) {
         StringBuilder sb = new StringBuilder();
-        Iterator<String > names = children.navigableKeySet().iterator();
-        while (names.hasNext()){
+        Iterator<String> names = children.navigableKeySet().iterator();
+        while (names.hasNext()) {
             String name = names.next();
-            sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), mapper.writeValueAsString(name)));
-            Iterator<ConfigObject> list = children.get(name).iterator();
-            while (list.hasNext()){
-                sb.append(list.next().toJsonString(level + 1));
-                sb.append(String.format("%s%n", list.hasNext()?",":""));
+            try {
+                sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), mapper.writeValueAsString(name)));
+            } catch (JsonProcessingException e) {
+                Utils.log(String.format("Unable to convert %s to JSON format.%n", name));
+                e.printStackTrace();
+                System.exit(1);
             }
-            sb.append(String.format("%s]%s%n", TAB_SPACE.repeat(level), names.hasNext()?",":""));
+            Iterator<ConfigObject> list = children.get(name).iterator();
+            while (list.hasNext()) {
+                sb.append(list.next().toJsonString(level + 1, false));
+                sb.append(String.format("%s%n", list.hasNext() ? "," : ""));
+            }
+            sb.append(String.format("%s]%s%n", TAB_SPACE.repeat(level), names.hasNext() ? "," : ""));
         }
         return sb;
     }
@@ -108,7 +137,6 @@ public class ConfigObject {
                 .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                 .collect(Collectors.toList());
         return String.join(",", idList);
-
     }
 
     /**
@@ -163,7 +191,7 @@ public class ConfigObject {
     @SneakyThrows
     @Override
     public String toString() {
-        return toJsonString(0).toString();
+        return toJsonString().toString();
     }
 
     public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
@@ -190,5 +218,22 @@ public class ConfigObject {
                 attributes.put(key, value);
             }
         });
+    }
+
+    public void generatRestoreCommands(RestCommandList commandList, String parentPath) {
+        var collectionPath = parentPath + "/" + collectionName;
+        var objectPath = collectionPath + "/" + getObjectId();
+        var payload = toJsonStringAttributeOnly();
+
+        if (isDefaultObject()) {
+            commandList.append(HTTPMethod.PATCH, objectPath, payload);
+        } else {
+            commandList.append(HTTPMethod.POST, collectionPath, payload);
+        }
+
+        children.values().forEach(
+                list -> list.forEach(
+                        configObject -> configObject.generateDeleteCommands(commandList, objectPath)));
+
     }
 }
