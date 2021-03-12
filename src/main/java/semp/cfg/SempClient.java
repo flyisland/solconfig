@@ -76,8 +76,11 @@ public class SempClient {
     }
 
     private JsonNode sendWithAbsoluteURI(String method, String absUri, String payload) {
+        var bp = Objects.isNull(payload) || payload.isEmpty() ?
+                BodyPublishers.noBody() :
+                BodyPublishers.ofString(payload);
         HttpRequest request = HttpRequest.newBuilder()
-                .method(method.toUpperCase(), Objects.isNull(payload)? BodyPublishers.noBody() : BodyPublishers.ofString(payload))
+                .method(method.toUpperCase(), bp)
                 .uri(URI.create(absUri))
                 .header("content-type", "application/json")
                 .build();
