@@ -142,16 +142,10 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedObjects));
     }
 
-    public void removeParentIdentifiers() {
-        var attributesToRemove = sempSpec.getSpecialAttributes(AttributeType.PARENT_IDENTIFIERS);
+    public void removeAttributes(AttributeType type) {
+        var attributesToRemove = sempSpec.getSpecialAttributes(type);
         attributesToRemove.forEach(attrName -> attributes.remove(attrName));
-        children.values().forEach(list -> list.forEach(ConfigObject::removeParentIdentifiers));
-    }
-
-    public void removeDeprecatedAttributes() {
-        var attributesToRemove = sempSpec.getSpecialAttributes(AttributeType.DEPRECATED);
-        attributesToRemove.forEach(attrName -> attributes.remove(attrName));
-        children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedAttributes));
+        children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(type)));
     }
 
     public void removeAttributesWithDefaultValue() {

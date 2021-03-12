@@ -1,10 +1,7 @@
 package semp.cfg;
 
 import lombok.Setter;
-import semp.cfg.model.ConfigBroker;
-import semp.cfg.model.ConfigObject;
-import semp.cfg.model.SempResponse;
-import semp.cfg.model.SempSpec;
+import semp.cfg.model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,8 +36,8 @@ public class Commander {
         getChildrenRecursively(configBroker, childrenLinks);
         configBroker.removeReservedObjects();
         configBroker.removeDeprecatedObjects();
-        configBroker.removeParentIdentifiers();
-        configBroker.removeDeprecatedAttributes();
+        configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
+        configBroker.removeAttributes(AttributeType.DEPRECATED);
         configBroker.removeAttributesWithDefaultValue();
         System.out.println(configBroker.toString());
     }
