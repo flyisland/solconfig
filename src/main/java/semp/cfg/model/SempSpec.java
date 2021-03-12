@@ -12,6 +12,8 @@ public class SempSpec {
 
     private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
+    @Getter
+    private static SempVersion sempVersion;
 
     private String specPath;
     @Getter
@@ -26,6 +28,7 @@ public class SempSpec {
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
 
         sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
+        sempVersion = new SempVersion(jsonSpec.getSempVersionText());
     }
 
     private static SempSpec brokerSpec() {

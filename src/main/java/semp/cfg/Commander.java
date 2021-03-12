@@ -24,7 +24,7 @@ public class Commander {
 
     public void backup(String resourceType, String[] objectNames){
         ConfigBroker configBroker = new ConfigBroker();
-        configBroker.setSempVersion(sempClient.getSempVersion());
+        configBroker.setSempVersion(SempSpec.getSempVersion());
 
         Map<String, String> childrenLinks = Arrays.stream(objectNames)
                 .map(objectName -> Map.entry(objectName,

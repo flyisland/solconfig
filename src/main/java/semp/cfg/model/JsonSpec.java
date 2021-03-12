@@ -253,4 +253,11 @@ Map:
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
+
+    protected String getSempVersionText() {
+        Optional<String> result = Optional.ofNullable(
+                JsonPath.using(jsonPathConf).parse(jsonDocument).read("$.info.version"));
+        return result.orElse("");
+
+    }
 }

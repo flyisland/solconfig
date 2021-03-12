@@ -44,11 +44,6 @@ public class SempClient {
                 .build();
     }
 
-    public SempVersion getSempVersion(){
-        JsonNode node = sendWithResourcePath("GET", "/about/api", null);
-        return new SempVersion(node.get("data").get("sempVersion").asText());
-    }
-
     public Optional<SempResponse> getCollectionWithAbsoluteUri(String absUri){
         Optional<SempResponse> result = Optional.empty();
         try {
