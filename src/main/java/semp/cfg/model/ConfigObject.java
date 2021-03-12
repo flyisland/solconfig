@@ -142,15 +142,10 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedObjects));
     }
 
-    /**
-     *
-     */
-    public void removeParentIdentifiers(List<String> parentIdentifiers) {
-        parentIdentifiers.forEach(id -> attributes.remove(id));
-
-        var cloneList = new LinkedList<>(parentIdentifiers);
-        cloneList.addAll(sempSpec.getIdentifiers());
-        children.values().forEach(list -> list.forEach(c->c.removeParentIdentifiers(cloneList)));
+    public void removeParentIdentifiers() {
+        var attributesToRemove = sempSpec.getSpecialAttributes(AttributeType.PARENT_IDENTIFIERS);
+        attributesToRemove.forEach(attrName -> attributes.remove(attrName));
+        children.values().forEach(list -> list.forEach(ConfigObject::removeParentIdentifiers));
     }
 
     public void removeDeprecatedAttributes() {

@@ -39,7 +39,7 @@ public class Commander {
         getChildrenRecursively(configBroker, childrenLinks);
         configBroker.removeReservedObjects();
         configBroker.removeDeprecatedObjects();
-        configBroker.removeParentIdentifiers(new LinkedList<>());
+        configBroker.removeParentIdentifiers();
         configBroker.removeDeprecatedAttributes();
         configBroker.removeAttributesWithDefaultValue();
         System.out.println(configBroker.toString());
