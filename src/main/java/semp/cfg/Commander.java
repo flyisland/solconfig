@@ -3,6 +3,7 @@ package semp.cfg;
 import lombok.Setter;
 import semp.cfg.model.*;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,10 @@ public class Commander {
         } else {
             commandList.exectue(sempClient);
         }
+    }
+
+    public void restore(File confFile) {
+        System.err.println(confFile);
     }
 
     private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {
