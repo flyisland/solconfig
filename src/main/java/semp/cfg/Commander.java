@@ -42,6 +42,9 @@ public class Commander {
         System.out.println(configBroker.toString());
     }
 
+    public void delete(String resourceType, String[] objectNames) {
+    }
+
     private void getChildrenRecursively(ConfigObject configObject, Map<String, String> childrenLinks){
         childrenLinks.entrySet().stream()
             .filter(e -> !e.getKey().equals("uri"))

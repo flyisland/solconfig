@@ -14,7 +14,10 @@ import java.util.concurrent.Callable;
         description = "Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol. " +
                 "Use the 'backup' command to export the configuration of objects on a PS+  Broker into a single JSON, " +
                 "then use the 'create' or 'sync' command to restore the configuration.",
-        subcommands = {BackupCommand.class, CommandLine.HelpCommand.class
+        subcommands = {
+            BackupCommand.class,
+            DeleteCommand.class,
+            CommandLine.HelpCommand.class
         },
         showDefaultValues = true)
 public class SempCfgCommand implements Callable<Integer> {

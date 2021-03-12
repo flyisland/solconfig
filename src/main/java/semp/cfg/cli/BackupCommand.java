@@ -8,10 +8,6 @@ import java.util.*;
 
 @CommandLine.Command(name = "backup", description = "Export the whole configuration of objects into a single JSON")
 public class BackupCommand extends SubCommand {
-    static class ResourceTypeCandidates extends HashSet<String> {
-        ResourceTypeCandidates() {
-            super(SempSpec.TOP_RESOURCES.keySet()); }
-    }
     @CommandLine.Parameters(index = "0", completionCandidates = ResourceTypeCandidates.class,
             description = "Type of the exported object [${COMPLETION-CANDIDATES}]")
     private String resourceType;
