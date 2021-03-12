@@ -51,7 +51,8 @@ public class Commander {
     }
 
     public void restore(File confFile) {
-        System.err.println(confFile);
+        var confMap = SempClient.mapFromJsonFile(confFile);
+        Utils.log(confMap.toString());
     }
 
     private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {

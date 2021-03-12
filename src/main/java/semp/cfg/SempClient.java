@@ -3,10 +3,9 @@ package semp.cfg;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import semp.cfg.model.SempResponse;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
@@ -16,13 +15,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class SempClient {
-    private static final Logger logger = LoggerFactory.getLogger(SempClient.class);
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -89,8 +84,8 @@ public class SempClient {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             node = objectMapper.readTree(response.body());
         } catch (InterruptedException|IOException e) {
-            logger.error("{} on [{}] with playload:\n{}\n{}", method.toUpperCase(), absUri,
-                    payload, e.toString());
+            Utils.log(String.format("%s %s with playload:%n%s%n%s",
+                    method.toUpperCase(), absUri, payload, e.toString()));
             System.exit(1);
         }
         return node;
@@ -98,4 +93,15 @@ public class SempClient {
     public JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
+
+    public static Map<String, Object> mapFromJsonFile(File confFile) {
+        try {
+            return (Map<String, Object>)objectMapper.readValue(confFile, Map.class);
+        } catch (IOException e) {
+            Utils.log(String.format("File %s is not a valid configuration json file!%n%s",
+                    confFile.getAbsolutePath(), e.toString()));
+        }
+        return new HashMap<>();
+    }
+
 }

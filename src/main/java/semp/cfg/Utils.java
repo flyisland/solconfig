@@ -44,4 +44,8 @@ public class Utils {
             return Optional.empty();
         }
     }
+
+    public static void log(String text) {
+        System.err.println(text);
+    }
 }
