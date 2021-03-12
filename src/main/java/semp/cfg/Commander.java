@@ -50,11 +50,6 @@ public class Commander {
         }
     }
 
-    public void restore(File confFile) {
-        var confMap = SempClient.mapFromJsonFile(confFile);
-        Utils.log(confMap.toString());
-    }
-
     private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
@@ -88,5 +83,13 @@ public class Commander {
                     getChildrenRecursively(child, links.get(i));
                 }
             });
+    }
+
+    public void restore(File confFile) {
+        var confMap = SempClient.mapFromJsonFile(confFile);
+
+        ConfigBroker configBroker = new ConfigBroker();
+        configBroker.fromMap(confMap);
+        Utils.log(configBroker.toString());
     }
 }

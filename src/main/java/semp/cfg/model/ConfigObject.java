@@ -175,4 +175,20 @@ public class ConfigObject {
 
         commandList.append(HTTPMethod.DELETE, objectPath, null);
     }
+
+    public void fromMap(Map<String, Object> input) {
+        var childrenNames = sempSpec.getChildrenNames();
+        input.forEach((key, value)->{
+            if (childrenNames.contains(key)) {
+                var childrenList = (List<Map<String, Object>>) value;
+                childrenList.forEach( childMap -> {
+                    var child = new ConfigObject(key);
+                    addChild(child);
+                    child.fromMap(childMap);
+                });
+            } else {
+                attributes.put(key, value);
+            }
+        });
+    }
 }

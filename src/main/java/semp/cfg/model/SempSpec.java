@@ -23,6 +23,7 @@ public class SempSpec {
     private Map<String, List<String>> specialAttributes;
     @Getter
     private Map<String, Object> defaultValues;
+    @Getter
     private List<String> childrenNames;
 
     public static void setup(JsonNode root){
@@ -38,6 +39,7 @@ public class SempSpec {
         spec.specPath = BROKER_SPEC_PATH;
         spec.specialAttributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
+        spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
         return spec;
     }
 
