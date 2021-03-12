@@ -1,6 +1,7 @@
 package semp.cfg;
 
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import semp.cfg.model.*;
 
 import java.util.*;
@@ -23,6 +24,19 @@ public class Commander {
     }
 
     public void backup(String resourceType, String[] objectNames){
+        ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
+        configBroker.removeReservedObjects();
+        configBroker.removeDeprecatedObjects();
+        configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
+        configBroker.removeAttributes(AttributeType.DEPRECATED);
+        configBroker.removeAttributesWithDefaultValue();
+        System.out.println(configBroker.toString());
+    }
+
+    public void delete(String resourceType, String[] objectNames) {
+    }
+
+    private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
 
@@ -34,15 +48,7 @@ public class Commander {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         getChildrenRecursively(configBroker, childrenLinks);
-        configBroker.removeReservedObjects();
-        configBroker.removeDeprecatedObjects();
-        configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
-        configBroker.removeAttributes(AttributeType.DEPRECATED);
-        configBroker.removeAttributesWithDefaultValue();
-        System.out.println(configBroker.toString());
-    }
-
-    public void delete(String resourceType, String[] objectNames) {
+        return configBroker;
     }
 
     private void getChildrenRecursively(ConfigObject configObject, Map<String, String> childrenLinks){
