@@ -192,7 +192,7 @@ Map:
                         .orElse(""));
     }
 
-    protected Map<String, ?> getMapOfAttributesWithDefaultValue(String collectionPath) {
+    protected Map<String, Object> getMapOfAttributesWithDefaultValue(String collectionPath) {
         var propMap = getDefinitionProperties(collectionPath);
         return getAttributesWithDefaultValueFromJProperties(propMap);
     }
@@ -214,7 +214,7 @@ Map:
         return result;
     }
 
-    protected Map<String, ?> getAttributesWithDefaultValueFromJProperties(Map<String, Map<String, ?>> propMap) {
+    protected Map<String, Object> getAttributesWithDefaultValueFromJProperties(Map<String, Map<String, ?>> propMap) {
         Map<String, Object> result = new HashMap<>();
         propMap.forEach((attr, def)->{
             if (!def.containsKey("description")) return;

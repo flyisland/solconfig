@@ -18,7 +18,7 @@ public class SempSpec {
     private boolean deprecated;
     private Map<String, List<String>> specialAttributes;
     @Getter
-    private Map<String, ?> defaultValues;
+    private Map<String, Object> defaultValues;
     private List<String> childrenNames;
 
     public static void setup(JsonNode root){
