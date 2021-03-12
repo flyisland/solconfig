@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import semp.cfg.RestCommandList;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

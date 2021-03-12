@@ -1,7 +1,8 @@
-package semp.cfg.model;
+package semp.cfg;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import semp.cfg.SempClient;
+import semp.cfg.model.HTTPMethod;
+import semp.cfg.model.SempResponse;
 
 import java.util.Iterator;
 import java.util.LinkedList;
