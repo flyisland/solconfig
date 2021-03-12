@@ -5,12 +5,14 @@ import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class SempSpec {
     static final Logger logger = LoggerFactory.getLogger(SempSpec.class);
+    public static final String BROKER_SPEC_PATH = "";
     static public final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
     static public final String SEMP_VERSION = "sempVersion";
 
@@ -28,6 +30,15 @@ public class SempSpec {
     public static void ofJsonNode(JsonNode root){
         jsonSpec = JsonSpec.ofJsonNode(root);
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
+
+        sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
+    }
+
+    private static SempSpec brokerSpec() {
+        var spec = new SempSpec();
+        spec.specPath = BROKER_SPEC_PATH;
+        spec.identifiers = new LinkedList<>();
+        return spec;
     }
 
     private static void buildSempSpec(String parentObjectPath, String collectionName){

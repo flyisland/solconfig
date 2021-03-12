@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 public class ConfigObject {
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
-    private String specPath;
     private final TreeMap<String, List<ConfigObject>> children;
+    private String specPath;
     private SempSpec sempSpec;
 
     static private final ObjectMapper mapper = new ObjectMapper();
@@ -24,7 +24,6 @@ public class ConfigObject {
 
     private ConfigObject(String collectionName){
         this.collectionName = collectionName;
-        specPath = "";
         attributes = new TreeMap<>();
         children = new TreeMap<>();
     }
@@ -40,7 +39,7 @@ public class ConfigObject {
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
     }
 
-    private void setSpecPath(String path) {
+    protected void setSpecPath(String path) {
         this.specPath = path;
         this.sempSpec = SempSpec.get(specPath);
     }
@@ -130,6 +129,17 @@ public class ConfigObject {
             }
         }
         children.values().forEach(list -> list.forEach(ConfigObject::removeReservedObjects));
+    }
+
+    /**
+     *
+     */
+    public void removeParentIdentifiers(List<String> parentIdentifiers) {
+        parentIdentifiers.forEach(id -> attributes.remove(id));
+
+        var cloneList = new LinkedList<>(parentIdentifiers);
+        cloneList.addAll(sempSpec.getIdentifiers());
+        children.values().forEach(list -> list.forEach(c->c.removeParentIdentifiers(cloneList)));
     }
 
     @SneakyThrows
