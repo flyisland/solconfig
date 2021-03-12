@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import semp.cfg.model.SempResponse;
-import semp.cfg.model.SempVersion;
 
 import java.io.IOException;
 import java.net.Authenticator;
