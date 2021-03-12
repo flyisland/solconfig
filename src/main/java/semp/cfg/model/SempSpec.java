@@ -16,8 +16,6 @@ public class SempSpec {
     private String specPath;
     @Getter
     private boolean deprecated;
-    @Getter
-    private List<String> identifiers;
     private Map<String, List<String>> specialAttributes;
     @Getter
     private Map<String, ?> defaultValues;
@@ -33,7 +31,6 @@ public class SempSpec {
     private static SempSpec brokerSpec() {
         var spec = new SempSpec();
         spec.specPath = BROKER_SPEC_PATH;
-        spec.identifiers = new LinkedList<>();
         spec.specialAttributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
         return spec;
@@ -55,7 +52,6 @@ public class SempSpec {
 
         spec.specPath = generateSpecPath(collectionPath);
         spec.deprecated = jsonSpec.isDeprecatedCollection(collectionPath);
-        spec.identifiers = JsonSpec.generateIdentifiers(objectPath);
         spec.specialAttributes = jsonSpec.findSpecialAttributes(collectionPath);
         spec.defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
         spec.childrenNames = jsonSpec.getChildrenNames(objectPath);
@@ -74,7 +70,8 @@ public class SempSpec {
 
     public static String getTopResourceIdentifierKey(String resourceName) {
         if (TOP_RESOURCES.containsValue(resourceName)){
-            return sempSpecMap.get("/"+resourceName).identifiers.get(0);
+            return sempSpecMap.get("/"+resourceName).
+                    getSpecialAttributes(AttributeType.IDENTIFYING).get(0);
         }else{
             throw new IllegalArgumentException(
                     String.format("%s is NOT one of [%s]!",

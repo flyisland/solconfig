@@ -109,7 +109,7 @@ public class ConfigObject {
      * @return the obj-id
      */
     private String getObjectId() {
-        var idList = sempSpec.getIdentifiers().stream()
+        var idList = sempSpec.getSpecialAttributes(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
                 .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                 .collect(Collectors.toList());
