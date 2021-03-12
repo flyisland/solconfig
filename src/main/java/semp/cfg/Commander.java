@@ -34,6 +34,20 @@ public class Commander {
     }
 
     public void delete(String resourceType, String[] objectNames) {
+        ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
+        configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
+        configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
+        configBroker.removeChildrenObjects(ConfigObject::isDefaultObject);
+
+        var commandList = new RestCommandList();
+        configBroker.getChildren().values().forEach(
+                list -> list.forEach(
+                        configObject -> configObject.generateDeleteCommands(commandList, "")));
+        if (curlOnly) {
+            System.err.println(commandList);
+        } else {
+            commandList.exectue(sempClient);
+        }
     }
 
     private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {

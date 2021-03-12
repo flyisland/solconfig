@@ -95,7 +95,7 @@ public class SempClient {
         }
         return node;
     }
-    protected JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
+    public JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
 }

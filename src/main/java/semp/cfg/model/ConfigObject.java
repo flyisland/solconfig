@@ -2,6 +2,7 @@ package semp.cfg.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.net.URLEncoder;
@@ -15,6 +16,7 @@ public class ConfigObject {
 
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
+    @Getter
     private final TreeMap<String, List<ConfigObject>> children;
     private String specPath;
     private SempSpec sempSpec;
@@ -163,7 +165,13 @@ public class ConfigObject {
         return toJsonString(0).toString();
     }
 
-    public void generateDeleteCommands() {
+    public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
+        var objectPath = String.format("%s/%s/%s",
+                parentPath, collectionName, getObjectId());
+        children.values().forEach(
+                list -> list.forEach(
+                        configObject -> configObject.generateDeleteCommands(commandList, objectPath)));
 
+        commandList.append(HTTPMethod.DELETE, objectPath, null);
     }
 }
