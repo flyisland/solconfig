@@ -159,6 +159,11 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedAttributes));
     }
 
+    public void removeAttributesWithDefaultValue() {
+        attributes.entrySet().removeAll(sempSpec.getDefaultValues().entrySet());
+        children.values().forEach(list -> list.forEach(ConfigObject::removeAttributesWithDefaultValue));
+    }
+
     @SneakyThrows
     @Override
     public String toString() {

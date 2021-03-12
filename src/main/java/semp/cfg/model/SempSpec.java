@@ -19,6 +19,7 @@ public class SempSpec {
     @Getter
     private List<String> identifiers;
     private Map<String, List<String>> specialAttributes;
+    @Getter
     private Map<String, ?> defaultValues;
     private List<String> childrenNames;
 
@@ -34,6 +35,7 @@ public class SempSpec {
         spec.specPath = BROKER_SPEC_PATH;
         spec.identifiers = new LinkedList<>();
         spec.specialAttributes = new HashMap<>();
+        spec.defaultValues = new HashMap<>();
         return spec;
     }
 
