@@ -9,6 +9,8 @@ public class SempSpec {
     public static  final String BROKER_SPEC_PATH = "";
     public static final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
     public static final String SEMP_VERSION = "sempVersion";
+    public static final String DEFAULT_OBJECT_NAME = "default";
+    public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
 
     private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();

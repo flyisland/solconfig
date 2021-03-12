@@ -137,6 +137,10 @@ public class ConfigObject {
         return getObjectId().startsWith("%23");
     }
 
+    public boolean isDefaultObject() {
+        return getObjectId().equals(SempSpec.DEFAULT_OBJECT_NAME) &&
+                SempSpec.SPEC_PATHS_OF_DEFAULT_OBJECT.contains(specPath);
+    }
 
     /**
      * Removes 'type' of attributes of all objects
