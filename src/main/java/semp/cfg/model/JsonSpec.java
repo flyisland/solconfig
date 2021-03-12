@@ -113,11 +113,11 @@ Map:
     protected Map<String, List<String>> findSpecialAttributes(String collectionPath){
         // "Required" only exists in POST action
         var result = findSpecialAttributesFromDescription(
-                getDescriptionOfAction(collectionPath, "post"));
+                getDescriptionOfAction(collectionPath, HTTPMethod.POST));
 
         // "Requires-Disable" only exists in PATCH/PUT action
         var mPatch = findSpecialAttributesFromDescription(
-                getDescriptionOfAction(getObjectPath(collectionPath), "patch"));
+                getDescriptionOfAction(getObjectPath(collectionPath), HTTPMethod.PATCH));
         // combine two maps
         mPatch.keySet().forEach(k ->{
             var source = mPatch.get(k);
@@ -173,9 +173,9 @@ Map:
         return result;
     }
 
-    private String getDescriptionOfAction(String path, String action) {
+    private String getDescriptionOfAction(String path, HTTPMethod method) {
         var descriptionPath = String.format("$.paths.%s.%s.description",
-                path, action);
+                path, method.toSEMPMethod());
         Optional<String> result = Optional.ofNullable(
                 JsonPath.using(jsonPathConf).parse(jsonDocument).read(descriptionPath));
         return result.orElse("");
