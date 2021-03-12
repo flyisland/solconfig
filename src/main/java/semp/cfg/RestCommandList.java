@@ -2,6 +2,7 @@ package semp.cfg;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import semp.cfg.model.HTTPMethod;
+import semp.cfg.model.SEMPError;
 import semp.cfg.model.SempResponse;
 
 import java.util.Iterator;
@@ -46,12 +47,17 @@ public class RestCommandList {
             var cmd = iterator.next();
             try {
                 var resp = SempResponse.ofJsonNode(sempClient.sendWithResourcePath(cmd.method.name(), cmd.resourcePath, cmd.payload));
-                System.err.printf("%s %s %d%n",
-                        cmd.method.name(), cmd.resourcePath, resp.getMeta().getResponseCode());
-                if (resp.getMeta().getResponseCode() != 200) {
-                    System.err.println(resp.getMeta());
-                } else {
+                System.err.printf("%s %s ", cmd.method.name(), cmd.resourcePath);
+                if (resp.getMeta().getResponseCode() == 200) {
+                    System.err.println("OK");
                     iterator.remove();
+                } else if (cmd.method == HTTPMethod.DELETE &&
+                        resp.getMeta().getError().getCode() == SEMPError.NOT_ALLOWED.getValue()) {
+                    System.err.printf("%s, retry later%n", SEMPError.NOT_ALLOWED);
+                } else {
+                    System.err.println();
+                    System.err.println(resp.getMeta());
+                    System.exit(1);
                 }
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
