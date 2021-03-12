@@ -46,17 +46,16 @@ public class RestCommandList {
         for (Iterator<Command> iterator = commands.iterator(); iterator.hasNext(); ) {
             var cmd = iterator.next();
             try {
+                Utils.err("%s %s ", cmd.method.name(), cmd.resourcePath);
                 var resp = SempResponse.ofJsonNode(sempClient.sendWithResourcePath(cmd.method.name(), cmd.resourcePath, cmd.payload));
-                System.err.printf("%s %s ", cmd.method.name(), cmd.resourcePath);
                 if (resp.getMeta().getResponseCode() == 200) {
-                    System.err.println("OK");
+                    Utils.err("OK%n");
                     iterator.remove();
                 } else if (cmd.method == HTTPMethod.DELETE &&
                         resp.getMeta().getError().getCode() == SEMPError.NOT_ALLOWED.getValue()) {
-                    System.err.printf("%s, retry later%n", SEMPError.NOT_ALLOWED);
+                    Utils.err("%s, retry later%n", SEMPError.NOT_ALLOWED);
                 } else {
-                    System.err.println();
-                    System.err.println(resp.getMeta());
+                    Utils.err("%n%s%n", resp.getMeta().toString());
                     System.exit(1);
                 }
             } catch (JsonProcessingException e) {

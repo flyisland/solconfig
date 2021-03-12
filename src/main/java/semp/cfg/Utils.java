@@ -48,4 +48,8 @@ public class Utils {
     public static void log(String text) {
         System.err.println(text);
     }
+
+    public static void err(String format, Object... args) {
+        System.err.printf(format, args);
+    }
 }
