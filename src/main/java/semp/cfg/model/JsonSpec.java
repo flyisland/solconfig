@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JsonSpec {
-    static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
-
+    private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private JsonNode root;
     private Object jsonDocument;
     private List<String> pathsList;

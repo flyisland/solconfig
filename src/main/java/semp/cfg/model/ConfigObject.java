@@ -10,13 +10,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConfigObject {
+    private static final ObjectMapper mapper = new ObjectMapper();
+
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
     private final TreeMap<String, List<ConfigObject>> children;
     private String specPath;
     private SempSpec sempSpec;
-
-    static private final ObjectMapper mapper = new ObjectMapper();
 
     public ConfigObject(){
         this(null);

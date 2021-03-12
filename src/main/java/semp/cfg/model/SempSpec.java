@@ -2,8 +2,6 @@ package semp.cfg.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,12 +9,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class SempSpec {
-    static final Logger logger = LoggerFactory.getLogger(SempSpec.class);
-    public static final String BROKER_SPEC_PATH = "";
-    static public final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
-    static public final String SEMP_VERSION = "sempVersion";
+    public static  final String BROKER_SPEC_PATH = "";
+    public static final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
+    public static final String SEMP_VERSION = "sempVersion";
 
-    static private JsonSpec jsonSpec;
+    private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
 
     private String specPath;
@@ -27,6 +24,7 @@ public class SempSpec {
     private Map<String, ?> defaultValues;
     private List<String> childrenNames;
 
+    // TODO: rename to stup
     public static void ofJsonNode(JsonNode root){
         jsonSpec = JsonSpec.ofJsonNode(root);
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));

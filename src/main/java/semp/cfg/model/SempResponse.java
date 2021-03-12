@@ -11,10 +11,11 @@ import java.util.*;
 @Getter
 @Setter
 public class SempResponse {
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
     private List<Map<String, Object>> data;
     private List<Map<String, String >> links;
     private SempMeta meta;
-    static private ObjectMapper objectMapper = new ObjectMapper();
 
     public static SempResponse ofString(String content) throws JsonProcessingException {
         JsonNode node = objectMapper.readTree(content);

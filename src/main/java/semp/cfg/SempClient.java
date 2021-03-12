@@ -23,11 +23,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class SempClient {
-    static final Logger logger = LoggerFactory.getLogger(SempClient.class);
-    private static final String CONFIG_BASE_PATH ="/SEMP/v2/config";
+    private static final Logger logger = LoggerFactory.getLogger(SempClient.class);
+    private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final String baseUrl;
     private final HttpClient httpClient;
-    private static ObjectMapper objectMapper = new ObjectMapper();
 
     public SempClient(String adminUrl, String adminUser, String adminPwd) {
         this.baseUrl = adminUrl+ CONFIG_BASE_PATH;

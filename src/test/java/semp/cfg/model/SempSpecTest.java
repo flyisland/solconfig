@@ -15,8 +15,8 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SempSpecTest {
-    static private final ObjectMapper objectMapper = new ObjectMapper();
-    static private JsonNode jsonNode;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static JsonNode jsonNode;
 
     @BeforeAll
     static void setup() throws IOException {

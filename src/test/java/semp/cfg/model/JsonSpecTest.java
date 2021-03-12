@@ -24,10 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class JsonSpecTest {
-    static private final ObjectMapper objectMapper = new ObjectMapper();
-    static private JsonSpec jsonSpec;
-
-    static Object jsonDocument;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static JsonSpec jsonSpec;
+    private static Object jsonDocument;
 
     @BeforeAll
     static void setup() throws IOException {
