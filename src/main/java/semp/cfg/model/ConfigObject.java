@@ -153,6 +153,12 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(c->c.removeParentIdentifiers(cloneList)));
     }
 
+    public void removeDeprecatedAttributes() {
+        var attributesToRemove = sempSpec.getSpecialAttributes(SempSpec.AttributeType.DEPRECATED);
+        attributesToRemove.forEach(attrName -> attributes.remove(attrName));
+        children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedAttributes));
+    }
+
     @SneakyThrows
     @Override
     public String toString() {

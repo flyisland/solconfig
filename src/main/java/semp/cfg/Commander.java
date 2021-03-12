@@ -40,6 +40,7 @@ public class Commander {
         configBroker.removeReservedObjects();
         configBroker.removeDeprecatedObjects();
         configBroker.removeParentIdentifiers(new LinkedList<>());
+        configBroker.removeDeprecatedAttributes();
         System.out.println(configBroker.toString());
     }
 

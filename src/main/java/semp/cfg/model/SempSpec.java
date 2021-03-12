@@ -3,10 +3,7 @@ package semp.cfg.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class SempSpec {
     public static  final String BROKER_SPEC_PATH = "";
@@ -36,6 +33,7 @@ public class SempSpec {
         var spec = new SempSpec();
         spec.specPath = BROKER_SPEC_PATH;
         spec.identifiers = new LinkedList<>();
+        spec.specialAttributes = new HashMap<>();
         return spec;
     }
 
@@ -84,5 +82,28 @@ public class SempSpec {
 
     protected static SempSpec get(String specPath) {
         return sempSpecMap.get(specPath);
+    }
+
+    public enum AttributeType {
+        DEPRECATED("Deprecated");
+
+        private final String type;
+        AttributeType(String type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return type;
+        }
+    }
+
+    public List<String> getSpecialAttributes(AttributeType type) {
+        var result = specialAttributes.get(type.toString());
+        if (Objects.nonNull(result)) {
+            return result;
+        }else {
+            return new LinkedList<>();
+        }
     }
 }
