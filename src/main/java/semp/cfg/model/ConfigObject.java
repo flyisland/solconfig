@@ -131,6 +131,17 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(ConfigObject::removeReservedObjects));
     }
 
+    public void removeDeprecatedObjects() {
+        for (Iterator<List<ConfigObject>> iterator = children.values().iterator(); iterator.hasNext(); ) {
+            var list =  iterator.next();
+            list.removeIf(configObject -> configObject.sempSpec.isDeprecated());
+            if (list.isEmpty()) {
+                iterator.remove();
+            }
+        }
+        children.values().forEach(list -> list.forEach(ConfigObject::removeDeprecatedObjects));
+    }
+
     /**
      *
      */
