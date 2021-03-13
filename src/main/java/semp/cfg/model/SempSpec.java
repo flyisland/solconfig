@@ -26,14 +26,6 @@ public class SempSpec {
     @Getter
     private List<String> childrenNames;
 
-    public static void setup(JsonNode root){
-        jsonSpec = JsonSpec.ofJsonNode(root);
-        TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
-
-        sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
-        sempVersion = new SempVersion(jsonSpec.getSempVersionText());
-    }
-
     public static void setupByString(String jsonString) {
         jsonSpec = JsonSpec.ofString(jsonString);
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
