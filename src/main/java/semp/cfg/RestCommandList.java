@@ -54,16 +54,21 @@ public class RestCommandList {
             var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
             if (meta.getResponseCode() == 200) {
                 Utils.err("OK%n");
-            } else if (cmd.method == HTTPMethod.DELETE &&
-                    meta.getError().getCode() == SEMPError.NOT_ALLOWED.getValue()) {
-                Utils.err("%s, retry later%n", SEMPError.NOT_ALLOWED);
-                retryCommands.add(cmd);
-            } else if (cmd.method == HTTPMethod.POST &&
-                    meta.getError().getCode() == SEMPError.ALREADY_EXISTS.getValue()) {
-                Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
-            } else {
-                Utils.err("%n%s%n", meta.toString());
-                System.exit(1);
+            } else  {
+                int semp_code = meta.getError().getCode();
+                if (cmd.method == HTTPMethod.DELETE){
+                    if(semp_code == SEMPError.NOT_ALLOWED.getValue() ||
+                            semp_code == SEMPError.CONFIGDB_OBJECT_DEPENDENCY.getValue()) {
+                        Utils.err("%s, retry later%n", SEMPError.ofInt(semp_code));
+                        retryCommands.add(cmd);
+                    }
+                } else if (cmd.method == HTTPMethod.POST &&
+                        semp_code == SEMPError.ALREADY_EXISTS.getValue()) {
+                    Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
+                } else {
+                    Utils.err("%n%s%n", meta.toString());
+                    System.exit(1);
+                }
             }
         }
         if (! retryCommands.isEmpty()) execute(sempClient, retryCommands);
