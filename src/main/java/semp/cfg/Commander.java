@@ -20,8 +20,7 @@ public class Commander {
     }
 
     private void setupSempSpec() {
-//        SempSpec.setup(sempClient.sendWithResourcePath("get", "/spec", null));
-        SempSpec.setupByString(sempClient.sendWithResourcePathStr("get", "/spec", null).get());
+        SempSpec.setupByString(sempClient.sendWithResourcePath("get", "/spec", null));
     }
 
     public void backup(String resourceType, String[] objectNames){
