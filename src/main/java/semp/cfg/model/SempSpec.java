@@ -34,6 +34,14 @@ public class SempSpec {
         sempVersion = new SempVersion(jsonSpec.getSempVersionText());
     }
 
+    public static void setupByString(String jsonString) {
+        jsonSpec = JsonSpec.ofString(jsonString);
+        TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
+
+        sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
+        sempVersion = new SempVersion(jsonSpec.getSempVersionText());
+    }
+
     private static SempSpec brokerSpec() {
         var spec = new SempSpec();
         spec.specPath = BROKER_SPEC_PATH;

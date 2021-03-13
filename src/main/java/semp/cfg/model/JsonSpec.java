@@ -30,15 +30,17 @@ public class JsonSpec {
     private List<String> pathsList;
 
     public static JsonSpec ofJsonNode(JsonNode root){
-        JsonSpec jsonSpec = new JsonSpec();
-        jsonSpec.pathsList = new LinkedList<>();
-
         String jsonString;
         try {
             jsonString = objectMapper.writeValueAsString(root);
         } catch (JsonProcessingException e) {
             jsonString = "";
         }
+        return ofString(jsonString);
+    }
+
+    public static JsonSpec ofString(String jsonString) {
+        JsonSpec jsonSpec = new JsonSpec();
         jsonSpec.jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
         jsonSpec.pathsList = jsonSpec.jsonPathRead("$.paths.keys()", List.class);
         return jsonSpec;
