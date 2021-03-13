@@ -136,16 +136,22 @@ public class Commander {
     }
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
+        checkObjectsExistence(resourceType, objectNames, false);
+    }
+
+    private void checkObjectsExistence(String resourceType, String[] objectNames, boolean existOn) {
         var objects = sempClient.checkIfObjectsExist(resourceType, Arrays.asList(objectNames));
-        var notExistedSet = objects.stream()
-                .filter(e -> !e.getValue())
+        var resultSet = objects.stream()
+                .filter(e -> e.getValue() == existOn)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
-        if (notExistedSet.isEmpty()) {
+        if (resultSet.isEmpty()) {
             return;
         }
-        Utils.errPrintlnAndExit(null, "Resource %s [%s] doesn't exist!",
+        Utils.errPrintlnAndExit(null, "Resource %s [%s] %s exist!",
                 resourceType,
-                String.join(", ", notExistedSet));
+                String.join(", ", resultSet),
+                existOn ? "already" : "doesn't");
     }
+
 }
