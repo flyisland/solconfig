@@ -62,9 +62,9 @@ public class JsonSpec {
     }
 
     protected boolean isDeprecatedCollection(String collectionPath){
-        return Optional.of(root.get("paths").get(collectionPath).get("get"))
-                .map(jsonNode -> jsonNode.get("deprecated"))
-                .map(jsonNode -> jsonNode.asBoolean(false)).orElse(false);
+        return Optional.ofNullable(
+                jsonPathRead(String.format("$.paths.%s.get.deprecated", collectionPath), Boolean.class)
+        ).orElse(false);
     }
 
     protected String getObjectPath(String collectionPath) {
