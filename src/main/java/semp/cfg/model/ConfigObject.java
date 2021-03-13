@@ -1,7 +1,6 @@
 package semp.cfg.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import semp.cfg.RestCommandList;
@@ -14,8 +13,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ConfigObject {
-    private static final ObjectMapper mapper = new ObjectMapper();
-
     private final String collectionName;
     protected TreeMap<String, Object> attributes;
     @Getter
@@ -85,8 +82,8 @@ public class ConfigObject {
                 sb.append(String.format(
                         "%s%s: %s",
                         TAB_SPACE.repeat(level),
-                        mapper.writeValueAsString(name),
-                        mapper.writeValueAsString(attributes.get(name))));
+                        Utils.objectMapper.writeValueAsString(name),
+                        Utils.objectMapper.writeValueAsString(attributes.get(name))));
             } catch (JsonProcessingException e) {
                 Utils.errPrintlnAndExit(e, "Unable to convert %s: %s to JSON format.",
                         name, attributes.get(name));
@@ -108,7 +105,7 @@ public class ConfigObject {
         while (names.hasNext()) {
             String name = names.next();
             try {
-                sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), mapper.writeValueAsString(name)));
+                sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), Utils.objectMapper.writeValueAsString(name)));
             } catch (JsonProcessingException e) {
                 Utils.errPrintlnAndExit(e, "Unable to convert %s to JSON format.%n", name);
             }
