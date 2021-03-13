@@ -86,7 +86,7 @@ public class Commander {
     }
 
     public void restore(File confFile) {
-        var confMap = SempClient.mapFromJsonFile(confFile);
+        var confMap = SempClient.readMapFromJsonFile(confFile);
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.fromMap(confMap);
 

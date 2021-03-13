@@ -94,7 +94,7 @@ public class SempClient {
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
 
-    public static Map<String, Object> mapFromJsonFile(File confFile) {
+    public static Map<String, Object> readMapFromJsonFile(File confFile) {
         try {
             return (Map<String, Object>)objectMapper.readValue(confFile, Map.class);
         } catch (IOException e) {
