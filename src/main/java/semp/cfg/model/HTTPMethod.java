@@ -1,6 +1,7 @@
 package semp.cfg.model;
 
 public enum HTTPMethod {
+    GET,
     POST,
     PATCH,
     PUT,

@@ -1,8 +1,10 @@
 package semp.cfg.model;
 
 public enum SEMPError {
+    NOT_FOUND(6),
+    ALREADY_EXISTS(10),
     NOT_ALLOWED(89),
-    ALREADY_EXISTS(10);
+    ;
 
     private int value;
 

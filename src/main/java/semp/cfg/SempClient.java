@@ -3,8 +3,7 @@ package semp.cfg;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import semp.cfg.model.SempMeta;
-import semp.cfg.model.SempResponse;
+import semp.cfg.model.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +16,12 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SempClient {
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     private static final ObjectMapper objectMapper = new ObjectMapper();
+    public static final int HTTP_OK = 200;
 
     private final String baseUrl;
     private final HttpClient httpClient;
@@ -148,5 +149,30 @@ public class SempClient {
         }
         return new HashMap<>();
     }
+
+    public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceType, List<String> objectNames){
+        var absUriList = objectNames.stream()
+                .filter(n -> !n.equals("*"))
+                .map(objectName -> Map.entry(objectName,
+                        String.format("/%s/%s", resourceType, objectName)))
+                .collect(Collectors.toList());
+
+        Map<String, Boolean> result = new HashMap<>();
+        absUriList.forEach( entry->{
+            var meta = cudWithResourcePath(HTTPMethod.GET.toSEMPMethod(), entry.getValue(), null);
+            if (meta.getResponseCode() == HTTP_OK) {
+                result.put(entry.getKey(), true);
+            } else if (meta.getError().getCode() == SEMPError.NOT_FOUND.getValue()) {
+                result.put(entry.getKey(), false);
+            } else {
+                Utils.errPrintlnAndExit(null, "%s %s%n%s%n",
+                        HTTPMethod.GET,
+                        entry.getValue(),
+                        meta);
+            }
+        });
+        return result.entrySet();
+    }
+
 
 }

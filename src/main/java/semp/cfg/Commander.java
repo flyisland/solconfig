@@ -24,10 +24,8 @@ public class Commander {
     }
 
     public void backup(String resourceType, String[] objectNames){
+        exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
-
-        var existed = checkIfExisted(configBroker, resourceType, objectNames);
-        existed.ifPresent(s -> Utils.errPrintlnAndExit(null, s));
 
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
@@ -135,5 +133,19 @@ public class Commander {
                     String.join(", ", requestSet)));
         }
 
+    }
+
+    private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
+        var objects = sempClient.checkIfObjectsExist(resourceType, Arrays.asList(objectNames));
+        var notExistedSet = objects.stream()
+                .filter(e -> !e.getValue())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+        if (notExistedSet.isEmpty()) {
+            return;
+        }
+        Utils.errPrintlnAndExit(null, "Resource %s [%s] doesn't exist!",
+                resourceType,
+                String.join(", ", notExistedSet));
     }
 }
