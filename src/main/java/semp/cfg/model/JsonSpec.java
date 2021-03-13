@@ -26,13 +26,11 @@ public class JsonSpec {
             .options(Option.SUPPRESS_EXCEPTIONS)
             .build();
 
-    private JsonNode root;
     private Object jsonDocument;
     private List<String> pathsList;
 
     public static JsonSpec ofJsonNode(JsonNode root){
         JsonSpec jsonSpec = new JsonSpec();
-        jsonSpec.root = root;
         jsonSpec.pathsList = new LinkedList<>();
 
         String jsonString;
