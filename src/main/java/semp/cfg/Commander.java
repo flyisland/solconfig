@@ -46,11 +46,7 @@ public class Commander {
         configBroker.getChildren().values().forEach(
                 list -> list.forEach(
                         configObject -> configObject.generateDeleteCommands(commandList, "")));
-        if (curlOnly) {
-            System.err.println(commandList);
-        } else {
-            commandList.execute(sempClient);
-        }
+        commandList.execute(sempClient, curlOnly);
     }
 
     private ConfigBroker getConfigBroker(String resourceType, String[] objectNames) {
@@ -92,21 +88,18 @@ public class Commander {
             });
     }
 
-    // TODO:: check object if existed before executing the commands
     public void restore(File confFile) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.fromMap(SempClient.readMapFromJsonFile(confFile));
-        exitOnObjectsAlreadyExist(configBroker);
+        if (!curlOnly){
+            exitOnObjectsAlreadyExist(configBroker);
+        }
 
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(
                 list -> list.forEach(
                         configObject -> configObject.generatRestoreCommands(commandList, "")));
-        if (curlOnly) {
-            System.err.println(commandList);
-        } else {
-            commandList.execute(sempClient);
-        }
+        commandList.execute(sempClient, curlOnly);
     }
 
     private Optional<String> checkIfExisted(ConfigBroker configBroker, String resourceType, String[] objectNames) {

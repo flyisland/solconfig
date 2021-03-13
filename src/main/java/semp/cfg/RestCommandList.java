@@ -39,8 +39,12 @@ public class RestCommandList {
         return sb.toString();
     }
 
-    public void execute(SempClient sempClient) {
-        execute(sempClient, this.commands);
+    public void execute(SempClient sempClient, boolean curlOnly) {
+        if (curlOnly) {
+            System.out.println(toCurlScript(sempClient));
+        } else {
+            execute(sempClient, this.commands);
+        }
     }
 
     private void execute(SempClient sempClient, List<Command> commandList) {
@@ -63,5 +67,24 @@ public class RestCommandList {
             }
         }
         if (! retryCommands.isEmpty()) execute(sempClient, retryCommands);
+    }
+
+    private String toCurlScript(SempClient sempClient) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#!/bin/sh +x\n");
+        sb.append(String.format("export SEMP_HOST=%s%n", sempClient.getBaseUrl()));
+        sb.append(String.format("export SEMP_ADMIN=%s%n", sempClient.getAdminUser()));
+        sb.append(String.format("export SEMP_PWD=%s%n", sempClient.getAdminPwd()));
+
+        for (Command cmd : commands) {
+            sb.append("\n");
+            sb.append(String.format("curl -X %s -u $SEMP_ADMIN:$SEMP_PWD $SEMP_HOST%s",
+                    cmd.method.name(), cmd.resourcePath));
+            if (Objects.nonNull(cmd.payload) && cmd.payload.length() > 0) {
+                sb.append(" -H 'content-type: application/json' -d '");
+                sb.append(String.format("%s'%n", cmd.payload));
+            }
+        }
+        return sb.toString();
     }
 }

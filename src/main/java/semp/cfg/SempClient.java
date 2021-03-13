@@ -1,5 +1,6 @@
 package semp.cfg;
 
+import lombok.Getter;
 import semp.cfg.model.HTTPMethod;
 import semp.cfg.model.SEMPError;
 import semp.cfg.model.SempMeta;
@@ -22,11 +23,15 @@ public class SempClient {
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     public static final int HTTP_OK = 200;
 
-    private final String baseUrl;
+    @Getter private final String baseUrl;
+    @Getter private final String adminUser;
+    @Getter private final String adminPwd;
     private final HttpClient httpClient;
 
     public SempClient(String adminUrl, String adminUser, String adminPwd) {
         this.baseUrl = adminUrl+ CONFIG_BASE_PATH;
+        this.adminUser = adminUser;
+        this.adminPwd = adminPwd;
         httpClient = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(10))
