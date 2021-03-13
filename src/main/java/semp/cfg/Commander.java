@@ -159,8 +159,13 @@ public class Commander {
         if (resultSet.isEmpty()) {
             return;
         }
-        Utils.errPrintlnAndExit((Exception) null, "Resource %s [%s] %s exist!",
-                resourceType,
+        var type = SempSpec.TOP_RESOURCES.entrySet().stream()
+                .filter(e -> e.getValue().equals(resourceType))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("");
+        Utils.errPrintlnAndExit((Exception) null, "Resource %s[%s] %s exist!",
+                type,
                 String.join(", ", resultSet),
                 existOn ? "already" : "doesn't");
     }
