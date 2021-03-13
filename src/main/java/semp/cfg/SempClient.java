@@ -64,10 +64,6 @@ public class SempClient {
         return result;
     }
 
-    public Optional<SempResponse> getCollectionWithResourcePath(String resourcePath){
-        return getCollectionWithAbsoluteUri(buildAbsoluteUri(resourcePath));
-    }
-
     public String buildAbsoluteUri(String resourcePath){
         return baseUrl+resourcePath;
     }
