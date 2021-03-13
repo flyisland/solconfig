@@ -29,15 +29,6 @@ public class JsonSpec {
     private Object jsonDocument;
     private List<String> pathsList;
 
-    public static JsonSpec ofJsonNode(JsonNode root){
-        String jsonString;
-        try {
-            jsonString = objectMapper.writeValueAsString(root);
-        } catch (JsonProcessingException e) {
-            jsonString = "";
-        }
-        return ofString(jsonString);
-    }
 
     public static JsonSpec ofString(String jsonString) {
         JsonSpec jsonSpec = new JsonSpec();

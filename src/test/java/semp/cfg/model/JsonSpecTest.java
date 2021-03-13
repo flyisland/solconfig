@@ -32,10 +32,7 @@ public class JsonSpecTest {
     static void setup() throws IOException {
         var jsonString = Files.readString(Path.of(JsonSpecTest.class.getResource("/semp-v2-config-2.19.json").getPath()));
         jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
-
-        JsonNode jsonNode = objectMapper.readTree(
-                JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
-        jsonSpec = JsonSpec.ofJsonNode(jsonNode);
+        jsonSpec = JsonSpec.ofString(jsonString);
     }
 
     @ParameterizedTest
