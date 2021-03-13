@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import semp.cfg.Utils;
+
+import static semp.cfg.Utils.objectMapper;
 
 @Getter
 @Setter
@@ -43,6 +46,17 @@ public class SempMeta {
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
         } catch (JsonProcessingException e) {
             return e.toString();
+        }
+    }
+
+    public static SempMeta ofString(String input) {
+        try {
+            var node = objectMapper.readTree(input);
+            return objectMapper.treeToValue(node.get("meta"), SempMeta.class);
+        } catch (JsonProcessingException e) {
+            Utils.errPrintlnAndExit(
+                    e, "Unable convert below text into a valid SempMeta structure.%n%s", input);
+            return null;
         }
     }
 }

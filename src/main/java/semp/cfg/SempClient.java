@@ -3,6 +3,7 @@ package semp.cfg;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import semp.cfg.model.SempMeta;
 import semp.cfg.model.SempResponse;
 
 import java.io.File;
@@ -90,9 +91,53 @@ public class SempClient {
         }
         return node;
     }
+
     public JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
+
+    /**
+     * Run Create/Update/Delete methods on the resourcePath
+     * @param method One of [post, put, patch, delete]
+     * @return the SEMP meta result
+     */
+    public SempMeta cudWithResourcePath(String method, String resourcePath, String payload) {
+        var resp = sendWithResourcePathStr(method, resourcePath, payload);
+        if (resp.isPresent()) {
+            return SempMeta.ofString(resp.get());
+        } else {
+            Utils.err("%s %s returns nothing!", method, buildAbsoluteUri(resourcePath));
+            System.exit(1);
+            return null;
+        }
+    }
+
+    private Optional<String> sendWithResourcePathStr(String method, String resourcePath, String payload) {
+        return sendWithAbsoluteURIStr(method, buildAbsoluteUri(resourcePath), payload);
+    }
+
+    private Optional<String> sendWithAbsoluteURIStr(String method, String absUri, String payload) {
+        var bp = Objects.isNull(payload) || payload.isEmpty() ?
+                BodyPublishers.noBody() :
+                BodyPublishers.ofString(payload);
+        HttpRequest request = HttpRequest.newBuilder()
+                .method(method.toUpperCase(), bp)
+                .uri(URI.create(absUri))
+                .header("content-type", "application/json")
+                .build();
+
+        try {
+            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return Optional.of(response.body());
+        } catch (InterruptedException|IOException e) {
+            Utils.log(String.format("%s %s with playload:%n%s%n%s",
+                    method.toUpperCase(), absUri, payload, e.toString()));
+            System.exit(1);
+        }
+        return Optional.empty();
+    }
+
+
 
     public static Map<String, Object> readMapFromJsonFile(File confFile) {
         try {

@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class Utils {
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    public static ObjectMapper objectMapper = new ObjectMapper();
 
     // TODO: move to SempSpec class
     public static String getCollectionNameFromUri(String uri){
@@ -51,5 +51,12 @@ public class Utils {
 
     public static void err(String format, Object... args) {
         System.err.printf(format, args);
+    }
+
+    public static void errPrintlnAndExit(Exception e, String format, Object... args) {
+        err(format, args);
+        err("%n");
+        e.printStackTrace();
+        System.exit(1);
     }
 }
