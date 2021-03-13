@@ -136,11 +136,11 @@ public class Commander {
     }
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
-        checkObjectsExistence(resourceType, objectNames, false);
+        checkObjectsExistence(resourceType, Arrays.asList(objectNames), false);
     }
 
-    private void checkObjectsExistence(String resourceType, String[] objectNames, boolean existOn) {
-        var objects = sempClient.checkIfObjectsExist(resourceType, Arrays.asList(objectNames));
+    private void checkObjectsExistence(String resourceType, List<String> objectNames, boolean existOn) {
+        var objects = sempClient.checkIfObjectsExist(resourceType, objectNames);
         var resultSet = objects.stream()
                 .filter(e -> e.getValue() == existOn)
                 .map(Map.Entry::getKey)
