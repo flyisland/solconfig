@@ -93,9 +93,9 @@ public class Commander {
 
     // TODO:: check object if existed before executing the commands
     public void restore(File confFile) {
-        var confMap = SempClient.readMapFromJsonFile(confFile);
         ConfigBroker configBroker = new ConfigBroker();
-        configBroker.fromMap(confMap);
+        configBroker.fromMap(SempClient.readMapFromJsonFile(confFile));
+        exitOnObjectsAlreadyExist(configBroker);
 
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(
@@ -139,6 +139,17 @@ public class Commander {
         checkObjectsExistence(resourceType, Arrays.asList(objectNames), false);
     }
 
+    private void exitOnObjectsAlreadyExist(ConfigBroker configBroker) {
+        var children=configBroker.getChildren().entrySet().stream().findFirst();
+        if (children.isEmpty()) {
+            Utils.errPrintlnAndExit("There is no objects to restore!");
+        }
+        var nameList = children.get().getValue().stream()
+                .map(ConfigObject::getObjectId)
+                .collect(Collectors.toList());
+        checkObjectsExistence(children.get().getKey(), nameList, true);
+    }
+
     private void checkObjectsExistence(String resourceType, List<String> objectNames, boolean existOn) {
         var objects = sempClient.checkIfObjectsExist(resourceType, objectNames);
         var resultSet = objects.stream()
@@ -148,7 +159,7 @@ public class Commander {
         if (resultSet.isEmpty()) {
             return;
         }
-        Utils.errPrintlnAndExit(null, "Resource %s [%s] %s exist!",
+        Utils.errPrintlnAndExit((Exception) null, "Resource %s [%s] %s exist!",
                 resourceType,
                 String.join(", ", resultSet),
                 existOn ? "already" : "doesn't");

@@ -54,6 +54,10 @@ public class Utils {
         System.err.printf(format, args);
     }
 
+    public static void errPrintlnAndExit(String format, Object... args) {
+        errPrintlnAndExit(null, format, args);
+    }
+
     public static void errPrintlnAndExit(Exception e, String format, Object... args) {
         err(format, args);
         err("%n");

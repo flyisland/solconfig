@@ -165,7 +165,7 @@ public class SempClient {
             } else if (meta.getError().getCode() == SEMPError.NOT_FOUND.getValue()) {
                 result.put(entry.getKey(), false);
             } else {
-                Utils.errPrintlnAndExit(null, "%s %s%n%s%n",
+                Utils.errPrintlnAndExit((Exception) null, "%s %s%n%s%n",
                         HTTPMethod.GET,
                         entry.getValue(),
                         meta);
