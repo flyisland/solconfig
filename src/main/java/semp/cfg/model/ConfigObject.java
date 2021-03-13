@@ -131,7 +131,7 @@ public class ConfigObject {
      *  Obj-id must be url encoded and join with "," as above example.
      * @return the obj-id
      */
-    private String getObjectId() {
+    public String getObjectId() {
         var idList = sempSpec.getSpecialAttributes(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
                 .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))

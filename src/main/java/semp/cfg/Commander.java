@@ -25,6 +25,10 @@ public class Commander {
 
     public void backup(String resourceType, String[] objectNames){
         ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
+
+        var existed = checkIfExisted(configBroker, resourceType, objectNames);
+        existed.ifPresent(s -> Utils.errPrintlnAndExit(null, s));
+
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
@@ -85,6 +89,7 @@ public class Commander {
             });
     }
 
+    // TODO:: check object if existed before executing the commands
     public void restore(File confFile) {
         var confMap = SempClient.readMapFromJsonFile(confFile);
         ConfigBroker configBroker = new ConfigBroker();
@@ -99,5 +104,32 @@ public class Commander {
         } else {
             commandList.execute(sempClient);
         }
+    }
+
+    private Optional<String> checkIfExisted(ConfigBroker configBroker, String resourceType, String[] objectNames) {
+        var objectSet = configBroker.getChildren().entrySet().stream()
+                .filter(e->e.getKey().equals(resourceType)) // get children list of the resourceType
+                .flatMap(e->e.getValue().stream()) // convert the list into a stream
+                .map(ConfigObject::getObjectId)
+                .collect(Collectors.toSet());
+
+        var requestSet = new HashSet<>(Set.of(objectNames));
+        requestSet.removeIf(n -> n.equals("*"));
+        requestSet.removeIf(objectSet::contains);
+
+        if (requestSet.isEmpty()) {
+            return Optional.empty();
+        }else {
+            var type = SempSpec.TOP_RESOURCES.entrySet().stream()
+                    .filter(e -> e.getValue().equals(resourceType))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse("");
+
+            return Optional.of(String.format( "Resource %s [%s] doesn't exist!",
+                    type,
+                    String.join(", ", requestSet)));
+        }
+
     }
 }

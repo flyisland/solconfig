@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -56,7 +57,9 @@ public class Utils {
     public static void errPrintlnAndExit(Exception e, String format, Object... args) {
         err(format, args);
         err("%n");
-        e.printStackTrace();
+        if (Objects.nonNull(e)) {
+            e.printStackTrace();
+        }
         System.exit(1);
     }
 }
