@@ -88,10 +88,8 @@ public class ConfigObject {
                         mapper.writeValueAsString(name),
                         mapper.writeValueAsString(attributes.get(name))));
             } catch (JsonProcessingException e) {
-                Utils.log(String.format("Unable to convert %s: %s to JSON format.%n",
-                        name, attributes.get(name)));
-                e.printStackTrace();
-                System.exit(1);
+                Utils.errPrintlnAndExit(e, "Unable to convert %s: %s to JSON format.",
+                        name, attributes.get(name));
             }
             if (names.hasNext()) {
                 sb.append(",");
@@ -112,9 +110,7 @@ public class ConfigObject {
             try {
                 sb.append(String.format("%s%s: [%n", TAB_SPACE.repeat(level), mapper.writeValueAsString(name)));
             } catch (JsonProcessingException e) {
-                Utils.log(String.format("Unable to convert %s to JSON format.%n", name));
-                e.printStackTrace();
-                System.exit(1);
+                Utils.errPrintlnAndExit(e, "Unable to convert %s to JSON format.%n", name);
             }
             Iterator<ConfigObject> list = children.get(name).iterator();
             while (list.hasNext()) {
