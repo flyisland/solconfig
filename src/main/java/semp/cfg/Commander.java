@@ -102,33 +102,6 @@ public class Commander {
         commandList.execute(sempClient, curlOnly);
     }
 
-    private Optional<String> checkIfExisted(ConfigBroker configBroker, String resourceType, String[] objectNames) {
-        var objectSet = configBroker.getChildren().entrySet().stream()
-                .filter(e->e.getKey().equals(resourceType)) // get children list of the resourceType
-                .flatMap(e->e.getValue().stream()) // convert the list into a stream
-                .map(ConfigObject::getObjectId)
-                .collect(Collectors.toSet());
-
-        var requestSet = new HashSet<>(Set.of(objectNames));
-        requestSet.removeIf(n -> n.equals("*"));
-        requestSet.removeIf(objectSet::contains);
-
-        if (requestSet.isEmpty()) {
-            return Optional.empty();
-        }else {
-            var type = SempSpec.TOP_RESOURCES.entrySet().stream()
-                    .filter(e -> e.getValue().equals(resourceType))
-                    .map(Map.Entry::getKey)
-                    .findFirst()
-                    .orElse("");
-
-            return Optional.of(String.format( "Resource %s [%s] doesn't exist!",
-                    type,
-                    String.join(", ", requestSet)));
-        }
-
-    }
-
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
         checkObjectsExistence(resourceType, Arrays.asList(objectNames), false);
     }
