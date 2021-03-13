@@ -67,36 +67,4 @@ public class RestCommandList {
         }
         if (! retryCommands.isEmpty()) execute(sempClient, retryCommands);
     }
-
-
-    public void exectue(SempClient sempClient) {
-        exectue(sempClient, this.commands);
-    }
-
-
-    private void exectue(SempClient sempClient, List<Command> commandList) {
-        List<Command> retryCommands = new LinkedList<>();
-        for (Command cmd : commandList) {
-            try {
-                Utils.err("%s %s%n%s ", cmd.method.name(), cmd.resourcePath, cmd.payload);
-                var resp = SempResponse.ofJsonNode(sempClient.sendWithResourcePath(cmd.method.name(), cmd.resourcePath, cmd.payload));
-                if (resp.getMeta().getResponseCode() == 200) {
-                    Utils.err("OK%n");
-                } else if (cmd.method == HTTPMethod.DELETE &&
-                        resp.getMeta().getError().getCode() == SEMPError.NOT_ALLOWED.getValue()) {
-                    Utils.err("%s, retry later%n", SEMPError.NOT_ALLOWED);
-                    retryCommands.add(cmd);
-                } else if (cmd.method == HTTPMethod.POST &&
-                        resp.getMeta().getError().getCode() == SEMPError.ALREADY_EXISTS.getValue()) {
-                    Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
-                } else {
-                    Utils.err("%n%s%n", resp.getMeta().toString());
-                    System.exit(1);
-                }
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        }
-        if (! retryCommands.isEmpty()) exectue(sempClient, retryCommands);
-    }
 }
