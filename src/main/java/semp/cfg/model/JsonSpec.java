@@ -1,8 +1,5 @@
 package semp.cfg.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -18,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class JsonSpec {
     private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     public static final Configuration jsonPathConf = Configuration
             .builder()
             .mappingProvider(new JacksonMappingProvider())
