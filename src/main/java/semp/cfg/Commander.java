@@ -36,6 +36,7 @@ public class Commander {
     }
 
     public void delete(String resourceType, String[] objectNames) {
+        exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
