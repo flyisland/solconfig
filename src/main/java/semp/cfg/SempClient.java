@@ -74,14 +74,7 @@ public class SempClient {
      * Send a SEMPv2 request, and return only the meta part of the response.
      */
     public SempMeta sendAndGetMeta(String method, String resourcePath, String payload) {
-        var resp = sendWithResourcePathStr(method, resourcePath, payload);
-        if (resp.isPresent()) {
-            return SempMeta.ofString(resp.get());
-        } else {
-            Utils.err("%s %s returns nothing!", method, buildAbsoluteUri(resourcePath));
-            System.exit(1);
-            return null;
-        }
+        return SempMeta.ofString(sendWithResourcePath(method, resourcePath, payload));
     }
 
     public Optional<String> sendWithResourcePathStr(String method, String resourcePath, String payload) {
