@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import semp.cfg.Utils;
 
 import java.util.*;
 
@@ -17,12 +18,18 @@ public class SempResponse {
     private List<Map<String, String >> links;
     private SempMeta meta;
 
-    public static SempResponse ofString(String content) throws JsonProcessingException {
-        JsonNode node = objectMapper.readTree(content);
+    public static SempResponse ofString(String content){
         SempResponse resp = new SempResponse();
-        resp.data = objectMapper.treeToValue(node.get("data"), List.class);
-        resp.links = objectMapper.treeToValue(node.get("links"), List.class);
-        resp.meta = objectMapper.treeToValue(node.get("meta"), SempMeta.class);
+        try {
+            var node = objectMapper.readTree(content);
+            resp.data = objectMapper.treeToValue(node.get("data"), List.class);
+            resp.links = objectMapper.treeToValue(node.get("links"), List.class);
+            resp.meta = objectMapper.treeToValue(node.get("meta"), SempMeta.class);
+        } catch (JsonProcessingException e) {
+            Utils.errPrintlnAndExit(e,
+                    "Unable to convert below string into SempResponse structure!%n%s",
+                    content);
+        }
         return resp;
     }
 

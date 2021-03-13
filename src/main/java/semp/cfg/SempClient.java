@@ -1,6 +1,5 @@
 package semp.cfg;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import semp.cfg.model.HTTPMethod;
 import semp.cfg.model.SEMPError;
@@ -43,26 +42,20 @@ public class SempClient {
     }
 
     public Optional<SempResponse> getCollectionWithAbsoluteUri(String absUri){
-        Optional<SempResponse> result = Optional.empty();
-        try {
-            List<SempResponse> responseList = new LinkedList<>();
-            Optional<String> nextPageUri = Optional.of(absUri);
-            while (nextPageUri.isPresent()){
-                SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", nextPageUri.get(), null));
-                responseList.add(resp);
-                nextPageUri = resp.getNextPageUri();
-            }
-            // Combine all paging results into one SempResponse
-            result = responseList.stream().reduce((r1, r2)->{
-                r1.getData().addAll(r2.getData());
-                r1.getLinks().addAll(r2.getLinks());
-                r1.setMeta(r2.getMeta());
-                return r1;
-            });
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            System.exit(1);
+        List<SempResponse> responseList = new LinkedList<>();
+        Optional<String> nextPageUri = Optional.of(absUri);
+        while (nextPageUri.isPresent()){
+            SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", nextPageUri.get(), null));
+            responseList.add(resp);
+            nextPageUri = resp.getNextPageUri();
         }
+        // Combine all paging results into one SempResponse
+        var result = responseList.stream().reduce((r1, r2)->{
+            r1.getData().addAll(r2.getData());
+            r1.getLinks().addAll(r2.getLinks());
+            r1.setMeta(r2.getMeta());
+            return r1;
+        });
         return result;
     }
 
