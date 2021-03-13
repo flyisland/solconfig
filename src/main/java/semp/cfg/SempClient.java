@@ -1,9 +1,11 @@
 package semp.cfg;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import semp.cfg.model.*;
+import semp.cfg.model.HTTPMethod;
+import semp.cfg.model.SEMPError;
+import semp.cfg.model.SempMeta;
+import semp.cfg.model.SempResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +114,36 @@ public class SempClient {
         return Optional.empty();
     }
 
+    public String sendWithResourcePath(String method, String resourcePath, String payload) {
+        return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
+    }
+
+    private String sendWithAbsoluteURI(String method, String absUri, String payload) {
+        var bp = Objects.isNull(payload) || payload.isEmpty() ?
+                BodyPublishers.noBody() :
+                BodyPublishers.ofString(payload);
+        HttpRequest request = HttpRequest.newBuilder()
+                .method(method.toUpperCase(), bp)
+                .uri(URI.create(absUri))
+                .header("content-type", "application/json")
+                .build();
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (InterruptedException|IOException e) {
+            Utils.errPrintlnAndExit(e, "%s %s with playload:%n%s%n%s",
+                    method.toUpperCase(), absUri, payload, e.toString());
+        }
+        var body = Optional.ofNullable(response)
+                .map(HttpResponse::body);
+            if (body.isEmpty() || body.get().isEmpty()) {
+                Utils.errPrintlnAndExit((Exception) null,
+                        "%s %s returns empty body",
+                        method, absUri);
+            }
+        return body.orElse(null);
+    }
 
 
     public static Map<String, Object> readMapFromJsonFile(File confFile) {
