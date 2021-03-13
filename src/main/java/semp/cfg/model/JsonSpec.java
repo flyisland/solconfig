@@ -192,16 +192,6 @@ Map:
 
     }
 
-    private String getPatchOrPostDescription(String collectionPath) {
-        String objectPath = getObjectPath(collectionPath);
-        var optionalS = Utils.jsonSafeGetValue(
-                root, String.class, "paths", objectPath, "patch", "description");
-
-        return optionalS.orElse(
-                Utils.jsonSafeGetValue(root, String.class, "paths", collectionPath, "post", "description")
-                        .orElse(""));
-    }
-
     protected Map<String, Object> getMapOfAttributesWithDefaultValue(String collectionPath) {
         var propMap = getDefinitionProperties(collectionPath);
         return getAttributesWithDefaultValueFromJProperties(propMap);
