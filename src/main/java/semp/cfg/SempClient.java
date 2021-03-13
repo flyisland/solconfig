@@ -112,7 +112,7 @@ public class SempClient {
         }
     }
 
-    private Optional<String> sendWithResourcePathStr(String method, String resourcePath, String payload) {
+    public Optional<String> sendWithResourcePathStr(String method, String resourcePath, String payload) {
         return sendWithAbsoluteURIStr(method, buildAbsoluteUri(resourcePath), payload);
     }
 
