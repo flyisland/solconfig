@@ -144,11 +144,12 @@ public class Commander {
         var children=configBroker.getChildren().entrySet().stream().findFirst();
         if (children.isEmpty()) {
             Utils.errPrintlnAndExit("There is no objects to restore!");
+        }else {
+            var nameList = children.get().getValue().stream()
+                    .map(ConfigObject::getObjectId)
+                    .collect(Collectors.toList());
+            checkObjectsExistence(children.get().getKey(), nameList, true);
         }
-        var nameList = children.get().getValue().stream()
-                .map(ConfigObject::getObjectId)
-                .collect(Collectors.toList());
-        checkObjectsExistence(children.get().getKey(), nameList, true);
     }
 
     private void checkObjectsExistence(String resourceType, List<String> objectNames, boolean existOn) {
