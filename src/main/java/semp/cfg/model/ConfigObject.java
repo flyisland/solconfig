@@ -233,7 +233,7 @@ public class ConfigObject {
 
         children.values().forEach(
                 list -> list.forEach(
-                        configObject -> configObject.generateDeleteCommands(commandList, objectPath)));
+                        configObject -> configObject.generatRestoreCommands(commandList, objectPath)));
 
     }
 }
