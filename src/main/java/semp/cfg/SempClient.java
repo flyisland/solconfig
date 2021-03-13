@@ -77,31 +77,6 @@ public class SempClient {
         return SempMeta.ofString(sendWithResourcePath(method, resourcePath, payload));
     }
 
-    public Optional<String> sendWithResourcePathStr(String method, String resourcePath, String payload) {
-        return sendWithAbsoluteURIStr(method, buildAbsoluteUri(resourcePath), payload);
-    }
-
-    private Optional<String> sendWithAbsoluteURIStr(String method, String absUri, String payload) {
-        var bp = Objects.isNull(payload) || payload.isEmpty() ?
-                BodyPublishers.noBody() :
-                BodyPublishers.ofString(payload);
-        HttpRequest request = HttpRequest.newBuilder()
-                .method(method.toUpperCase(), bp)
-                .uri(URI.create(absUri))
-                .header("content-type", "application/json")
-                .build();
-
-        try {
-            var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            return Optional.of(response.body());
-        } catch (InterruptedException|IOException e) {
-            Utils.log(String.format("%s %s with playload:%n%s%n%s",
-                    method.toUpperCase(), absUri, payload, e.toString()));
-            System.exit(1);
-        }
-        return Optional.empty();
-    }
-
     public String sendWithResourcePath(String method, String resourcePath, String payload) {
         return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
     }
