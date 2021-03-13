@@ -19,10 +19,6 @@ public class SempResponse {
 
     public static SempResponse ofString(String content) throws JsonProcessingException {
         JsonNode node = objectMapper.readTree(content);
-        return ofJsonNode(node);
-    }
-
-    public static SempResponse ofJsonNode(JsonNode node) throws JsonProcessingException {
         SempResponse resp = new SempResponse();
         resp.data = objectMapper.treeToValue(node.get("data"), List.class);
         resp.links = objectMapper.treeToValue(node.get("links"), List.class);
