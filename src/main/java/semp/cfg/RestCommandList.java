@@ -1,11 +1,8 @@
 package semp.cfg;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import semp.cfg.model.HTTPMethod;
 import semp.cfg.model.SEMPError;
-import semp.cfg.model.SempResponse;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +47,7 @@ public class RestCommandList {
         List<Command> retryCommands = new LinkedList<>();
         for (Command cmd : commandList) {
             Utils.err("%s %s ", cmd.method.name(), cmd.resourcePath);
-            var meta = sempClient.cudWithResourcePath(cmd.method.name(), cmd.resourcePath, cmd.payload);
+            var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
             if (meta.getResponseCode() == 200) {
                 Utils.err("OK%n");
             } else if (cmd.method == HTTPMethod.DELETE &&

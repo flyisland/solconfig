@@ -98,11 +98,9 @@ public class SempClient {
     }
 
     /**
-     * Run Create/Update/Delete methods on the resourcePath
-     * @param method One of [post, put, patch, delete]
-     * @return the SEMP meta result
+     * Send a SEMPv2 request, and return only the meta part of the response.
      */
-    public SempMeta cudWithResourcePath(String method, String resourcePath, String payload) {
+    public SempMeta sendAndGetMeta(String method, String resourcePath, String payload) {
         var resp = sendWithResourcePathStr(method, resourcePath, payload);
         if (resp.isPresent()) {
             return SempMeta.ofString(resp.get());
@@ -159,7 +157,7 @@ public class SempClient {
 
         Map<String, Boolean> result = new HashMap<>();
         absUriList.forEach( entry->{
-            var meta = cudWithResourcePath(HTTPMethod.GET.toSEMPMethod(), entry.getValue(), null);
+            var meta = sendAndGetMeta(HTTPMethod.GET.toSEMPMethod(), entry.getValue(), null);
             if (meta.getResponseCode() == HTTP_OK) {
                 result.put(entry.getKey(), true);
             } else if (meta.getError().getCode() == SEMPError.NOT_FOUND.getValue()) {
