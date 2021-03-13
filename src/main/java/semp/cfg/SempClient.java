@@ -1,6 +1,5 @@
 package semp.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import semp.cfg.model.HTTPMethod;
 import semp.cfg.model.SEMPError;
 import semp.cfg.model.SempMeta;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class SempClient {
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     public static final int HTTP_OK = 200;
 
     private final String baseUrl;
@@ -110,10 +108,11 @@ public class SempClient {
 
     public static Map<String, Object> readMapFromJsonFile(File confFile) {
         try {
-            return (Map<String, Object>)objectMapper.readValue(confFile, Map.class);
+            return (Map<String, Object>)Utils.objectMapper.readValue(confFile, Map.class);
         } catch (IOException e) {
-            Utils.log(String.format("File %s is not a valid configuration json file!%n%s",
-                    confFile.getAbsolutePath(), e.toString()));
+            Utils.errPrintlnAndExit(e,
+                    "File %s is not a valid configuration json file!",
+                    confFile.getAbsolutePath());
         }
         return new HashMap<>();
     }
