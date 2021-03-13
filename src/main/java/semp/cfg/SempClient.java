@@ -73,31 +73,6 @@ public class SempClient {
         return baseUrl+resourcePath;
     }
 
-    private JsonNode sendWithAbsoluteURI(String method, String absUri, String payload) {
-        var bp = Objects.isNull(payload) || payload.isEmpty() ?
-                BodyPublishers.noBody() :
-                BodyPublishers.ofString(payload);
-        HttpRequest request = HttpRequest.newBuilder()
-                .method(method.toUpperCase(), bp)
-                .uri(URI.create(absUri))
-                .header("content-type", "application/json")
-                .build();
-        JsonNode node = null;
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            node = objectMapper.readTree(response.body());
-        } catch (InterruptedException|IOException e) {
-            Utils.log(String.format("%s %s with playload:%n%s%n%s",
-                    method.toUpperCase(), absUri, payload, e.toString()));
-            System.exit(1);
-        }
-        return node;
-    }
-
-    public JsonNode sendWithResourcePath(String method, String resourcePath, String payload){
-        return sendWithAbsoluteURI(method, buildAbsoluteUri(resourcePath), payload);
-    }
-
     /**
      * Send a SEMPv2 request, and return only the meta part of the response.
      */
