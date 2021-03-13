@@ -48,14 +48,9 @@ public class SempClient {
             List<SempResponse> responseList = new LinkedList<>();
             Optional<String> nextPageUri = Optional.of(absUri);
             while (nextPageUri.isPresent()){
-                var collectionStr = sendWithAbsoluteURIStr("GET", nextPageUri.get(), null);
-                if (collectionStr.isPresent()){
-                    SempResponse resp = SempResponse.ofString(collectionStr.get());
-                    responseList.add(resp);
-                    nextPageUri = resp.getNextPageUri();
-                }else {
-                    break;
-                }
+                SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", nextPageUri.get(), null));
+                responseList.add(resp);
+                nextPageUri = resp.getNextPageUri();
             }
             // Combine all paging results into one SempResponse
             result = responseList.stream().reduce((r1, r2)->{
