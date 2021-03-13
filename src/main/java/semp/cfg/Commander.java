@@ -24,7 +24,7 @@ public class Commander {
     }
 
     public void backup(String resourceType, String[] objectNames){
-        ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
+        ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
 
         var existed = checkIfExisted(configBroker, resourceType, objectNames);
         existed.ifPresent(s -> Utils.errPrintlnAndExit(null, s));
@@ -38,7 +38,7 @@ public class Commander {
     }
 
     public void delete(String resourceType, String[] objectNames) {
-        ConfigBroker configBroker = generateConfigBroker(resourceType, objectNames);
+        ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDefaultObject);
@@ -54,7 +54,7 @@ public class Commander {
         }
     }
 
-    private ConfigBroker generateConfigBroker(String resourceType, String[] objectNames) {
+    private ConfigBroker getConfigBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
 
