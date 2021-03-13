@@ -1,25 +1,21 @@
 package semp.cfg.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SempSpecTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static JsonNode jsonNode;
-
     @BeforeAll
     static void setup() throws IOException {
-        jsonNode = objectMapper.readTree(
-                JsonSpecTest.class.getResource("/semp-v2-config-2.19.json"));
-        SempSpec.setup(jsonNode);
+        var jsonString = Files.readString(Path.of(JsonSpecTest.class.getResource("/semp-v2-config-2.19.json").getPath()));
+        SempSpec.setupByString(jsonString);
     }
 
     @ParameterizedTest
