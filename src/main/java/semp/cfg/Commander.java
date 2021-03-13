@@ -46,7 +46,7 @@ public class Commander {
         if (curlOnly) {
             System.err.println(commandList);
         } else {
-            commandList.exectue(sempClient);
+            commandList.execute(sempClient);
         }
     }
 
@@ -97,7 +97,7 @@ public class Commander {
         if (curlOnly) {
             System.err.println(commandList);
         } else {
-            commandList.exectue(sempClient);
+            commandList.execute(sempClient);
         }
     }
 }
