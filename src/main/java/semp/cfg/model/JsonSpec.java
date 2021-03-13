@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import semp.cfg.Utils;
@@ -17,7 +19,12 @@ import java.util.stream.Collectors;
 public class JsonSpec {
     private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Configuration jsonPathConf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
+    public static final Configuration jsonPathConf = Configuration
+            .builder()
+            .mappingProvider(new JacksonMappingProvider())
+            .jsonProvider(new JacksonJsonProvider())
+            .options(Option.SUPPRESS_EXCEPTIONS)
+            .build();
 
     private JsonNode root;
     private Object jsonDocument;
@@ -27,7 +34,6 @@ public class JsonSpec {
         JsonSpec jsonSpec = new JsonSpec();
         jsonSpec.root = root;
         jsonSpec.pathsList = new LinkedList<>();
-        root.get("paths").fieldNames().forEachRemaining(name -> jsonSpec.pathsList.add(name));
 
         String jsonString;
         try {
@@ -36,8 +42,12 @@ public class JsonSpec {
             jsonString = "";
         }
         jsonSpec.jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
-
+        jsonSpec.pathsList = jsonSpec.jsonPathRead("$.paths.keys()", List.class);
         return jsonSpec;
+    }
+
+    private <T> T jsonPathRead(String path, Class<T> type) {
+        return JsonPath.using(jsonPathConf).parse(jsonDocument).read(path, type);
     }
 
     protected boolean isPathExist(String specPath){

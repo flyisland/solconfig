@@ -142,6 +142,7 @@ public class JsonSpecTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+            "$.paths.keys()",
             "$.paths./msgVpns.post.parameters[?(@.name=='body')].schema.$ref",
             "$.paths./msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}.patch.description"
     })
