@@ -58,7 +58,11 @@ public class Commander {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
 
-        Map<String, String> childrenLinks = Arrays.stream(objectNames)
+        var nameList = Arrays.asList(objectNames);
+        if (nameList.contains("*")){
+            nameList = List.of("*");
+        }
+        Map<String, String> childrenLinks = nameList.stream()
                 .map(objectName -> Map.entry(objectName,
                         sempClient.buildAbsoluteUri(
                                 String.format("/%s?where=%s==%s",
