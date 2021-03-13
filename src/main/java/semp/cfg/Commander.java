@@ -77,13 +77,13 @@ public class Commander {
             .filter(e -> !e.getKey().equals("uri"))
             .forEach(e -> {
                 String collectionName = Utils.getCollectionNameFromUri(e.getValue());
-                Optional<SempResponse> sempResponse = sempClient.getCollectionWithAbsoluteUri(e.getValue());
-                if (sempResponse.isEmpty() || sempResponse.get().isEmpty()){
+                var sempResponse = sempClient.getCollectionWithAbsoluteUri(e.getValue());
+                if (sempResponse.isEmpty()){
                     return;
                 }
 
-                List<Map<String, Object>> data = sempResponse.get().getData();
-                List<Map<String, String>> links = sempResponse.get().getLinks();
+                List<Map<String, Object>> data = sempResponse.getData();
+                List<Map<String, String>> links = sempResponse.getLinks();
                 for (int i = 0; i < data.size(); i++) {
                     ConfigObject child = ConfigObject.ofAttributes(collectionName, data.get(i));
                     configObject.addChild(child);

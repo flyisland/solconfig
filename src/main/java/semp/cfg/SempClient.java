@@ -41,7 +41,13 @@ public class SempClient {
                 .build();
     }
 
-    public Optional<SempResponse> getCollectionWithAbsoluteUri(String absUri){
+    /**
+     * If the collection is large, this method will follow the "nextPageUri" field
+     * in the response to continually fetch all results.
+     * @param absUri MUST be a collection path
+     * @return a SempRespone with all data and links from the absUri
+     */
+    public SempResponse getCollectionWithAbsoluteUri(String absUri){
         List<SempResponse> responseList = new LinkedList<>();
         Optional<String> nextPageUri = Optional.of(absUri);
         while (nextPageUri.isPresent()){
@@ -56,7 +62,7 @@ public class SempClient {
             r1.setMeta(r2.getMeta());
             return r1;
         });
-        return result;
+        return result.orElse(null);
     }
 
     public String buildAbsoluteUri(String resourcePath){
