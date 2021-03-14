@@ -94,7 +94,7 @@ public class Commander {
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(
                 list -> list.forEach(
-                        configObject -> configObject.generatRestoreCommands(commandList, "")));
+                        configObject -> configObject.generateRestoreCommands(commandList, "")));
         commandList.execute(sempClient, curlOnly);
     }
 
