@@ -37,6 +37,11 @@ public class JsonSpec {
         return JsonPath.using(jsonPathConf).parse(jsonDocument).read(path, type);
     }
 
+    private <T> T jsonPathRead(String path, T defaultValue) {
+        Optional<T> result = Optional.ofNullable (JsonPath.using(jsonPathConf).parse(jsonDocument).read(path));
+        return result.orElse(defaultValue);
+    }
+
     protected boolean isPathExist(String specPath){
         return pathsList.contains(specPath);
     }
@@ -178,10 +183,7 @@ Map:
     private String getDescriptionOfAction(String path, HTTPMethod method) {
         var descriptionPath = String.format("$.paths.%s.%s.description",
                 path, method.toSEMPMethod());
-        Optional<String> result = Optional.ofNullable(
-                JsonPath.using(jsonPathConf).parse(jsonDocument).read(descriptionPath));
-        return result.orElse("");
-
+        return jsonPathRead(descriptionPath, "");
     }
 
     private List<String> getAttributeNames(String collectionPath) {
