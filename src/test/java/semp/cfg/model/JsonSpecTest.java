@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static semp.cfg.Utils.objectMapper;
 
 public class JsonSpecTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static JsonSpec jsonSpec;
     private static Object jsonDocument;
 

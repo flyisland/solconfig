@@ -1,19 +1,20 @@
 package semp.cfg.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import semp.cfg.Utils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+
+import static semp.cfg.Utils.objectMapper;
 
 @Getter
 @Setter
 public class SempResponse {
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     private List<Map<String, Object>> data;
     private List<Map<String, String >> links;
     private SempMeta meta;
