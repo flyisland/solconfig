@@ -84,7 +84,7 @@ public class Commander {
             });
     }
 
-    public void restore(File confFile) {
+    public void create(File confFile) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.fromMap(SempClient.readMapFromJsonFile(confFile));
         if (!curlOnly){
@@ -94,7 +94,7 @@ public class Commander {
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(
                 list -> list.forEach(
-                        configObject -> configObject.generateRestoreCommands(commandList, "")));
+                        configObject -> configObject.generateCreateCommands(commandList, "")));
         commandList.execute(sempClient, curlOnly);
     }
 

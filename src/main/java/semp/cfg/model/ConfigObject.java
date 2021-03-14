@@ -224,7 +224,7 @@ public class ConfigObject {
         });
     }
 
-    public void generateRestoreCommands(RestCommandList commandList, String parentPath) {
+    public void generateCreateCommands(RestCommandList commandList, String parentPath) {
         var collectionPath = parentPath + "/" + collectionName;
         var objectPath = collectionPath + "/" + getObjectId();
         var payload = toJsonStringAttributeOnly();
@@ -237,7 +237,7 @@ public class ConfigObject {
 
         children.values().forEach(
                 list -> list.forEach(
-                        configObject -> configObject.generateRestoreCommands(commandList, objectPath)));
+                        configObject -> configObject.generateCreateCommands(commandList, objectPath)));
 
     }
 }

@@ -2,12 +2,11 @@ package semp.cfg.cli;
 
 import picocli.CommandLine;
 import semp.cfg.Commander;
-import semp.cfg.model.SempSpec;
 
 import java.io.File;
 
-@CommandLine.Command(name = "restore", description = "Restore objects from the configuration file")
-public class RestoreCommand extends SubCommand {
+@CommandLine.Command(name = "create", description = "Create objects from the configuration file")
+public class CreateCommand extends SubCommand {
     @CommandLine.Parameters(index = "0", description = "Configuration file")
     private File confFile;
 
@@ -24,7 +23,7 @@ public class RestoreCommand extends SubCommand {
         }
 
         Commander commander = parentCommand.commander;
-        commander.restore(confFile);
+        commander.create(confFile);
         return 0;
     }
 }
