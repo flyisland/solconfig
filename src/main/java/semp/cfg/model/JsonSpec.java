@@ -127,11 +127,15 @@ Map:
                 result.put(k, mPatch.get(k));
             }
         });
-        sortOutpecialAttributes(collectionPath, result);
+        sortOutSpecialAttributes(collectionPath, result);
         return result;
     }
 
-    private void sortOutpecialAttributes(String collectionPath, Map<String, List<String>> input) {
+    /**
+     * 1. Generate PARENT_IDENTIFIERS list, so we could remove them to make the exported JSON more concise
+     * 2. Make sure the IDENTIFYING list is in order to the Object-URL
+     */
+    private void sortOutSpecialAttributes(String collectionPath, Map<String, List<String>> input) {
         var uriIds = generateIdentifiers(getObjectPath(collectionPath));
         var cloneIds = new LinkedList<>(input.get(AttributeType.IDENTIFYING.toString()));
         cloneIds.removeAll(uriIds);
