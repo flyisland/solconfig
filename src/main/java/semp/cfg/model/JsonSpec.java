@@ -128,6 +128,7 @@ Map:
             }
         });
         sortOutSpecialAttributes(collectionPath, result);
+        result.put(AttributeType.ALL.toString(), getAttributeNames(collectionPath));
         return result;
     }
 
@@ -181,6 +182,11 @@ Map:
                 JsonPath.using(jsonPathConf).parse(jsonDocument).read(descriptionPath));
         return result.orElse("");
 
+    }
+
+    private List<String> getAttributeNames(String collectionPath) {
+        var propMap = getDefinitionProperties(collectionPath);
+        return new ArrayList<>(propMap.keySet());
     }
 
     protected Map<String, Object> getMapOfAttributesWithDefaultValue(String collectionPath) {

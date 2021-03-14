@@ -1,6 +1,7 @@
 package semp.cfg.model;
 
 public enum AttributeType {
+    ALL("ALL"),
     PARENT_IDENTIFIERS("Parent-Identifiers"),
     IDENTIFYING("Identifying"),
     REQUIRED("Required"),

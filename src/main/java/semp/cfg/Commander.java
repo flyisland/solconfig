@@ -40,7 +40,6 @@ public class Commander {
         ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
         configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
-        configBroker.removeChildrenObjects(ConfigObject::isDefaultObject);
 
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(

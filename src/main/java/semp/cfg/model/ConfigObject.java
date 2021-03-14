@@ -194,7 +194,13 @@ public class ConfigObject {
                 list -> list.forEach(
                         configObject -> configObject.generateDeleteCommands(commandList, objectPath)));
 
-        commandList.append(HTTPMethod.DELETE, objectPath, null);
+        if (isDefaultObject()){
+            if(sempSpec.getSpecialAttributes(AttributeType.ALL).contains("enabled")) {
+                commandList.append(HTTPMethod.PATCH, objectPath, "{\"enabled\":false}");
+            }
+        }else {
+            commandList.append(HTTPMethod.DELETE, objectPath, null);
+        }
     }
 
     public void fromMap(Map<String, Object> input) {
