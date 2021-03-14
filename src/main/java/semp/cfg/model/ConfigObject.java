@@ -9,6 +9,7 @@ import semp.cfg.Utils;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -190,6 +191,12 @@ public class ConfigObject {
     @Override
     public String toString() {
         return toJsonString().toString();
+    }
+
+    public void forEachChild(Consumer<ConfigObject> action) {
+        getChildren().values().stream()
+                .flatMap(list -> list.stream())
+                .forEach(action);
     }
 
     public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
