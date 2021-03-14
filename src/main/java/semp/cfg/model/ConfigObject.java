@@ -202,9 +202,7 @@ public class ConfigObject {
     public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
         var objectPath = String.format("%s/%s/%s",
                 parentPath, collectionName, getObjectId());
-        children.values().forEach(
-                list -> list.forEach(
-                        configObject -> configObject.generateDeleteCommands(commandList, objectPath)));
+        forEachChild(configObject -> configObject.generateDeleteCommands(commandList, objectPath));
 
         if (isDefaultObject()){
             if(sempSpec.getSpecialAttributes(AttributeType.ALL).contains("enabled")) {
@@ -242,9 +240,6 @@ public class ConfigObject {
             commandList.append(HTTPMethod.POST, collectionPath, payload);
         }
 
-        children.values().forEach(
-                list -> list.forEach(
-                        configObject -> configObject.generateCreateCommands(commandList, objectPath)));
-
+        forEachChild(configObject -> configObject.generateCreateCommands(commandList, objectPath));
     }
 }
