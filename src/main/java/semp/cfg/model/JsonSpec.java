@@ -16,13 +16,6 @@ import java.util.stream.Collectors;
 
 public class JsonSpec {
     private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
-    public static final Configuration jsonPathConf = Configuration
-            .builder()
-            .mappingProvider(new JacksonMappingProvider())
-            .jsonProvider(new JacksonJsonProvider())
-            .options(Option.SUPPRESS_EXCEPTIONS)
-            .build();
-
     private DocumentContext jsonPathCtx;
     private List<String> pathsList;
 
@@ -30,6 +23,12 @@ public class JsonSpec {
     public static JsonSpec ofString(String jsonString) {
         JsonSpec jsonSpec = new JsonSpec();
         var jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
+        Configuration jsonPathConf = Configuration
+                .builder()
+                .mappingProvider(new JacksonMappingProvider())
+                .jsonProvider(new JacksonJsonProvider())
+                .options(Option.SUPPRESS_EXCEPTIONS)
+                .build();
         jsonSpec.jsonPathCtx = JsonPath.using(jsonPathConf).parse(jsonDocument);
         jsonSpec.pathsList = jsonSpec.jsonPathRead("$.paths.keys()", List.class);
 
