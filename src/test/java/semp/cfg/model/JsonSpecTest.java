@@ -100,18 +100,9 @@ public class JsonSpecTest {
 
     @ParameterizedTest
     @CsvSource({
-            "/msgVpns, '{\n" +
-                    "  \"Read-Only\" : [ \"msgVpnName\" ],\n" +
-                    "  \"Requires-Disable\" : [ ],\n" +
-                    "  \"Parent-Identifiers\" : [ ],\n" +
-                    "  \"Required\" : [ \"msgVpnName\" ],\n" +
-                    "  \"Deprecated\" : [ \"bridgingTlsServerCertEnforceTrustedCommonNameEnabled\", \"restTlsServerCertEnforceTrustedCommonNameEnabled\" ],\n" +
-                    "  \"Opaque\" : [ \"replicationBridgeAuthenticationBasicPassword\", \"replicationBridgeAuthenticationClientCertContent\" ],\n" +
-                    "  \"Identifying\" : [ \"msgVpnName\" ],\n" +
-                    "  \"Write-Only\" : [ \"replicationBridgeAuthenticationBasicPassword\", \"replicationBridgeAuthenticationClientCertContent\", \"replicationBridgeAuthenticationClientCertPassword\", \"replicationEnabledQueueBehavior\" ]\n" +
-                    "}'",
             "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions, '{\n" +
                     "  \"Read-Only\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
+                    "  \"ALL\" : [ \"aclProfileName\", \"msgVpnName\", \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
                     "  \"Parent-Identifiers\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
                     "  \"Required\" : [ \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
@@ -122,6 +113,7 @@ public class JsonSpecTest {
             "'/msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns', '{\n" +
                     "  \"Read-Only\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
                     "  \"Requires-Disable\" : [ \"clientUsername\", \"compressedDataEnabled\", \"egressFlowWindowSize\", \"password\", \"tlsEnabled\" ],\n" +
+                    "  \"ALL\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"clientUsername\", \"compressedDataEnabled\", \"connectOrder\", \"egressFlowWindowSize\", \"enabled\", \"msgVpnName\", \"password\", \"queueBinding\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\", \"tlsEnabled\", \"unidirectionalClientProfile\" ],\n"+
                     "  \"Parent-Identifiers\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\" ],\n" +
                     "  \"Required\" : [ \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
