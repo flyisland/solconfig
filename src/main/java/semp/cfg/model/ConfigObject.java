@@ -134,17 +134,20 @@ public class ConfigObject {
 
     /**
      * Remove all children objects if it meets the filter's test
-     * @param filter  a predicate which returns true for objects to be removed
+     * @param filters  a predicate which returns true for objects to be removed
      */
-    public void removeChildrenObjects(Predicate<ConfigObject> filter) {
+    @SafeVarargs
+    public final void removeChildrenObjects(Predicate<ConfigObject>... filters) {
         for (Iterator<List<ConfigObject>> iterator = children.values().iterator(); iterator.hasNext(); ) {
             var list =  iterator.next();
-            list.removeIf(filter);
+            for (Predicate<ConfigObject> filter : filters) {
+                list.removeIf(filter);
+            }
             if (list.isEmpty()) {
                 iterator.remove();
             }
         }
-        children.values().forEach(list -> list.forEach(configObject -> configObject.removeChildrenObjects(filter)));
+        children.values().forEach(list -> list.forEach(configObject -> configObject.removeChildrenObjects(filters)));
     }
 
     public boolean isDeprecatedObject() {
@@ -168,12 +171,14 @@ public class ConfigObject {
 
     /**
      * Removes 'type' of attributes of all objects
-     * @param type of attributes to remove
+     * @param types of attributes to remove
      */
-    public void removeAttributes(AttributeType type) {
-        var attributesToRemove = sempSpec.getSpecialAttributes(type);
-        attributesToRemove.forEach(attrName -> attributes.remove(attrName));
-        children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(type)));
+    public void removeAttributes(AttributeType ... types) {
+        for (AttributeType type : types) {
+            var attributesToRemove = sempSpec.getSpecialAttributes(type);
+            attributesToRemove.forEach(attrName -> attributes.remove(attrName));
+        }
+        children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(types)));
     }
 
     public void removeAttributesWithDefaultValue() {

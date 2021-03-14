@@ -27,10 +27,8 @@ public class Commander {
         exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
 
-        configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
-        configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
-        configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS);
-        configBroker.removeAttributes(AttributeType.DEPRECATED);
+        configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
+        configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
         configBroker.removeAttributesWithDefaultValue();
         System.out.println(configBroker.toString());
     }
@@ -38,8 +36,7 @@ public class Commander {
     public void delete(String resourceType, String[] objectNames) {
         exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
-        configBroker.removeChildrenObjects(ConfigObject::isReservedObject);
-        configBroker.removeChildrenObjects(ConfigObject::isDeprecatedObject);
+        configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
 
         var commandList = new RestCommandList();
         configBroker.getChildren().values().forEach(
