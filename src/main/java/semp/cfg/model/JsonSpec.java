@@ -198,7 +198,9 @@ Map:
 
     protected Map<String, Map<String, ?>> getDefinitionProperties(String collectionPath){
         var refPath = "$.paths." + collectionPath + ".post.parameters[?(@.name=='body')].schema.$ref";
-        List<String> ref = JsonPath.using(jsonPathConf).parse(jsonDocument).read(refPath);
+        List<String> ref = jsonPathRead(refPath, List.class);
+
+
         if (Objects.isNull(ref)){
             logger.warn("Unable to find path:{}", refPath);
             return null;
@@ -206,7 +208,7 @@ Map:
 
         // "#/definitions/MsgVpn" -> "$.definitions.MsgVpn.properties"
         var propertiesPath = ref.get(0).replace("#", "$").replace("/", ".") + ".properties";
-        Map<String, Map<String, ?>> result = JsonPath.using(jsonPathConf).parse(jsonDocument).read(propertiesPath);
+        Map<String, Map<String, ?>> result = jsonPathRead(propertiesPath, Map.class);
         if (Objects.isNull(result)){
             logger.warn("Unable to find path:{}", propertiesPath);
         }
@@ -254,9 +256,7 @@ Map:
     }
 
     protected String getSempVersionText() {
-        Optional<String> result = Optional.ofNullable(
-                JsonPath.using(jsonPathConf).parse(jsonDocument).read("$.info.version"));
-        return result.orElse("");
+        return jsonPathRead("$.info.version", "");
 
     }
 }
