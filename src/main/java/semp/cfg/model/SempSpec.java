@@ -13,17 +13,13 @@ public class SempSpec {
 
     private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
-    @Getter
-    private static SempVersion sempVersion;
+    @Getter private static SempVersion sempVersion;
 
     private String specPath;
-    @Getter
-    private boolean deprecated;
-    private Map<String, List<String>> specialAttributes;
-    @Getter
-    private Map<String, Object> defaultValues;
-    @Getter
-    private List<String> childrenNames;
+    @Getter private boolean deprecated;
+    private Map<String, List<String>> attributes;
+    @Getter private Map<String, Object> defaultValues;
+    @Getter private List<String> childrenNames;
 
     public static void setupByString(String jsonString) {
         jsonSpec = JsonSpec.ofString(jsonString);
@@ -36,7 +32,7 @@ public class SempSpec {
     private static SempSpec brokerSpec() {
         var spec = new SempSpec();
         spec.specPath = BROKER_SPEC_PATH;
-        spec.specialAttributes = new HashMap<>();
+        spec.attributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
         spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
         return spec;
@@ -58,7 +54,7 @@ public class SempSpec {
 
         spec.specPath = generateSpecPath(collectionPath);
         spec.deprecated = jsonSpec.isDeprecatedCollection(collectionPath);
-        spec.specialAttributes = jsonSpec.findSpecialAttributes(collectionPath);
+        spec.attributes = jsonSpec.findAttributes(collectionPath);
         spec.defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
         spec.childrenNames = jsonSpec.getChildrenNames(objectPath);
 
@@ -77,7 +73,7 @@ public class SempSpec {
     public static String getTopResourceIdentifierKey(String resourceName) {
         if (TOP_RESOURCES.containsValue(resourceName)){
             return sempSpecMap.get("/"+resourceName).
-                    getSpecialAttributes(AttributeType.IDENTIFYING).get(0);
+                    getAttributes(AttributeType.IDENTIFYING).get(0);
         }else{
             throw new IllegalArgumentException(
                     String.format("%s is NOT one of [%s]!",
@@ -89,8 +85,8 @@ public class SempSpec {
         return sempSpecMap.get(specPath);
     }
 
-    public List<String> getSpecialAttributes(AttributeType type) {
-        var result = specialAttributes.get(type.toString());
+    public List<String> getAttributes(AttributeType type) {
+        var result = attributes.get(type.toString());
         if (Objects.nonNull(result)) {
             return result;
         }else {

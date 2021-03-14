@@ -126,7 +126,7 @@ public class ConfigObject {
      * @return the obj-id
      */
     public String getObjectId() {
-        var idList = sempSpec.getSpecialAttributes(AttributeType.IDENTIFYING).stream()
+        var idList = sempSpec.getAttributes(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
                 .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                 .collect(Collectors.toList());
@@ -176,7 +176,7 @@ public class ConfigObject {
      */
     public void removeAttributes(AttributeType ... types) {
         for (AttributeType type : types) {
-            var attributesToRemove = sempSpec.getSpecialAttributes(type);
+            var attributesToRemove = sempSpec.getAttributes(type);
             attributesToRemove.forEach(attrName -> attributes.remove(attrName));
         }
         children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(types)));
@@ -205,7 +205,7 @@ public class ConfigObject {
         forEachChild(configObject -> configObject.generateDeleteCommands(commandList, objectPath));
 
         if (isDefaultObject()){
-            if(sempSpec.getSpecialAttributes(AttributeType.ALL).contains("enabled")) {
+            if(sempSpec.getAttributes(AttributeType.ALL).contains("enabled")) {
                 commandList.append(HTTPMethod.PATCH, objectPath, "{\"enabled\":false}");
             }
         }else {

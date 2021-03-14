@@ -114,7 +114,7 @@ Map:
 }
 
  */
-    protected Map<String, List<String>> findSpecialAttributes(String collectionPath){
+    protected Map<String, List<String>> findAttributes(String collectionPath){
         // "Required" only exists in POST action
         var result = findSpecialAttributesFromDescription(
                 getDescriptionOfAction(collectionPath, HTTPMethod.POST));
