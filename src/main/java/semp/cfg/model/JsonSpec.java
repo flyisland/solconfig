@@ -1,6 +1,7 @@
 package semp.cfg.model;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
@@ -22,23 +23,25 @@ public class JsonSpec {
             .options(Option.SUPPRESS_EXCEPTIONS)
             .build();
 
-    private Object jsonDocument;
+    private DocumentContext jsonPathCtx;
     private List<String> pathsList;
 
 
     public static JsonSpec ofString(String jsonString) {
         JsonSpec jsonSpec = new JsonSpec();
-        jsonSpec.jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
+        var jsonDocument = Configuration.defaultConfiguration().jsonProvider().parse(jsonString);
+        jsonSpec.jsonPathCtx = JsonPath.using(jsonPathConf).parse(jsonDocument);
         jsonSpec.pathsList = jsonSpec.jsonPathRead("$.paths.keys()", List.class);
+
         return jsonSpec;
     }
 
     private <T> T jsonPathRead(String path, Class<T> type) {
-        return JsonPath.using(jsonPathConf).parse(jsonDocument).read(path, type);
+        return jsonPathCtx.read(path, type);
     }
 
     private <T> T jsonPathRead(String path, T defaultValue) {
-        Optional<T> result = Optional.ofNullable (JsonPath.using(jsonPathConf).parse(jsonDocument).read(path));
+        Optional<T> result = Optional.ofNullable (jsonPathCtx.read(path));
         return result.orElse(defaultValue);
     }
 
