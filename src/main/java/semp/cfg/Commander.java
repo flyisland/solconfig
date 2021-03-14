@@ -103,14 +103,18 @@ public class Commander {
     }
 
     private void exitOnObjectsAlreadyExist(ConfigBroker configBroker) {
-        var children=configBroker.getChildren().entrySet().stream().findFirst();
+        checkConfigExistence(configBroker, true);
+    }
+
+    private void checkConfigExistence(ConfigBroker configBroker, boolean existOn) {
+        var children= configBroker.getChildren().entrySet().stream().findFirst();
         if (children.isEmpty()) {
-            Utils.errPrintlnAndExit("There is no objects to restore!");
+            Utils.errPrintlnAndExit("The configuration file is empty!");
         }else {
             var nameList = children.get().getValue().stream()
                     .map(ConfigObject::getObjectId)
                     .collect(Collectors.toList());
-            checkObjectsExistence(children.get().getKey(), nameList, true);
+            checkObjectsExistence(children.get().getKey(), nameList, existOn);
         }
     }
 
