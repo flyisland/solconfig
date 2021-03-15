@@ -3,27 +3,28 @@ package semp.cfg.cli;
 import picocli.CommandLine;
 import semp.cfg.Commander;
 
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @CommandLine.Command(name = "create", description = "Create objects from the configuration file")
 public class CreateCommand extends SubCommand {
     @CommandLine.Parameters(index = "0", description = "Configuration file")
-    private File confFile;
+    private Path confPath;
 
     @CommandLine.Spec  CommandLine.Model.CommandSpec spec;
 
     @Override
     protected Integer execute() {
-        if (!confFile.exists()) {
+        if (!Files.isReadable(confPath)) {
             throw new CommandLine.ParameterException(spec.commandLine(), String.format(
-                    "File %s is not exists!",
-                    confFile.getAbsolutePath()
+                    "Path %s doesn't exist or is un-readable!",
+                    confPath.toAbsolutePath()
             ));
 
         }
 
         Commander commander = parentCommand.commander;
-        commander.create(confFile);
+        commander.create(confPath.toFile());
         return 0;
     }
 }
