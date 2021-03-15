@@ -4,6 +4,7 @@ import lombok.Setter;
 import semp.cfg.model.*;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -82,9 +83,9 @@ public class Commander {
             });
     }
 
-    public void create(File confFile) {
+    public void create(Path confPath) {
         ConfigBroker configBroker = new ConfigBroker();
-        configBroker.fromMap(SempClient.readMapFromJsonFile(confFile));
+        configBroker.fromMap(SempClient.readMapFromJsonFile(confPath));
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
         }

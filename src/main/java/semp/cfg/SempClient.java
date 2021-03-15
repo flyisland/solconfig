@@ -15,6 +15,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -111,13 +113,13 @@ public class SempClient {
     }
 
 
-    public static Map<String, Object> readMapFromJsonFile(File confFile) {
+    public static Map<String, Object> readMapFromJsonFile(Path confPath) {
         try {
-            return (Map<String, Object>)Utils.objectMapper.readValue(confFile, Map.class);
+            return (Map<String, Object>)Utils.objectMapper.readValue(Files.newInputStream(confPath), Map.class);
         } catch (IOException e) {
             Utils.errPrintlnAndExit(e,
                     "File %s is not a valid configuration json file!",
-                    confFile.getAbsolutePath());
+                    confPath.toAbsolutePath());
         }
         return new HashMap<>();
     }

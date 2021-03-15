@@ -24,7 +24,7 @@ public class CreateCommand extends SubCommand {
         }
 
         Commander commander = parentCommand.commander;
-        commander.create(confPath.toFile());
+        commander.create(confPath);
         return 0;
     }
 }
