@@ -1,0 +1,31 @@
+<#import 'vars.ftl' as var >
+{
+  "sempVersion": "2.19",
+  "dmrClusters": [
+    {
+        "authenticationBasicPassword":"${var.authenticationBasicPassword}",
+        "dmrClusterName": "${var.dmrClusterName}",
+        "enabled": true,
+        "nodeName": "${var.localNodeName}",
+        "links": [
+        {
+          "remoteNodeName": "${var.remoteNodeName}",
+          "authenticationBasicPassword":"${var.authenticationBasicPassword}",    
+          "enabled": true,
+          "initiator": "local",
+          "queueEventSpoolUsageThreshold": {
+            "clearPercent": 1,
+            "setPercent": 2
+          },
+          "queueMaxMsgSpoolUsage": 800000,
+          "span": "internal",
+          "remoteAddresses": [
+            {
+              "remoteAddress": "${var.remoteAddress}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
