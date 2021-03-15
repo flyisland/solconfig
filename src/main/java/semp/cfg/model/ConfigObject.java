@@ -232,8 +232,12 @@ public class ConfigObject {
     public void generateCreateCommands(RestCommandList commandList, String parentPath) {
         var collectionPath = parentPath + "/" + collectionName;
         var objectPath = collectionPath + "/" + getObjectId();
-        var payload = toJsonStringAttributeOnly();
 
+        var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
+        if (requiresDisable) {
+            attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
+        }
+        var payload = toJsonStringAttributeOnly();
         if (isDefaultObject()) {
             commandList.append(HTTPMethod.PATCH, objectPath, payload);
         } else {
@@ -241,5 +245,26 @@ public class ConfigObject {
         }
 
         forEachChild(configObject -> configObject.generateCreateCommands(commandList, objectPath));
+
+        if(requiresDisable) {
+            commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                    SempSpec.ENABLED_ATTRIBUTE_NAME, true));
+        }
+
+    }
+
+    private boolean ifRequiresDisableBeforeUpdateChangeChildren() {
+        if(! sempSpec.getAttributes(AttributeType.ALL).contains(SempSpec.ENABLED_ATTRIBUTE_NAME)) {
+            return false;
+        }
+        if ((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME) == false){
+            return false;
+        }
+        for (String s : children.keySet()) {
+            if (SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD.contains(specPath+"/"+s)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

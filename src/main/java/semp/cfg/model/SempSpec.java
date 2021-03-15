@@ -10,6 +10,8 @@ public class SempSpec {
     public static final String SEMP_VERSION = "sempVersion";
     public static final String DEFAULT_OBJECT_NAME = "default";
     public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
+    public static final String ENABLED_ATTRIBUTE_NAME = "enabled";
+    public static final List<String> SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD = List.of("/dmrClusters/links/remoteAddresses");
 
     private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
