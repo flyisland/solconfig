@@ -200,8 +200,14 @@ public class ConfigObject {
     }
 
     public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
+        var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
         var objectPath = String.format("%s/%s/%s",
                 parentPath, collectionName, getObjectId());
+        if(requiresDisable) {
+            commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                    SempSpec.ENABLED_ATTRIBUTE_NAME, false));
+        }
+
         forEachChild(configObject -> configObject.generateDeleteCommands(commandList, objectPath));
 
         if (isDefaultObject()){
