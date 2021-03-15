@@ -254,10 +254,8 @@ public class ConfigObject {
     }
 
     private boolean ifRequiresDisableBeforeUpdateChangeChildren() {
-        if(! sempSpec.getAttributes(AttributeType.ALL).contains(SempSpec.ENABLED_ATTRIBUTE_NAME)) {
-            return false;
-        }
-        if ((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME) == false){
+        if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+                .orElse(false)){
             return false;
         }
         for (String s : children.keySet()) {
