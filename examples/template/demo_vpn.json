@@ -1,0 +1,57 @@
+{
+  "sempVersion": "2.19",
+  "msgVpns": [
+    {
+      "authenticationBasicProfileName": "",
+      "authenticationBasicType": "internal",
+      "enabled": true,
+      "msgVpnName": "Demo",
+      "aclProfiles": [
+        {
+          "aclProfileName": "default",
+          "clientConnectDefaultAction": "allow",
+          "publishTopicDefaultAction": "allow",
+          "subscribeTopicDefaultAction": "allow"
+        },
+        {
+          "aclProfileName": "testACL",
+          "clientConnectDefaultAction": "allow",
+          "publishTopicDefaultAction": "allow",
+          "subscribeTopicDefaultAction": "allow"
+        }
+      ],
+      "clientProfiles": [
+        {
+          "allowBridgeConnectionsEnabled": true,
+          "allowGuaranteedEndpointCreateEnabled": true,
+          "allowGuaranteedMsgReceiveEnabled": true,
+          "allowGuaranteedMsgSendEnabled": true,
+          "allowSharedSubscriptionsEnabled": true,
+          "clientProfileName": "default"
+        },
+        {
+          "allowBridgeConnectionsEnabled": true,
+          "allowGuaranteedEndpointCreateEnabled": true,
+          "allowGuaranteedMsgReceiveEnabled": true,
+          "allowGuaranteedMsgSendEnabled": true,
+          "allowSharedSubscriptionsEnabled": true,
+          "clientProfileName": "testClientProfile"
+        }
+      ],
+      "clientUsernames": [
+        {
+          "clientUsername": "default",
+          "enabled": true
+        },
+        {
+          "aclProfileName": "testACL",
+          "clientProfileName": "testClientProfile",
+          "clientUsername": "testUser",
+          "enabled": true,
+          "password": "password"
+        }
+      ],
+      <#include "queues.json">
+    }
+  ]
+}

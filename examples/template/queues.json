@@ -1,0 +1,11 @@
+<#import "vars.ftl" as var>
+"queues": [
+    <#list 1..var.qNumber as n>
+    {
+      "egressEnabled": true,
+      "ingressEnabled": true,
+      "permission": "consume",
+      "queueName": "${var.qPrefix}${n?left_pad(3, "0")}"
+    }<#sep>,</#sep>
+    </#list>        
+  ]
