@@ -276,17 +276,6 @@ public class ConfigObject {
         return mergeSet.stream().anyMatch(e -> Requires_Disable.contains(e.getKey()));
     }
 
-    private boolean ifRequiresDisableBeforeChangeChildren(ConfigObject newObj) {
-        if (! Optional.ofNullable((Boolean) newObj.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
-                .orElse(false)){
-            return false;
-        }
-
-        return Stream.concat(children.keySet().stream(), newObj.children.keySet().stream())
-                .distinct()
-                .map(childCollectionName -> specPath + "/" + childCollectionName)
-                .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
-    }
 
     private boolean ifRequiresParentDisableBeforeChange(String childSpecPath) {
         if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
