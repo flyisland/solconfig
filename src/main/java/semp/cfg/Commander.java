@@ -1,5 +1,6 @@
 package semp.cfg;
 
+import lombok.Getter;
 import lombok.Setter;
 import semp.cfg.model.*;
 
@@ -8,9 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Commander {
-    private SempClient sempClient;
-    @Setter
-    private boolean curlOnly;
+    @Getter private SempClient sempClient;
+    @Setter private boolean curlOnly;
 
     public static Commander ofSempClient(SempClient sempClient){
         Commander commander = new Commander();
