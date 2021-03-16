@@ -6,6 +6,7 @@ public enum AttributeType {
     IDENTIFYING("Identifying"),
     REQUIRED("Required"),
     DEPRECATED("Deprecated"),
+    REQUIRES_DISABLE("Requires-Disable"),
     ;
 
     private final String type;
