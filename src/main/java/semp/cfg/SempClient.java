@@ -61,6 +61,15 @@ public class SempClient {
         if (opaquePassword.length() < 8 || opaquePassword.length() > 128) {
             Utils.errPrintlnAndExit("Opaque Password must be between 8 and 128 characters inclusive!");
         }
+        this.opaquePassword = opaquePassword;
+    }
+
+    public String uriAddOpaquePassword(String uri) {
+        if (Optional.ofNullable(opaquePassword).map(String::isEmpty).orElse(true)) {
+            return uri;
+        }
+        var q = (uri.contains("?") ? "&" : "?") + "opaquePassword=" + opaquePassword;
+        return uri+ q;
     }
 
     public String getBrokerSpec() {
@@ -77,7 +86,7 @@ public class SempClient {
         List<SempResponse> responseList = new LinkedList<>();
         Optional<String> nextPageUri = Optional.of(absUri);
         while (nextPageUri.isPresent()){
-            SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", nextPageUri.get(), null));
+            SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", uriAddOpaquePassword(nextPageUri.get()), null));
             responseList.add(resp);
             nextPageUri = resp.getNextPageUri();
         }
