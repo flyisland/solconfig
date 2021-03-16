@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Utils {
     public static ObjectMapper objectMapper = new ObjectMapper();
@@ -65,5 +65,18 @@ public class Utils {
             e.printStackTrace();
         }
         System.exit(1);
+    }
+
+    public static TreeMap<String, Object> symmetricDiff(final Map<String, Object> m1, final Map<String, Object> m2) {
+        var s1 = m1.entrySet();
+        var s2 = m2.entrySet();
+        var symmetricDiff = new TreeSet<>(s1);
+        symmetricDiff.addAll(s2);
+        var tmp = new TreeSet<>(s1);
+        tmp.retainAll(s2);
+        symmetricDiff.removeAll(tmp);
+
+        var result= symmetricDiff.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return new TreeMap<>(result);
     }
 }

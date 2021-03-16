@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ConfigObject {
     private final String collectionName;
@@ -274,5 +275,27 @@ public class ConfigObject {
             return false;
         }
         return sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE).stream().anyMatch(attributes::containsKey);
+    }
+
+    private static ConfigObject merge(ConfigObject objOld, ConfigObject objNew) {
+        if (!objNew.objectPath.equals(objOld.objectPath)) {
+            Utils.errPrintlnAndExit("Can NOT merge two config object with different objectPath as '%s' and '%s'!",
+                    objOld.objectPath, objNew.objectPath);
+        }
+        var objMerge = new ConfigObject();
+        objMerge.sempSpec = objOld.sempSpec;
+        objMerge.attributes = Utils.symmetricDiff(objOld.attributes, objNew.attributes);
+
+        Stream.concat(
+                objOld.children.entrySet().stream(),
+                objNew.children.entrySet().stream())
+                .forEach(e -> Optional.ofNullable(objMerge.children.get(e.getKey()))
+                        .ifPresentOrElse(
+                                list -> list.addAll(e.getValue()),
+                                () -> {
+                                    objMerge.children.put(e.getKey(), e.getValue());
+                                })
+                );
+        return objMerge;
     }
 }
