@@ -76,8 +76,7 @@ public class Commander {
                 List<Map<String, Object>> data = sempResponse.getData();
                 List<Map<String, String>> links = sempResponse.getLinks();
                 for (int i = 0; i < data.size(); i++) {
-                    ConfigObject child = ConfigObject.ofAttributes(collectionName, data.get(i));
-                    configObject.addChild(child);
+                    var child = configObject.addChild(collectionName, data.get(i));
                     getChildrenRecursively(child, links.get(i));
                 }
             });

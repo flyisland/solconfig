@@ -42,6 +42,17 @@ public class ConfigObject {
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
     }
 
+    public ConfigObject addChild(String collectionName, Map<String, Object> attributes) {
+        ConfigObject child = new ConfigObject(collectionName);
+        child.setSpecPath(specPath + "/" + child.collectionName);
+        for (String name : child.sempSpec.getAttributes(AttributeType.ALL)) {
+            Optional.ofNullable(attributes.get(name))
+                    .ifPresent(v -> child.attributes.put(name, v));
+        }
+        children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
+        return child;
+    }
+
     protected void setSpecPath(String path) {
         this.specPath = path;
         this.sempSpec = SempSpec.get(specPath);
