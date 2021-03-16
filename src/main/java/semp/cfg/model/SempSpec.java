@@ -17,7 +17,7 @@ public class SempSpec {
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
     @Getter private static SempVersion sempVersion;
 
-    private String specPath;
+    @Getter private String specPath;
     @Getter private boolean deprecated;
     private Map<String, List<String>> attributes;
     @Getter private Map<String, Object> defaultValues;

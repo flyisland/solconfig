@@ -288,12 +288,50 @@ public class ConfigObject {
                 .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
     }
 
-    public void generateUpdateCommands(ConfigObject newObj,
-                                       RestCommandList deleteCommandList, RestCommandList updateCommandList, RestCommandList createCommandList) {
-        var requiresDisableUpdateAttributes = ifRequiresDisableBeforeUpdateAttributes(newObj);
-        var requiresDisableChangeChildren = ifRequiresDisableBeforeChangeChildren(newObj);
+    private boolean ifRequiresParentDisableBeforeChange(String childSpecPath) {
+        if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+                .orElse(false)){
+            return false;
+        }
+        return SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD
+                .contains(childSpecPath);
+    }
 
-        if (requiresDisableUpdateAttributes) {
+    public void generateUpdateCommands(ConfigObject newObj,
+                                       RestCommandList deleteCommandList, RestCommandList updateCommandList,
+                                       RestCommandList createCommandList, RestCommandList enableCommandList) {
+        var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        var newChildren = newObj.children.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        var requiresDisableChangeChildren = false;
+        for (Iterator<ConfigObject> newIt = newChildren.iterator(); newIt.hasNext(); ) {
+            var newItem = newIt.next();
+            if (oldChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(newItem.objectPath))) {
+                if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(newItem.specPath)){
+                    requiresDisableChangeChildren = true;
+                    createCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                            SempSpec.ENABLED_ATTRIBUTE_NAME, false));
+                }
+
+                newItem.generateCreateCommands(createCommandList);
+                newIt.remove();
+            }
+        }
+
+        for (Iterator<ConfigObject> oldIt = oldChildren.iterator(); oldIt.hasNext(); ) {
+            var oldItem = oldIt.next();
+            if (newChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(oldItem.objectPath))) {
+                if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(oldItem.specPath)){
+                    requiresDisableChangeChildren = true;
+                    deleteCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                            SempSpec.ENABLED_ATTRIBUTE_NAME, false));
+                }
+                oldItem.generateDeleteCommands(deleteCommandList);
+                oldIt.remove();
+            }
+        }
+
+        var requiresDisableUpdateAttributes = ifRequiresDisableBeforeUpdateAttributes(newObj);
+        if (requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
         if (!attributes.entrySet().equals(newObj.attributes.entrySet()) &&
@@ -302,39 +340,15 @@ public class ConfigObject {
             updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
         }
 
-        if (requiresDisableChangeChildren){
-            // disable this object before changing children
-            createCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
-                    SempSpec.ENABLED_ATTRIBUTE_NAME, false));
-        }
-
-        var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
-        var newChildren = newObj.children.values().stream().flatMap(List::stream).collect(Collectors.toList());
-
-        for (Iterator<ConfigObject> oldIt = oldChildren.iterator(); oldIt.hasNext(); ) {
-            var oldItem = oldIt.next();
-            if (newChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(oldItem.objectPath))) {
-                oldItem.generateDeleteCommands(deleteCommandList);
-                oldIt.remove();
-            }
-        }
-
-        for (Iterator<ConfigObject> newIt = newChildren.iterator(); newIt.hasNext(); ) {
-            var newItem = newIt.next();
-            if (oldChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(newItem.objectPath))) {
-                newItem.generateCreateCommands(createCommandList);
-                newIt.remove();
-            }
-        }
 
         for (int i = 0; i < oldChildren.size(); i++) {
             oldChildren.get(i).generateUpdateCommands(newChildren.get(i),
-                    deleteCommandList, updateCommandList, createCommandList);
+                    deleteCommandList, updateCommandList, createCommandList, enableCommandList);
         }
 
         if(requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
             // enable this object at last
-            deleteCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+            enableCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
     }

@@ -176,9 +176,11 @@ public class Commander {
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();
         var updateCommandList = new RestCommandList();
-        configBroker.generateUpdateCommands(configFile, deleteCommandList, updateCommandList, createCommandList);
+        var enableCommandList = new RestCommandList();
+        configBroker.generateUpdateCommands(configFile, deleteCommandList, updateCommandList, createCommandList, enableCommandList);
 
-        var allCommands = createCommandList.addAll(updateCommandList).addAll(deleteCommandList);
+        var allCommands = createCommandList.addAll(updateCommandList)
+                .addAll(deleteCommandList).addAll(enableCommandList);
         if (allCommands.sieze()>0){
             allCommands.execute(sempClient, curlOnly);
         }else {
