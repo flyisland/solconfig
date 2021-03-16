@@ -52,6 +52,7 @@ public class Commander {
     private ConfigBroker generateConfigFromBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
+        configBroker.setOpaquePassword(sempClient.getOpaquePassword());
 
         var nameList = Arrays.asList(objectNames);
         if (nameList.contains("*")){

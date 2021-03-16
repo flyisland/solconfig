@@ -28,7 +28,7 @@ public class SempClient {
     @Getter private final String baseUrl;
     @Getter private final String adminUser;
     @Getter private final String adminPwd;
-    private String opaquePassword;
+    @Getter private String opaquePassword;
     private final HttpClient httpClient;
 
     public SempClient(String adminUrl, String adminUser, String adminPwd) {
@@ -68,8 +68,8 @@ public class SempClient {
         if (Optional.ofNullable(opaquePassword).map(String::isEmpty).orElse(true)) {
             return uri;
         }
-        var q = (uri.contains("?") ? "&" : "?") + "opaquePassword=" + opaquePassword;
-        return uri+ q;
+        var q = (uri.contains("?") ? "&" : "?") + SempSpec.OPAQUE_PASSWORD + "=" + opaquePassword;
+        return uri + q;
     }
 
     public String getBrokerSpec() {
