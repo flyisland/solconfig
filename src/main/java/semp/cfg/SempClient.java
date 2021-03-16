@@ -63,6 +63,10 @@ public class SempClient {
         }
     }
 
+    public String getBrokerSpec() {
+        return sendWithResourcePath(HTTPMethod.GET.name(), "/spec", null);
+    }
+
     /**
      * If the collection is large, this method will follow the "nextPageUri" field
      * in the response to continually fetch all results.
