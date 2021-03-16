@@ -289,8 +289,8 @@ public class ConfigObject {
                 .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
     }
 
-    public void generateObjectUpdateCommands(ConfigObject newObj,
-                                             RestCommandList deleteCommandList, RestCommandList updateCommandList, RestCommandList createCommandList) {
+    public void generateUpdateCommands(ConfigObject newObj,
+                                       RestCommandList deleteCommandList, RestCommandList updateCommandList, RestCommandList createCommandList) {
         var requiresDisable = ifRequiresDisableBeforeUpdateAttributes(newObj) ||
                 ifRequiresDisableBeforeChangeChildren(newObj);
         if (requiresDisable) {
@@ -321,7 +321,7 @@ public class ConfigObject {
         }
 
         for (int i = 0; i < oldChildren.size(); i++) {
-            oldChildren.get(i).generateObjectUpdateCommands(newChildren.get(i),
+            oldChildren.get(i).generateUpdateCommands(newChildren.get(i),
                     deleteCommandList, updateCommandList, createCommandList);
         }
 
