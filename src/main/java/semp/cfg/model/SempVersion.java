@@ -32,17 +32,4 @@ public class SempVersion{
                 ", number=" + number +
                 '}';
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SempVersion that = (SempVersion) o;
-        return number == that.number && Objects.equals(text, that.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(text, number);
-    }
 }
