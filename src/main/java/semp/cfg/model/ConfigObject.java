@@ -291,36 +291,18 @@ public class ConfigObject {
                                        RestCommandList createCommandList, RestCommandList enableCommandList) {
         var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
         var newChildren = newObj.children.values().stream().flatMap(List::stream).collect(Collectors.toList());
-        var requiresDisableChangeChildren = false;
-        for (Iterator<ConfigObject> newIt = newChildren.iterator(); newIt.hasNext(); ) {
-            var newItem = newIt.next();
-            if (oldChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(newItem.objectPath))) {
-                if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(newItem.specPath)){
-                    requiresDisableChangeChildren = true;
-                    createCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
-                            SempSpec.ENABLED_ATTRIBUTE_NAME, false));
-                }
+        var requiresDisableChangeChildren = generateUpdateChildrenCommands(
+                createCommandList, oldChildren, newChildren, c-> c.generateCreateCommands(createCommandList),false);
+        requiresDisableChangeChildren = generateUpdateChildrenCommands(
+                deleteCommandList, newChildren, oldChildren, c-> c.generateDeleteCommands(deleteCommandList),requiresDisableChangeChildren);
 
-                newItem.generateCreateCommands(createCommandList);
-                newIt.remove();
-            }
+        if(requiresDisableChangeChildren) {
+            // means this object has already been disabled, update it to reflect the status
+            attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
+            newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
-
-        for (Iterator<ConfigObject> oldIt = oldChildren.iterator(); oldIt.hasNext(); ) {
-            var oldItem = oldIt.next();
-            if (newChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(oldItem.objectPath))) {
-                if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(oldItem.specPath)){
-                    requiresDisableChangeChildren = true;
-                    deleteCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
-                            SempSpec.ENABLED_ATTRIBUTE_NAME, false));
-                }
-                oldItem.generateDeleteCommands(deleteCommandList);
-                oldIt.remove();
-            }
-        }
-
         var requiresDisableUpdateAttributes = ifRequiresDisableBeforeUpdateAttributes(newObj);
-        if (requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
+        if (requiresDisableUpdateAttributes){
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
         if (!attributes.entrySet().equals(newObj.attributes.entrySet()) &&
@@ -328,7 +310,6 @@ public class ConfigObject {
             var payload = newObj.toJsonStringAttributeOnly();
             updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
         }
-
 
         for (int i = 0; i < oldChildren.size(); i++) {
             oldChildren.get(i).generateUpdateCommands(newChildren.get(i),
@@ -340,6 +321,23 @@ public class ConfigObject {
             enableCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
+    }
+
+    private boolean generateUpdateChildrenCommands(RestCommandList commandList, List<ConfigObject> l1, List<ConfigObject> l2, Consumer<ConfigObject> action, boolean requiresDisableChangeChildren) {
+        for (Iterator<ConfigObject> newIt = l2.iterator(); newIt.hasNext(); ) {
+            var diffItem = newIt.next();
+            if (l1.stream().noneMatch(configObject -> configObject.objectPath.equals(diffItem.objectPath))) {
+                if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(diffItem.specPath)){
+                    requiresDisableChangeChildren = true;
+                    commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                            SempSpec.ENABLED_ATTRIBUTE_NAME, false));
+                }
+
+                action.accept(diffItem);
+                newIt.remove();
+            }
+        }
+        return requiresDisableChangeChildren;
     }
 
 }
