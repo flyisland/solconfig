@@ -8,7 +8,7 @@ import semp.cfg.SempClient;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "sempcfg", mixinStandardHelpOptions = true, version = {"sempcfg 0.1",
+@Command(name = "sempcfg", mixinStandardHelpOptions = true, version = {"sempcfg 1.0.0",
         "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
         "OS: ${os.name} ${os.version} ${os.arch}"},
         description = "Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol. " +
