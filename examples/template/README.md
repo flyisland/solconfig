@@ -6,11 +6,11 @@ The most used features are:
 
 ## [Include](https://freemarker.apache.org/docs/ref_directive_include.html)
 
-The `include` directive lets you literally include different parts of configuration file together.  For example, you could have the queue's configuration in a separated file `queues.json`,  then include it into the message vpn configuration file `demo_vpn.json`.
+The `include` directive lets you literally include different parts of configuration file together.  For example, you could have the queue's configuration in a separated file [queues.json](queues.json),  then include it into the message vpn configuration file [demo_vpn.json](demo_vpn.json).
 
 ## [Import](https://freemarker.apache.org/docs/ref_directive_include.html)
 
-The `import` directive is used to define your variables together in a separated file. For example, you could have the number and name prefix of queue defined in the file `vars.ftl`, then import it in the `queues.json` file.
+The `import` directive is used to define your variables together in a separated file. For example, you could have the number and name prefix of queue defined in the file [vars.ftl](vars.ftl), then import it in the [queues.json](queues.json) file.
 
 ## [Apache FreeMarker Manual](https://freemarker.apache.org/docs/index.html)
 
