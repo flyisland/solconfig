@@ -3,7 +3,6 @@ package semp.cfg;
 import lombok.Setter;
 import semp.cfg.model.*;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class Commander {
 
     public void backup(String resourceType, String[] objectNames){
         exitOnObjectsNotExist(resourceType, objectNames);
-        ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
+        ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
 
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
@@ -36,7 +35,7 @@ public class Commander {
 
     public void delete(String resourceType, String[] objectNames) {
         exitOnObjectsNotExist(resourceType, objectNames);
-        ConfigBroker configBroker = getConfigBroker(resourceType, objectNames);
+        ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
 
         var commandList = new RestCommandList();
@@ -44,7 +43,13 @@ public class Commander {
         commandList.execute(sempClient, curlOnly);
     }
 
-    private ConfigBroker getConfigBroker(String resourceType, String[] objectNames) {
+    /**
+     * Geenerate a ConfigBroker object from the PS+ broker
+     * @param resourceType of one resource type
+     * @param objectNames of multiple objects
+     * @return a new ConfigBroker object
+     */
+    private ConfigBroker generateConfigFromBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
 
