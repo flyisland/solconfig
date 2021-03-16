@@ -269,33 +269,45 @@ public class ConfigObject {
         return false;
     }
 
-    private static boolean ifRequiresDisableBeforeUpdateAttributes(SempSpec sempSpec, Map<String, Object> attributes) {
-        if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+    private boolean ifRequiresDisableBeforeUpdateAttributes(ConfigObject objNew) {
+        if (! Optional.ofNullable((Boolean) objNew.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
                 .orElse(false)){
             return false;
         }
-        return sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE).stream().anyMatch(attributes::containsKey);
+        var mergeSet = Utils.symmetricDiff(attributes.entrySet(), objNew.attributes.entrySet());
+        var Requires_Disable = sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE);
+        return mergeSet.stream().anyMatch(e -> Requires_Disable.contains(e.getKey()));
     }
 
-    private static ConfigObject merge(ConfigObject objOld, ConfigObject objNew) {
-        if (!objNew.objectPath.equals(objOld.objectPath)) {
-            Utils.errPrintlnAndExit("Can NOT merge two config object with different objectPath as '%s' and '%s'!",
-                    objOld.objectPath, objNew.objectPath);
+    private boolean ifRequiresDisableBeforeChangeChildren(ConfigObject objNew) {
+        if (! Optional.ofNullable((Boolean) objNew.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+                .orElse(false)){
+            return false;
         }
-        var objMerge = new ConfigObject();
-        objMerge.sempSpec = objOld.sempSpec;
-        objMerge.attributes = Utils.symmetricDiff(objOld.attributes, objNew.attributes);
 
-        Stream.concat(
-                objOld.children.entrySet().stream(),
-                objNew.children.entrySet().stream())
-                .forEach(e -> Optional.ofNullable(objMerge.children.get(e.getKey()))
-                        .ifPresentOrElse(
-                                list -> list.addAll(e.getValue()),
-                                () -> {
-                                    objMerge.children.put(e.getKey(), e.getValue());
-                                })
-                );
-        return objMerge;
+        return Stream.concat(children.keySet().stream(), objNew.children.keySet().stream())
+                .distinct()
+                .map(childCollectionName -> specPath + "/" + childCollectionName)
+                .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
     }
+
+
+    public void generateObjectUpdateCommands(ConfigObject newObj, RestCommandList updateCommandList) {
+        var requiresDisable = ifRequiresDisableBeforeUpdateAttributes(newObj) ||
+                ifRequiresDisableBeforeChangeChildren(newObj);
+        if (requiresDisable) {
+            newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
+        }
+
+        var payload = newObj.toJsonStringAttributeOnly();
+        updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
+
+        // TODO: update children
+
+        if(requiresDisable) {
+            updateCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                    SempSpec.ENABLED_ATTRIBUTE_NAME, true));
+        }
+    }
+
 }
