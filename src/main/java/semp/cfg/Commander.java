@@ -39,7 +39,7 @@ public class Commander {
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
 
         var commandList = new RestCommandList();
-        configBroker.forEachChild(configObject -> configObject.generateDeleteCommands(commandList, ""));
+        configBroker.forEachChild(configObject -> configObject.generateDeleteCommands(commandList));
         commandList.execute(sempClient, curlOnly);
     }
 
@@ -95,7 +95,7 @@ public class Commander {
         }
 
         var commandList = new RestCommandList();
-        configBroker.forEachChild(configObject -> configObject.generateCreateCommands(commandList, ""));
+        configBroker.forEachChild(configObject -> configObject.generateCreateCommands(commandList));
         commandList.execute(sempClient, curlOnly);
     }
 

@@ -203,14 +203,14 @@ public class ConfigObject {
                 .forEach(action);
     }
 
-    public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
+    public void generateDeleteCommands(RestCommandList commandList) {
         var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
         if(requiresDisable) {
             commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, false));
         }
 
-        forEachChild(configObject -> configObject.generateDeleteCommands(commandList, objectPath));
+        forEachChild(configObject -> configObject.generateDeleteCommands(commandList));
 
         if (isDefaultObject()){
             if(sempSpec.getAttributes(AttributeType.ALL).contains("enabled")) {
@@ -235,7 +235,7 @@ public class ConfigObject {
 
     }
 
-    public void generateCreateCommands(RestCommandList commandList, String parentPath) {
+    public void generateCreateCommands(RestCommandList commandList) {
         var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
         if (requiresDisable) {
             attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
@@ -247,7 +247,7 @@ public class ConfigObject {
             commandList.append(HTTPMethod.POST, collectionPath, payload);
         }
 
-        forEachChild(configObject -> configObject.generateCreateCommands(commandList, objectPath));
+        forEachChild(configObject -> configObject.generateCreateCommands(commandList));
 
         if(requiresDisable) {
             commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
