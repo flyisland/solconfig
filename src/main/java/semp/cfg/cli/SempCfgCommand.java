@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
             BackupCommand.class,
             DeleteCommand.class,
             CreateCommand.class,
+            UpdateCommand.class,
             CommandLine.HelpCommand.class
         },
         showDefaultValues = true)

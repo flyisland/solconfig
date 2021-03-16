@@ -92,4 +92,13 @@ public class RestCommandList {
         }
         return sb.toString();
     }
+
+    public RestCommandList addAll(RestCommandList toAdd) {
+        commands.addAll(toAdd.commands);
+        return this;
+    }
+
+    public int sieze() {
+        return commands.size();
+    }
 }

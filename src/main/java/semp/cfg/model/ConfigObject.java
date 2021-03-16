@@ -15,10 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ConfigObject {
-    private final String collectionName;
+    @Getter private final String collectionName;
     protected TreeMap<String, Object> attributes;
-    @Getter
-    private final TreeMap<String, List<ConfigObject>> children;
+    @Getter private final TreeMap<String, List<ConfigObject>> children;
     private String specPath;
     private SempSpec sempSpec;
     private String collectionPath;
@@ -267,23 +266,23 @@ public class ConfigObject {
         return false;
     }
 
-    private boolean ifRequiresDisableBeforeUpdateAttributes(ConfigObject objNew) {
-        if (! Optional.ofNullable((Boolean) objNew.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+    private boolean ifRequiresDisableBeforeUpdateAttributes(ConfigObject newObj) {
+        if (! Optional.ofNullable((Boolean) newObj.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
                 .orElse(false)){
             return false;
         }
-        var mergeSet = Utils.symmetricDiff(attributes.entrySet(), objNew.attributes.entrySet());
+        var mergeSet = Utils.symmetricDiff(attributes.entrySet(), newObj.attributes.entrySet());
         var Requires_Disable = sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE);
         return mergeSet.stream().anyMatch(e -> Requires_Disable.contains(e.getKey()));
     }
 
-    private boolean ifRequiresDisableBeforeChangeChildren(ConfigObject objNew) {
-        if (! Optional.ofNullable((Boolean) objNew.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+    private boolean ifRequiresDisableBeforeChangeChildren(ConfigObject newObj) {
+        if (! Optional.ofNullable((Boolean) newObj.attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
                 .orElse(false)){
             return false;
         }
 
-        return Stream.concat(children.keySet().stream(), objNew.children.keySet().stream())
+        return Stream.concat(children.keySet().stream(), newObj.children.keySet().stream())
                 .distinct()
                 .map(childCollectionName -> specPath + "/" + childCollectionName)
                 .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
@@ -291,16 +290,24 @@ public class ConfigObject {
 
     public void generateUpdateCommands(ConfigObject newObj,
                                        RestCommandList deleteCommandList, RestCommandList updateCommandList, RestCommandList createCommandList) {
-        var requiresDisable = ifRequiresDisableBeforeUpdateAttributes(newObj) ||
-                ifRequiresDisableBeforeChangeChildren(newObj);
-        if (requiresDisable) {
+        var requiresDisableUpdateAttributes = ifRequiresDisableBeforeUpdateAttributes(newObj);
+        var requiresDisableChangeChildren = ifRequiresDisableBeforeChangeChildren(newObj);
+
+        if (requiresDisableUpdateAttributes) {
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
+        if (!attributes.entrySet().equals(newObj.attributes.entrySet()) &&
+                newObj.attributes.size() > 0) {
+            var payload = newObj.toJsonStringAttributeOnly();
+            updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
+        }
 
-        var payload = newObj.toJsonStringAttributeOnly();
-        updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
+        if (requiresDisableChangeChildren){
+            // disable this object before changing children
+            createCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                    SempSpec.ENABLED_ATTRIBUTE_NAME, isDefaultObject()));
+        }
 
-        // TODO: update children
         var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
         var newChildren = newObj.children.values().stream().flatMap(List::stream).collect(Collectors.toList());
 
@@ -325,8 +332,9 @@ public class ConfigObject {
                     deleteCommandList, updateCommandList, createCommandList);
         }
 
-        if(requiresDisable) {
-            updateCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+        if(requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
+            // enable this object at last
+            deleteCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
     }

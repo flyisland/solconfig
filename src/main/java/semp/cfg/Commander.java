@@ -139,4 +139,51 @@ public class Commander {
                 existOn ? "already" : "doesn't");
     }
 
+    private void exitOnObjectsNotExist(ConfigBroker configFile) {
+        configFile.forEachChild(obj ->
+                checkObjectsExistence(obj.getCollectionName(), List.of(obj.getObjectId()), false));
+    }
+
+    private ConfigBroker generateConfigFromBroker(ConfigBroker configFile) {
+        ConfigBroker configBroker = new ConfigBroker();
+        configBroker.setSempVersion(SempSpec.getSempVersion());
+
+        Map<String, String> childrenLinks = new TreeMap<>();
+        configFile.forEachChild(configObject -> {
+            String resourceType = configObject.getCollectionName();
+            String objectName = configObject.getObjectId();
+            childrenLinks.put(objectName,
+                    sempClient.buildAbsoluteUri(String.format("/%s?where=%s==%s",
+                            resourceType, SempSpec.getTopResourceIdentifierKey(resourceType), objectName)));
+        });
+
+        getChildrenRecursively(configBroker, childrenLinks);
+        return configBroker;
+    }
+
+    public void update(Path confPath) {
+        ConfigBroker configFile = new ConfigBroker();
+        configFile.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        exitOnObjectsNotExist(configFile);
+        ConfigBroker configBroker = generateConfigFromBroker(configFile);
+        List.of(configFile, configBroker).forEach(cb->{
+            cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
+            cb.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
+            cb.removeAttributesWithDefaultValue();
+        });
+
+
+        var deleteCommandList = new RestCommandList();
+        var createCommandList = new RestCommandList();
+        var updateCommandList = new RestCommandList();
+        configBroker.generateUpdateCommands(configFile, deleteCommandList, updateCommandList, createCommandList);
+
+        var allCommands = createCommandList.addAll(updateCommandList).addAll(deleteCommandList);
+        if (allCommands.sieze()>0){
+            allCommands.execute(sempClient, curlOnly);
+        }else {
+            Utils.errPrintlnAndExit("Configuration file %s is identical to the existing objects.", confPath.toAbsolutePath());
+        }
+    }
+
 }

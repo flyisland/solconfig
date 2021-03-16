@@ -68,7 +68,7 @@ public class Utils {
     }
 
     public static Set<Map.Entry<String, Object>> symmetricDiff(Set<Map.Entry<String, Object>> s1, Set<Map.Entry<String, Object>> s2) {
-        var symmetricDiff = new TreeSet<>(s1);
+        var symmetricDiff = new HashSet<>(s1);
         symmetricDiff.addAll(s2);
         var tmp = new HashSet<>(s1);
         tmp.retainAll(s2);
