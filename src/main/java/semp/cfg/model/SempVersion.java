@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.Objects;
 
-public class SempVersion{
+public class SempVersion implements Comparable<SempVersion>{
     @Getter
     private String text;
     private int   number;
@@ -31,5 +31,10 @@ public class SempVersion{
                 "text='" + text + '\'' +
                 ", number=" + number +
                 '}';
+    }
+
+    @Override
+    public int compareTo(SempVersion input) {
+        return number-input.number;
     }
 }
