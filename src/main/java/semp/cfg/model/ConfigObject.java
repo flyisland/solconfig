@@ -206,7 +206,7 @@ public class ConfigObject {
 
     public void forEachChild(Consumer<ConfigObject> action) {
         getChildren().values().stream()
-                .flatMap(list -> list.stream())
+                .flatMap(Collection::stream)
                 .forEach(action);
     }
 
