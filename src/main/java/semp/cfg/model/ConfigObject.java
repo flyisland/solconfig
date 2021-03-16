@@ -253,7 +253,6 @@ public class ConfigObject {
             commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
-
     }
 
     private boolean ifRequiresDisableBeforeUpdateChangeChildren() {
@@ -267,5 +266,13 @@ public class ConfigObject {
             }
         }
         return false;
+    }
+
+    private static boolean ifRequiresDisableBeforeUpdateAttributes(SempSpec sempSpec, Map<String, Object> attributes) {
+        if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
+                .orElse(false)){
+            return false;
+        }
+        return sempSpec.getAttributes(AttributeType.REQUIRES_DISABLE).stream().anyMatch(attributes::containsKey);
     }
 }
