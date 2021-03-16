@@ -204,7 +204,7 @@ public class ConfigObject {
     }
 
     public void generateDeleteCommands(RestCommandList commandList) {
-        var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
+        var requiresDisable = ifRequiresDisableBeforeChangeChildren();
         if(requiresDisable) {
             commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, false));
@@ -236,7 +236,7 @@ public class ConfigObject {
     }
 
     public void generateCreateCommands(RestCommandList commandList) {
-        var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
+        var requiresDisable = ifRequiresDisableBeforeChangeChildren();
         if (requiresDisable) {
             attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
@@ -255,7 +255,7 @@ public class ConfigObject {
         }
     }
 
-    private boolean ifRequiresDisableBeforeUpdateChangeChildren() {
+    private boolean ifRequiresDisableBeforeChangeChildren() {
         if (! Optional.ofNullable((Boolean) attributes.get(SempSpec.ENABLED_ATTRIBUTE_NAME))
                 .orElse(false)){
             return false;
