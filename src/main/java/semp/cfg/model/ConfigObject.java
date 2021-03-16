@@ -305,7 +305,7 @@ public class ConfigObject {
         if (requiresDisableChangeChildren){
             // disable this object before changing children
             createCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
-                    SempSpec.ENABLED_ATTRIBUTE_NAME, isDefaultObject()));
+                    SempSpec.ENABLED_ATTRIBUTE_NAME, false));
         }
 
         var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
