@@ -289,8 +289,8 @@ public class ConfigObject {
                 .anyMatch(SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD::contains);
     }
 
-
-    public void generateObjectUpdateCommands(ConfigObject newObj, RestCommandList updateCommandList) {
+    public void generateObjectUpdateCommands(ConfigObject newObj,
+                                             RestCommandList deleteCommandList, RestCommandList updateCommandList, RestCommandList createCommandList) {
         var requiresDisable = ifRequiresDisableBeforeUpdateAttributes(newObj) ||
                 ifRequiresDisableBeforeChangeChildren(newObj);
         if (requiresDisable) {
@@ -301,6 +301,29 @@ public class ConfigObject {
         updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
 
         // TODO: update children
+        var oldChildren = children.values().stream().flatMap(List::stream).collect(Collectors.toList());
+        var newChildren = newObj.children.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+        for (Iterator<ConfigObject> oldIt = oldChildren.iterator(); oldIt.hasNext(); ) {
+            var oldItem = oldIt.next();
+            if (newChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(oldItem.objectPath))) {
+                oldItem.generateDeleteCommands(deleteCommandList);
+                oldIt.remove();
+            }
+        }
+
+        for (Iterator<ConfigObject> newIt = newChildren.iterator(); newIt.hasNext(); ) {
+            var newItem = newIt.next();
+            if (oldChildren.stream().noneMatch(configObject -> configObject.objectPath.equals(newItem.objectPath))) {
+                newItem.generateCreateCommands(createCommandList);
+                newIt.remove();
+            }
+        }
+
+        for (int i = 0; i < oldChildren.size(); i++) {
+            oldChildren.get(i).generateObjectUpdateCommands(newChildren.get(i),
+                    deleteCommandList, updateCommandList, createCommandList);
+        }
 
         if(requiresDisable) {
             updateCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
