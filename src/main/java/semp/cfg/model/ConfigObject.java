@@ -20,6 +20,8 @@ public class ConfigObject {
     private final TreeMap<String, List<ConfigObject>> children;
     private String specPath;
     private SempSpec sempSpec;
+    private String collectionPath;
+    private String objectPath="";
 
     public ConfigObject(){
         this(null);
@@ -38,6 +40,8 @@ public class ConfigObject {
             Optional.ofNullable(attributes.get(name))
                     .ifPresent(v -> child.attributes.put(name, v));
         }
+        child.collectionPath = objectPath + "/" + collectionName;
+        child.objectPath = child.collectionPath + "/" + child.getObjectId();
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
         return child;
     }
@@ -201,8 +205,6 @@ public class ConfigObject {
 
     public void generateDeleteCommands(RestCommandList commandList, String parentPath) {
         var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
-        var objectPath = String.format("%s/%s/%s",
-                parentPath, collectionName, getObjectId());
         if(requiresDisable) {
             commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, false));
@@ -234,9 +236,6 @@ public class ConfigObject {
     }
 
     public void generateCreateCommands(RestCommandList commandList, String parentPath) {
-        var collectionPath = parentPath + "/" + collectionName;
-        var objectPath = collectionPath + "/" + getObjectId();
-
         var requiresDisable = ifRequiresDisableBeforeUpdateChangeChildren();
         if (requiresDisable) {
             attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
