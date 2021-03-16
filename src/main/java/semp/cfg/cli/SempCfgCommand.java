@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
         "OS: ${os.name} ${os.version} ${os.arch}"},
         description = "Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol. " +
                 "Use the 'backup' command to export the configuration of objects on a PS+  Broker into a single JSON, " +
-                "then use the 'create' or 'sync' command to restore the configuration.",
+                "then use the 'create' or 'update' command to restore the configuration.",
         subcommands = {
             BackupCommand.class,
             DeleteCommand.class,
