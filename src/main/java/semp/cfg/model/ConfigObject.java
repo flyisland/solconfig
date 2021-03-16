@@ -230,20 +230,18 @@ public class ConfigObject {
         }
     }
 
-    public void fromMap(Map<String, Object> input) {
+    public void addChildrenFromMap(Map<String, Object> input) {
         var childrenNames = sempSpec.getChildrenNames();
-        input.forEach((key, value)->{
-            if (childrenNames.contains(key)) {
-                var childrenList = (List<Map<String, Object>>) value;
+        childrenNames.forEach(childName->{
+            Optional.ofNullable(input.get(childName)).ifPresent(list->{
+                var childrenList = (List<Map<String, Object>>) list;
                 childrenList.forEach( childMap -> {
-                    var child = new ConfigObject(key);
-                    addChild(child);
-                    child.fromMap(childMap);
+                    var child = addChild(childName, childMap);
+                    child.addChildrenFromMap(childMap);
                 });
-            } else {
-                attributes.put(key, value);
-            }
+            });
         });
+
     }
 
     public void generateCreateCommands(RestCommandList commandList, String parentPath) {

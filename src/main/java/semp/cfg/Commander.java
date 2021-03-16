@@ -89,7 +89,7 @@ public class Commander {
 
     public void create(Path confPath) {
         ConfigBroker configBroker = new ConfigBroker();
-        configBroker.fromMap(SempClient.readMapFromJsonFile(confPath));
+        configBroker.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
         }
