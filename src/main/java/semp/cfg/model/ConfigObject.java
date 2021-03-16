@@ -224,15 +224,13 @@ public class ConfigObject {
 
     public void addChildrenFromMap(Map<String, Object> input) {
         var childrenNames = sempSpec.getChildrenNames();
-        childrenNames.forEach(childName->{
-            Optional.ofNullable(input.get(childName)).ifPresent(list->{
-                var childrenList = (List<Map<String, Object>>) list;
-                childrenList.forEach( childMap -> {
-                    var child = addChild(childName, childMap);
-                    child.addChildrenFromMap(childMap);
-                });
+        childrenNames.forEach(childName-> Optional.ofNullable(input.get(childName)).ifPresent(list->{
+            var childrenList = (List<Map<String, Object>>) list;
+            childrenList.forEach( childMap -> {
+                var child = addChild(childName, childMap);
+                child.addChildrenFromMap(childMap);
             });
-        });
+        }));
 
     }
 
