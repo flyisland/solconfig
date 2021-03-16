@@ -12,6 +12,6 @@ The `include` directive lets you literally include different parts of configurat
 
 The `import` directive is used to define your variables together in a separated file. For example, you could have the number and name prefix of queue defined in the file `vars.ftl`, then import it in the `queues.json` file.
 
-##[Apache FreeMarker Manual](https://freemarker.apache.org/docs/index.html)
+## [Apache FreeMarker Manual](https://freemarker.apache.org/docs/index.html)
 
 Please check the official website for more details of FreeMarker.
