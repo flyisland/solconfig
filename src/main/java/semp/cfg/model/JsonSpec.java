@@ -6,8 +6,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import semp.cfg.Utils;
 
 import java.util.*;
@@ -15,7 +13,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JsonSpec {
-    private static final Logger logger = LoggerFactory.getLogger(JsonSpec.class);
     private DocumentContext jsonPathCtx;
     private List<String> pathsList;
 
@@ -50,8 +47,7 @@ public class JsonSpec {
 
     protected void assertPathExist(String specPath){
         if (! isPathExist(specPath)){
-            logger.error("Path '{}' is NOT found inside the SEMPv2 specification!", specPath);
-            System.exit(1);
+            Utils.errPrintlnAndExit("Path '%s' is NOT found inside the SEMPv2 specification!", specPath);
         }
     }
 
@@ -204,7 +200,7 @@ Map:
 
 
         if (Objects.isNull(ref)){
-            logger.warn("Unable to find path:{}", refPath);
+            Utils.errPrintlnAndExit("Unable to find path %s in the SEMPv2 specification.", refPath);
             return null;
         }
 
@@ -212,7 +208,7 @@ Map:
         var propertiesPath = ref.get(0).replace("#", "$").replace("/", ".") + ".properties";
         Map<String, Map<String, ?>> result = jsonPathRead(propertiesPath, Map.class);
         if (Objects.isNull(result)){
-            logger.warn("Unable to find path:{}", propertiesPath);
+            Utils.errPrintlnAndExit("Unable to find path %s in the SEMPv2 specification.", propertiesPath);
         }
         return result;
     }
@@ -232,7 +228,7 @@ Map:
                 case "string" -> result.put(attr, value.substring(1, value.length() - 1));
                 case "integer" -> result.put(attr, Integer.parseInt(value));
                 case "boolean" -> result.put(attr, Boolean.parseBoolean(value));
-                default -> logger.error("Unknown type '{}' of property '{}', the default value is {}",
+                default -> Utils.errPrintlnAndExit("Unknown type '%s' of property '%s', the default value is '%s'",
                         type, attr, value);
             }
         });
