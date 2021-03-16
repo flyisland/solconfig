@@ -75,7 +75,7 @@ public class SempSpec {
     public static String getTopResourceIdentifierKey(String resourceName) {
         if (TOP_RESOURCES.containsValue(resourceName)){
             return sempSpecMap.get("/"+resourceName).
-                    getAttributes(AttributeType.IDENTIFYING).get(0);
+                    getAttributeNames(AttributeType.IDENTIFYING).get(0);
         }else{
             throw new IllegalArgumentException(
                     String.format("%s is NOT one of [%s]!",
@@ -87,7 +87,7 @@ public class SempSpec {
         return sempSpecMap.get(specPath);
     }
 
-    public List<String> getAttributes(AttributeType type) {
+    public List<String> getAttributeNames(AttributeType type) {
         var result = attributes.get(type.toString());
         if (Objects.nonNull(result)) {
             return result;

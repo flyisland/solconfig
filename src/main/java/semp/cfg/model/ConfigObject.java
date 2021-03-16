@@ -36,7 +36,7 @@ public class ConfigObject {
     public ConfigObject addChild(String collectionName, Map<String, Object> attributes) {
         ConfigObject child = new ConfigObject(collectionName);
         child.setSpecPath(specPath + "/" + child.collectionName);
-        for (String name : child.sempSpec.getAttributes(AttributeType.ALL)) {
+        for (String name : child.sempSpec.getAttributeNames(AttributeType.ALL)) {
             Optional.ofNullable(attributes.get(name))
                     .ifPresent(v -> child.attributes.put(name, v));
         }
@@ -130,7 +130,7 @@ public class ConfigObject {
      * @return the obj-id
      */
     public String getObjectId() {
-        var idList = sempSpec.getAttributes(AttributeType.IDENTIFYING).stream()
+        var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
                 .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                 .collect(Collectors.toList());
@@ -180,7 +180,7 @@ public class ConfigObject {
      */
     public void removeAttributes(AttributeType ... types) {
         for (AttributeType type : types) {
-            var attributesToRemove = sempSpec.getAttributes(type);
+            var attributesToRemove = sempSpec.getAttributeNames(type);
             attributesToRemove.forEach(attrName -> attributes.remove(attrName));
         }
         children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(types)));
@@ -213,7 +213,7 @@ public class ConfigObject {
         forEachChild(configObject -> configObject.generateDeleteCommands(commandList));
 
         if (isDefaultObject()){
-            if(sempSpec.getAttributes(AttributeType.ALL).contains("enabled")) {
+            if(sempSpec.getAttributeNames(AttributeType.ALL).contains("enabled")) {
                 commandList.append(HTTPMethod.PATCH, objectPath, "{\"enabled\":false}");
             }
         }else {
@@ -273,6 +273,6 @@ public class ConfigObject {
                 .orElse(false)){
             return false;
         }
-        return sempSpec.getAttributes(AttributeType.REQUIRES_DISABLE).stream().anyMatch(attributes::containsKey);
+        return sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE).stream().anyMatch(attributes::containsKey);
     }
 }
