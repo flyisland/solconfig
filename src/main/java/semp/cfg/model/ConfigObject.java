@@ -31,17 +31,6 @@ public class ConfigObject {
         children = new TreeMap<>();
     }
 
-    public static ConfigObject ofAttributes(String collectionName, Map<String, Object> attributes){
-        ConfigObject configObject = new ConfigObject(collectionName);
-        configObject.attributes = new TreeMap<>(attributes);
-        return configObject;
-    }
-
-    public void addChild(ConfigObject child){
-        child.setSpecPath(specPath + "/" + child.collectionName);
-        children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
-    }
-
     public ConfigObject addChild(String collectionName, Map<String, Object> attributes) {
         ConfigObject child = new ConfigObject(collectionName);
         child.setSpecPath(specPath + "/" + child.collectionName);
