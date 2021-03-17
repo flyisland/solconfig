@@ -101,7 +101,10 @@ public class Commander {
 
     private ConfigBroker getConfigBrokerFromFile(Path confPath) {
         ConfigBroker configBroker = new ConfigBroker();
-        configBroker.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        Map<String, Object> map = SempClient.readMapFromJsonFile(confPath);
+        configBroker.addChildrenFromMap(map);
+        configBroker.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
+        configBroker.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
         return configBroker;
     }
 
@@ -170,6 +173,8 @@ public class Commander {
     public void update(Path confPath) {
         ConfigBroker configFile = getConfigBrokerFromFile(confPath);
         exitOnObjectsNotExist(configFile);
+
+        sempClient.setOpaquePassword(configFile.getOpaquePassword());
         ConfigBroker configBroker = generateConfigFromBroker(configFile);
         List.of(configFile, configBroker).forEach(cb->{
             cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);

@@ -20,4 +20,8 @@ public class ConfigBroker extends ConfigObject{
         }
         attributes.put(SempSpec.OPAQUE_PASSWORD, opaquePassword);
     }
+
+    public String getOpaquePassword() {
+        return (String) attributes.get(SempSpec.OPAQUE_PASSWORD);
+    }
 }
