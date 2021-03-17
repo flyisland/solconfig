@@ -89,8 +89,7 @@ public class Commander {
     }
 
     public void create(Path confPath) {
-        ConfigBroker configBroker = new ConfigBroker();
-        configBroker.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        ConfigBroker configBroker = getConfigBrokerFromFile(confPath);
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
         }
@@ -98,6 +97,12 @@ public class Commander {
         var commandList = new RestCommandList();
         configBroker.forEachChild(configObject -> configObject.generateCreateCommands(commandList));
         commandList.execute(sempClient, curlOnly);
+    }
+
+    private ConfigBroker getConfigBrokerFromFile(Path confPath) {
+        ConfigBroker configBroker = new ConfigBroker();
+        configBroker.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        return configBroker;
     }
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
@@ -163,8 +168,7 @@ public class Commander {
     }
 
     public void update(Path confPath) {
-        ConfigBroker configFile = new ConfigBroker();
-        configFile.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        ConfigBroker configFile = getConfigBrokerFromFile(confPath);
         exitOnObjectsNotExist(configFile);
         ConfigBroker configBroker = generateConfigFromBroker(configFile);
         List.of(configFile, configBroker).forEach(cb->{
@@ -172,7 +176,6 @@ public class Commander {
             cb.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
             cb.removeAttributesWithDefaultValue();
         });
-
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();
