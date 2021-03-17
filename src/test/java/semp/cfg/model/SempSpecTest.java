@@ -37,8 +37,7 @@ public class SempSpecTest {
     @ParameterizedTest
     @CsvSource({
             "dmrClusters, dmrClusterName",
-            "msgVpns, msgVpnName",
-            "certAuthorities, certAuthorityName"
+            "msgVpns, msgVpnName"
     })
     void testGetTopResourceIdentifierKey(String topName, String expected) {
         assertEquals(expected, SempSpec.getTopResourceIdentifierKey(topName));
