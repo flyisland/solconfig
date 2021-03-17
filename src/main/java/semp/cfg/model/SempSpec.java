@@ -38,6 +38,8 @@ public class SempSpec {
         spec.attributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
         spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
+        spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
+                List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
         return spec;
     }
 

@@ -7,6 +7,7 @@ public enum AttributeType {
     REQUIRED("Required"),
     DEPRECATED("Deprecated"),
     REQUIRES_DISABLE("Requires-Disable"),
+    BROKER_SPECIFIC("BROKER_SPECIFIC"),
     ;
 
     private final String type;

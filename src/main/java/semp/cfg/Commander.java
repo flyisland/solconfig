@@ -178,7 +178,10 @@ public class Commander {
         ConfigBroker configBroker = generateConfigFromBroker(configFile);
         List.of(configFile, configBroker).forEach(cb->{
             cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
-            cb.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
+            cb.removeAttributes(
+                    AttributeType.PARENT_IDENTIFIERS,
+                    AttributeType.DEPRECATED,
+                    AttributeType.BROKER_SPECIFIC);
             cb.removeAttributesWithDefaultValue();
         });
 
