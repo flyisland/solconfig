@@ -5,6 +5,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import semp.cfg.Commander;
 import semp.cfg.SempClient;
+import semp.cfg.Utils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +40,7 @@ public class SempCfgCommand implements Callable<Integer> {
     @Option(names = {"-k", "--insecure"}, description = "Allow insecure server connections when using SSL")
     private boolean insecure = false;
 
-    @Option(names = "--cacert", description = "CA certificate file to verify peer against")
+    @Option(names = "--cacert", description = "CA certificate file to verify peer against when using SSL")
     private Path cacert;
 
     @Option(names = "--curl-only", description = "Print curl commands only, no effect on 'backup' command")
@@ -55,10 +56,7 @@ public class SempCfgCommand implements Callable<Integer> {
     protected void init(){
         Optional.ofNullable(cacert).ifPresent(path -> {
             if (!Files.isReadable(path)) {
-                throw new CommandLine.ParameterException(spec.commandLine(), String.format(
-                        "Path %s doesn't exist or is un-readable!",
-                        path.toAbsolutePath()
-                ));
+                Utils.errPrintlnAndExit("Path %s doesn't exist or is un-readable!", path.toAbsolutePath());
             }
         });
         commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd, insecure, cacert));

@@ -2,6 +2,7 @@ package semp.cfg.cli;
 
 import picocli.CommandLine;
 import semp.cfg.Commander;
+import semp.cfg.Utils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,11 +21,7 @@ public class UpdateCommand extends SubCommand {
     @Override
     protected Integer execute() {
         if (!Files.isReadable(confPath)) {
-            throw new CommandLine.ParameterException(spec.commandLine(), String.format(
-                    "Path %s doesn't exist or is un-readable!",
-                    confPath.toAbsolutePath()
-            ));
-
+            Utils.errPrintlnAndExit("Path %s doesn't exist or is un-readable!", confPath.toAbsolutePath());
         }
 
         Commander commander = parentCommand.commander;
