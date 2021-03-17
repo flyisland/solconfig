@@ -33,10 +33,6 @@ public class SempCfgCommand implements Callable<Integer> {
     @Option(names = {"-p", "--admin-password"}, description = "The password of the management user")
     private String adminPwd = "admin";
 
-    @Option(names = {"-O", "---opaque-password"},
-            description = "The opaquePassword for receiving and updating opaque properties like the password of Client Usernames")
-    private String opaquePassword;
-
     @Option(names = "--curl-only", description = "Print curl commands only, no effect on 'backup' command")
     private boolean curlOnly = false;
 
@@ -50,7 +46,6 @@ public class SempCfgCommand implements Callable<Integer> {
     protected void init(){
         commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd));
         commander.setCurlOnly(curlOnly);
-        commander.getSempClient().setOpaquePassword(opaquePassword);
     }
 
     @Override
