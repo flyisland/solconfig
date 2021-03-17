@@ -103,6 +103,7 @@ public class Commander {
         ConfigBroker configBroker = new ConfigBroker();
         Map<String, Object> map = SempClient.readMapFromJsonFile(confPath);
         configBroker.addChildrenFromMap(map);
+        configBroker.sortChildren();
         configBroker.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
         configBroker.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
         return configBroker;

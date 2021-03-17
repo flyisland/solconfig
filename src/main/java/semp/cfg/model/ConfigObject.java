@@ -340,4 +340,8 @@ public class ConfigObject {
         return requiresDisableChangeChildren;
     }
 
+    public void sortChildren() {
+        getChildren().values().forEach(l -> l.sort(Comparator.comparing(ConfigObject::getObjectId)));
+        forEachChild(ConfigObject::sortChildren);
+    }
 }
