@@ -85,7 +85,7 @@ public class RestCommandList {
         for (Command cmd : commands) {
             sb.append("\n");
             String uri = sempClient.uriAddOpaquePassword(cmd.resourcePath);
-            sb.append(String.format("curl -X %s -u $SEMP_ADMIN:$SEMP_PWD $SEMP_HOST%s",
+            sb.append(String.format("curl -X %s -u $SEMP_ADMIN:$SEMP_PWD \"$SEMP_HOST%s\"",
                     cmd.method.name(), uri));
             if (Objects.nonNull(cmd.payload) && cmd.payload.length() > 0) {
                 sb.append(" -H 'content-type: application/json' -d '");
