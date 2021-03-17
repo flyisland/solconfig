@@ -104,15 +104,7 @@ public class SempClient {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
             return sslContext;
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
         }
         return null;
@@ -179,7 +171,8 @@ public class SempClient {
      * Send a SEMPv2 request, and return only the meta part of the response.
      */
     public SempMeta sendAndGetMeta(String method, String resourcePath, String payload) {
-        return SempMeta.ofString(sendWithResourcePath(method, resourcePath, payload));
+        String uri = uriAddOpaquePassword(resourcePath);
+        return SempMeta.ofString(sendWithResourcePath(method, uri, payload));
     }
 
     public String sendWithResourcePath(String method, String resourcePath, String payload) {

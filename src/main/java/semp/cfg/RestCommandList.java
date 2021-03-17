@@ -50,9 +50,8 @@ public class RestCommandList {
     private void execute(SempClient sempClient, List<Command> commandList) {
         List<Command> retryCommands = new LinkedList<>();
         for (Command cmd : commandList) {
-            String uri = sempClient.uriAddOpaquePassword(cmd.resourcePath);
-            Utils.err("%s %s ", cmd.method.name(), uri);
-            var meta = sempClient.sendAndGetMeta(cmd.method.name(), uri, cmd.payload);
+            Utils.err("%s %s ", cmd.method.name(), cmd.resourcePath);
+            var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
             if (meta.getResponseCode() == 200) {
                 Utils.err("OK%n");
             } else  {
