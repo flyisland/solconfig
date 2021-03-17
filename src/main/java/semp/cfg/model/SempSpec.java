@@ -8,6 +8,7 @@ public class SempSpec {
     public static  final String BROKER_SPEC_PATH = "";
     public static final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters", "ca", "certAuthorities");
     public static final String SEMP_VERSION = "sempVersion";
+    public static final String OPAQUE_PASSWORD = "opaquePassword";
     public static final String DEFAULT_OBJECT_NAME = "default";
     public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
     public static final String ENABLED_ATTRIBUTE_NAME = "enabled";
@@ -37,6 +38,8 @@ public class SempSpec {
         spec.attributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
         spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
+        spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
+                List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
         return spec;
     }
 

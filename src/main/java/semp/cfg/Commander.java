@@ -1,5 +1,6 @@
 package semp.cfg;
 
+import lombok.Getter;
 import lombok.Setter;
 import semp.cfg.model.*;
 
@@ -8,9 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Commander {
-    private SempClient sempClient;
-    @Setter
-    private boolean curlOnly;
+    @Getter private SempClient sempClient;
+    @Setter private boolean curlOnly;
 
     public static Commander ofSempClient(SempClient sempClient){
         Commander commander = new Commander();
@@ -20,7 +20,7 @@ public class Commander {
     }
 
     private void setupSempSpec() {
-        SempSpec.setupByString(sempClient.sendWithResourcePath("get", "/spec", null));
+        SempSpec.setupByString(sempClient.getBrokerSpec());
     }
 
     public void backup(String resourceType, String[] objectNames){
@@ -52,6 +52,7 @@ public class Commander {
     private ConfigBroker generateConfigFromBroker(String resourceType, String[] objectNames) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
+        configBroker.setOpaquePassword(sempClient.getOpaquePassword());
 
         var nameList = Arrays.asList(objectNames);
         if (nameList.contains("*")){
@@ -88,8 +89,7 @@ public class Commander {
     }
 
     public void create(Path confPath) {
-        ConfigBroker configBroker = new ConfigBroker();
-        configBroker.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        ConfigBroker configBroker = getConfigBrokerFromFile(confPath);
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
         }
@@ -97,6 +97,15 @@ public class Commander {
         var commandList = new RestCommandList();
         configBroker.forEachChild(configObject -> configObject.generateCreateCommands(commandList));
         commandList.execute(sempClient, curlOnly);
+    }
+
+    private ConfigBroker getConfigBrokerFromFile(Path confPath) {
+        ConfigBroker configBroker = new ConfigBroker();
+        Map<String, Object> map = SempClient.readMapFromJsonFile(confPath);
+        configBroker.addChildrenFromMap(map);
+        configBroker.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
+        configBroker.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
+        return configBroker;
     }
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
@@ -162,16 +171,19 @@ public class Commander {
     }
 
     public void update(Path confPath) {
-        ConfigBroker configFile = new ConfigBroker();
-        configFile.addChildrenFromMap(SempClient.readMapFromJsonFile(confPath));
+        ConfigBroker configFile = getConfigBrokerFromFile(confPath);
         exitOnObjectsNotExist(configFile);
+
+        sempClient.setOpaquePassword(configFile.getOpaquePassword());
         ConfigBroker configBroker = generateConfigFromBroker(configFile);
         List.of(configFile, configBroker).forEach(cb->{
             cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
-            cb.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
+            cb.removeAttributes(
+                    AttributeType.PARENT_IDENTIFIERS,
+                    AttributeType.DEPRECATED,
+                    AttributeType.BROKER_SPECIFIC);
             cb.removeAttributesWithDefaultValue();
         });
-
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();

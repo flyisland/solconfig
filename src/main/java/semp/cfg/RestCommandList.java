@@ -50,8 +50,9 @@ public class RestCommandList {
     private void execute(SempClient sempClient, List<Command> commandList) {
         List<Command> retryCommands = new LinkedList<>();
         for (Command cmd : commandList) {
-            Utils.err("%s %s ", cmd.method.name(), cmd.resourcePath);
-            var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
+            String uri = sempClient.uriAddOpaquePassword(cmd.resourcePath);
+            Utils.err("%s %s ", cmd.method.name(), uri);
+            var meta = sempClient.sendAndGetMeta(cmd.method.name(), uri, cmd.payload);
             if (meta.getResponseCode() == 200) {
                 Utils.err("OK%n");
             } else  {
@@ -83,8 +84,9 @@ public class RestCommandList {
 
         for (Command cmd : commands) {
             sb.append("\n");
+            String uri = sempClient.uriAddOpaquePassword(cmd.resourcePath);
             sb.append(String.format("curl -X %s -u $SEMP_ADMIN:$SEMP_PWD $SEMP_HOST%s",
-                    cmd.method.name(), cmd.resourcePath));
+                    cmd.method.name(), uri));
             if (Objects.nonNull(cmd.payload) && cmd.payload.length() > 0) {
                 sb.append(" -H 'content-type: application/json' -d '");
                 sb.append(String.format("%s'%n", cmd.payload));

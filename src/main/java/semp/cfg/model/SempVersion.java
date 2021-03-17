@@ -1,27 +1,28 @@
 package semp.cfg.model;
 
 import lombok.Getter;
+import semp.cfg.Utils;
 
 import java.util.Objects;
 
-public class SempVersion{
+public class SempVersion implements Comparable<SempVersion>{
     @Getter
     private String text;
     private int   number;
 
-    public SempVersion(String version) throws IllegalArgumentException {
+    public SempVersion(String version) {
         if (Objects.isNull(version)){
-            throw new IllegalArgumentException("Null is an illegal SEMPv2 version.");
+            Utils.errPrintlnAndExit(new IllegalArgumentException("Null is an illegal SEMPv2 version."),"Unable to new a SempVersion object");
         }
         this.text = version;
         String[] v = version.split("\\.");
         if (v.length !=2) {
-            throw new IllegalArgumentException(version+" is an illegal SEMPv2 version.");
+            Utils.errPrintlnAndExit(new IllegalArgumentException(version+" is an illegal SEMPv2 version."),"Unable to new a SempVersion object");
         }
         try {
             number = Integer.parseInt(v[0]) * 1000 + Integer.parseInt(v[1]);
         }catch (NumberFormatException e){
-            throw new IllegalArgumentException(version+" is an illegal SEMPv2 version.");
+            Utils.errPrintlnAndExit(new IllegalArgumentException(version+" is an illegal SEMPv2 version."),"Unable to new a SempVersion object");
         }
     }
 
@@ -34,15 +35,7 @@ public class SempVersion{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SempVersion that = (SempVersion) o;
-        return number == that.number && Objects.equals(text, that.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(text, number);
+    public int compareTo(SempVersion input) {
+        return number-input.number;
     }
 }

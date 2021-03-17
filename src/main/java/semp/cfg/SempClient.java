@@ -5,12 +5,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.Getter;
-import semp.cfg.model.HTTPMethod;
-import semp.cfg.model.SEMPError;
-import semp.cfg.model.SempMeta;
-import semp.cfg.model.SempResponse;
+import semp.cfg.model.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.Authenticator;
@@ -20,7 +16,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
@@ -33,6 +28,7 @@ public class SempClient {
     @Getter private final String baseUrl;
     @Getter private final String adminUser;
     @Getter private final String adminPwd;
+    @Getter private String opaquePassword;
     private final HttpClient httpClient;
 
     public SempClient(String adminUrl, String adminUser, String adminPwd) {
@@ -51,6 +47,35 @@ public class SempClient {
                 .build();
     }
 
+    public void setOpaquePassword(String opaquePassword) {
+        if (Optional.ofNullable(opaquePassword).map(String::isEmpty).orElse(true)) {
+            return;
+        }
+        if (SempSpec.getSempVersion().compareTo(new SempVersion("2.17")) < 0) {
+            Utils.errPrintlnAndExit("The SEMPv2 version of this broker is %s, Opaque Password is only supported since version 9.6(sempVersion 2.17)",
+                    SempSpec.getSempVersion());
+        }
+        if (!baseUrl.substring(0, 5).equalsIgnoreCase("https")) {
+            Utils.errPrintlnAndExit("Opaque Password is only supported over HTTPS!");
+        }
+        if (opaquePassword.length() < 8 || opaquePassword.length() > 128) {
+            Utils.errPrintlnAndExit("Opaque Password must be between 8 and 128 characters inclusive!");
+        }
+        this.opaquePassword = opaquePassword;
+    }
+
+    public String uriAddOpaquePassword(String uri) {
+        if (Optional.ofNullable(opaquePassword).map(String::isEmpty).orElse(true)) {
+            return uri;
+        }
+        var q = (uri.contains("?") ? "&" : "?") + SempSpec.OPAQUE_PASSWORD + "=" + opaquePassword;
+        return uri + q;
+    }
+
+    public String getBrokerSpec() {
+        return sendWithResourcePath(HTTPMethod.GET.name(), "/spec", null);
+    }
+
     /**
      * If the collection is large, this method will follow the "nextPageUri" field
      * in the response to continually fetch all results.
@@ -61,7 +86,7 @@ public class SempClient {
         List<SempResponse> responseList = new LinkedList<>();
         Optional<String> nextPageUri = Optional.of(absUri);
         while (nextPageUri.isPresent()){
-            SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", nextPageUri.get(), null));
+            SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", uriAddOpaquePassword(nextPageUri.get()), null));
             responseList.add(resp);
             nextPageUri = resp.getNextPageUri();
         }
