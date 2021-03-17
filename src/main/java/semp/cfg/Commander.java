@@ -90,6 +90,7 @@ public class Commander {
 
     public void create(Path confPath) {
         ConfigBroker configBroker = getConfigBrokerFromFile(confPath);
+        sempClient.setOpaquePassword(configBroker.getOpaquePassword());
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
         }
