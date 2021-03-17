@@ -225,10 +225,14 @@ Map:
             var type = (String) def.get("type");
             // remove quote marks at both the begin and the end
             switch (type) {
-                case "string" -> result.put(attr, value.substring(1, value.length() - 1));
-                case "integer" -> result.put(attr, Integer.parseInt(value));
-                case "boolean" -> result.put(attr, Boolean.parseBoolean(value));
-                default -> Utils.errPrintlnAndExit("Unknown type '%s' of property '%s', the default value is '%s'",
+                case "string" : result.put(attr, value.substring(1, value.length() - 1));
+                    break;
+                case "integer" : result.put(attr, Integer.parseInt(value));
+                    break;
+                case "boolean" : result.put(attr, Boolean.parseBoolean(value));
+                    break;
+                default :
+                    Utils.errPrintlnAndExit("Unknown type '%s' of property '%s', the default value is '%s'",
                         type, attr, value);
             }
         });
