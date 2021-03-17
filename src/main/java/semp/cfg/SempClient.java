@@ -87,7 +87,7 @@ public class SempClient {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             return sc;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            e.printStackTrace();
+            Utils.errPrintlnAndExit(e, "Unable init the SSLContext!");
         }
         return null;
     }
@@ -105,7 +105,7 @@ public class SempClient {
             sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
             return sslContext;
         } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            e.printStackTrace();
+            Utils.errPrintlnAndExit(e, "Path %s is not a valid certification!", crtFile.toAbsolutePath());
         }
         return null;
     }
