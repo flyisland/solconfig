@@ -7,6 +7,10 @@ import freemarker.template.TemplateExceptionHandler;
 import lombok.Getter;
 import semp.cfg.model.*;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.Authenticator;
@@ -16,7 +20,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,11 +44,18 @@ public class SempClient {
     @Getter private String opaquePassword;
     private final HttpClient httpClient;
 
-    public SempClient(String adminUrl, String adminUser, String adminPwd) {
+    public SempClient(String adminUrl, String adminUser, String adminPwd, boolean insecure, Path cacert) {
         this.baseUrl = adminUrl+ CONFIG_BASE_PATH;
         this.adminUser = adminUser;
         this.adminPwd = adminPwd;
-        httpClient = HttpClient.newBuilder()
+
+        var b =  HttpClient.newBuilder();
+        if (insecure) {
+            Optional.ofNullable(getInscureSSLContext()).ifPresent(b::sslContext);
+        } else if (Objects.nonNull(cacert)) {
+            Optional.ofNullable(getSSLContextFrom(cacert)).ifPresent(b::sslContext);
+        }
+        this.httpClient = b
                 .version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(10))
                 .authenticator(new Authenticator() {
@@ -45,6 +65,57 @@ public class SempClient {
                     }
                 })
                 .build();
+    }
+
+    private SSLContext getInscureSSLContext() {
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager() {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                    public void checkClientTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                    public void checkServerTrusted(
+                            java.security.cert.X509Certificate[] certs, String authType) {
+                    }
+                }
+        };
+
+        try {
+            var sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            return sc;
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private SSLContext getSSLContextFrom(Path crtFile) {
+        try {
+            var certificate = CertificateFactory.getInstance("X.509").generateCertificate(Files.newInputStream(crtFile));
+            KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            keyStore.load(null, null);
+            keyStore.setCertificateEntry("server", certificate);
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            trustManagerFactory.init(keyStore);
+
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
+            return sslContext;
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void setOpaquePassword(String opaquePassword) {

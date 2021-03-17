@@ -20,7 +20,6 @@ public class CreateCommand extends SubCommand {
                     "Path %s doesn't exist or is un-readable!",
                     confPath.toAbsolutePath()
             ));
-
         }
 
         Commander commander = parentCommand.commander;

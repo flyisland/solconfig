@@ -6,6 +6,9 @@ import picocli.CommandLine.Option;
 import semp.cfg.Commander;
 import semp.cfg.SempClient;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 @Command(name = "sempcfg", mixinStandardHelpOptions = true, version = {"sempcfg 1.0.0",
@@ -33,6 +36,12 @@ public class SempCfgCommand implements Callable<Integer> {
     @Option(names = {"-p", "--admin-password"}, description = "The password of the management user")
     private String adminPwd = "admin";
 
+    @Option(names = {"-k", "--insecure"}, description = "Allow insecure server connections when using SSL")
+    private boolean insecure = false;
+
+    @Option(names = "--cacert", description = "CA certificate file to verify peer against")
+    private Path cacert;
+
     @Option(names = "--curl-only", description = "Print curl commands only, no effect on 'backup' command")
     private boolean curlOnly = false;
 
@@ -44,7 +53,15 @@ public class SempCfgCommand implements Callable<Integer> {
 
     protected Commander commander;
     protected void init(){
-        commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd));
+        Optional.ofNullable(cacert).ifPresent(path -> {
+            if (!Files.isReadable(path)) {
+                throw new CommandLine.ParameterException(spec.commandLine(), String.format(
+                        "Path %s doesn't exist or is un-readable!",
+                        path.toAbsolutePath()
+                ));
+            }
+        });
+        commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd, insecure, cacert));
         commander.setCurlOnly(curlOnly);
     }
 
