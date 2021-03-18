@@ -12,9 +12,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-@Command(name = "sempcfg", mixinStandardHelpOptions = true, version = {"sempcfg 1.0.1",
-        "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
-        "OS: ${os.name} ${os.version} ${os.arch}"},
+@Command(name = "sempcfg", mixinStandardHelpOptions = true,
+        versionProvider = SempCfgCommand.BuildVersion.class,
         description = "Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol. " +
                 "Use the 'backup' command to export the configuration of objects on a PS+  Broker into a single JSON, " +
                 "then use the 'create' or 'update' command to restore the configuration.",
@@ -71,5 +70,15 @@ public class SempCfgCommand implements Callable<Integer> {
                 ", adminPwd='" + adminPwd + '\'' +
                 ", curlOnly=" + curlOnly +
                 '}';
+    }
+
+    public static class BuildVersion implements CommandLine.IVersionProvider {
+        @Override
+        public String[] getVersion() {
+            var pkg = BuildVersion.class.getPackage();
+            return new String[]{pkg.getImplementationTitle() + " " + pkg.getImplementationVersion(),
+                    "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
+                    "OS: ${os.name} ${os.version} ${os.arch}"};
+        }
     }
 }
