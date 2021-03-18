@@ -37,3 +37,4 @@ out/
 
 ### lombok gradle plugin ###
 lombok.config
+/sempcfg
