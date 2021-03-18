@@ -4,9 +4,15 @@
 
 Use the "backup" command to export the configuration of objects on a PS+ Broker into a single JSON, then use the "create" or "update" command to restore the configuration.
 
+For example, you could run `./sempcfg vpn Demo` to show the whole configuration on the console, or run `./sempcfg vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./sempcfg -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
+
+Then run `./sempcfg -H http://another-broker:8080 create Demo.json` to create the same Message VPN on another broker.
+
+## Help
+
 Run `sempcfg help` and `sempcfg help sub-command` to check the help message carefully before you use it.
 
-```shell
+```commandline
 ./sempcfg help
 Usage: sempcfg [-hkV] [--curl-only] [--cacert=<cacert>] [-H=<adminHost>]
                [-p=<adminPwd>] [-u=<adminUser>] [COMMAND]
@@ -48,7 +54,7 @@ Commands:
 
 ### backup
 
-```shell
+```commandline
 ./sempcfg help backup
 Usage: sempcfg backup [-O=<opaquePassword>] <resourceType> <objectNames>...
 Export the whole configuration of objects into a single JSON
@@ -61,7 +67,7 @@ Export the whole configuration of objects into a single JSON
 
 ### delete
 
-```shell
+```commandline
 ./sempcfg help delete
 Usage: sempcfg delete <resourceType> <objectName>
 Delete the specified objects
@@ -71,7 +77,7 @@ Delete the specified objects
 
 ### update
 
-```shell
+```commandline
 ./sempcfg help update
 Usage: sempcfg update <confPath>
 Update the existing objects to make them the same as the configuration file
