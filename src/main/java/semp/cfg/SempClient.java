@@ -1,9 +1,5 @@
 package semp.cfg;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
 import lombok.Getter;
 import semp.cfg.model.*;
 
@@ -12,7 +8,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
@@ -26,7 +21,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -209,7 +203,7 @@ public class SempClient {
 
     public static Map<String, Object> readMapFromJsonFile(Path confPath) {
         try {
-            return (Map<String, Object>)Utils.objectMapper.readValue(freeMakerToString(confPath), Map.class);
+            return (Map<String, Object>)Utils.objectMapper.readValue(Files.newInputStream(confPath), Map.class);
         } catch (IOException e) {
             Utils.errPrintlnAndExit(e,
                     "File %s is not a valid configuration json file!",
@@ -218,25 +212,6 @@ public class SempClient {
         return new HashMap<>();
     }
 
-    private static String freeMakerToString(Path confPath) {
-        try {
-            Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-            cfg.setDirectoryForTemplateLoading(confPath.getParent().toFile());
-            cfg.setDefaultEncoding("UTF-8");
-            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-            cfg.setLogTemplateExceptions(false);
-            cfg.setWrapUncheckedExceptions(true);
-            cfg.setFallbackOnNullLoopVariable(false);
-
-            Template temp = cfg.getTemplate(confPath.getFileName().toString());
-            var stringWriter = new StringWriter();
-            temp.process(null, stringWriter);
-            return stringWriter.toString();
-        } catch (IOException | TemplateException e) {
-            Utils.errPrintlnAndExit(e, "Unable to read file %s", confPath.toAbsolutePath());
-            return "";
-        }
-    }
 
     public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceType, List<String> objectNames){
         var absUriList = objectNames.stream()
