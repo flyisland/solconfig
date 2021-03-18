@@ -18,7 +18,7 @@ Make sure you have [JDK 11](https://adoptopenjdk.net/) or above installed.
 git clone https://github.com/flyisland/sempcfg
 cd sempcfg
 ./gradlew build
-java -jar build/libs/sempcfg-1.0.1.jar help
+java -jar build/libs/sempcfg.jar help
 ```
 
 ### [Download](https://github.com/flyisland/sempcfg/releases)
