@@ -76,7 +76,7 @@ public class SempCfgCommand implements Callable<Integer> {
         @Override
         public String[] getVersion() {
             var pkg = BuildVersion.class.getPackage();
-            return new String[]{pkg.getImplementationTitle() + " " + pkg.getImplementationVersion(),
+            return new String[]{pkg.getImplementationTitle() + ": " + pkg.getImplementationVersion(),
                     "JVM: ${java.version} (${java.vendor} ${java.vm.name} ${java.vm.version})",
                     "OS: ${os.name} ${os.version} ${os.arch}"};
         }
