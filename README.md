@@ -8,6 +8,22 @@ For example, you could run `./sempcfg vpn Demo` to show the whole configuration 
 
 Then run `./sempcfg -H http://another-broker:8080 create Demo.json` to create the same Message VPN on another broker.
 
+## Installation
+
+### Build
+
+Make sure you have [JDK 11](https://adoptopenjdk.net/) or above installed.
+
+```commandline
+git clone https://github.com/flyisland/sempcfg
+cd sempcfg
+./gradlew build
+java -jar build/libs/sempcfg-1.0.1.jar help
+```
+
+### [Download](https://github.com/flyisland/sempcfg/releases)
+
+
 ## Help
 
 Run `sempcfg help` and `sempcfg help sub-command` to check the help message carefully before you use it.
