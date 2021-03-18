@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2021-03-18
+### Added
+- Graalvm Native Image ready, check [README.md](README.md) to see how to build the native image.
+
 ## [1.0.1] - 2021-03-17
 ### Added
 - support [Opaque Password](https://docs.solace.com/API-Developer-Online-Ref-Documentation/swagger-ui/config/index.html) to backup and restore passwords.
