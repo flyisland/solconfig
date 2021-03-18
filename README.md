@@ -21,6 +21,10 @@ cd sempcfg
 java -jar build/libs/sempcfg.jar help
 ```
 
+### Native Image
+
+Install [Native Image](https://www.graalvm.org/reference-manual/native-image/) first, then run `./native-image.sh`, it will create a native image `./sempcfg` which could be executed independently without JDK installed. 
+
 ### [Download](https://github.com/flyisland/sempcfg/releases)
 
 
