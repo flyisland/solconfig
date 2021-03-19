@@ -66,7 +66,7 @@ public class RestCommandList {
                         semp_code == SEMPError.ALREADY_EXISTS.getValue()) {
                     Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
                 } else {
-                    Utils.err("%n%s%n", meta.toString());
+                    Utils.err("%n%s%s%n", Objects.nonNull(cmd.payload) ? cmd.payload + "\n" : "", meta.toString());
                     System.exit(1);
                 }
             }
