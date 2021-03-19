@@ -25,7 +25,7 @@ public class SempResponse {
             var node = objectMapper.readTree(content);
             resp.data = objectMapper.treeToValue(node.get("data"), List.class);
             resp.links = objectMapper.treeToValue(node.get("links"), List.class);
-            resp.meta = objectMapper.treeToValue(node.get("meta"), SempMeta.class);
+            resp.meta = SempMeta.ofJsonNode(node.get("meta"));
         } catch (JsonProcessingException e) {
             Utils.errPrintlnAndExit(e,
                     "Unable to convert below string into SempResponse structure!%n%s",
