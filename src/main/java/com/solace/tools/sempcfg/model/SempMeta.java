@@ -86,7 +86,7 @@ public class SempMeta {
     public static SempMeta ofString(String input) {
         try {
             var node = objectMapper.readTree(input);
-            return ofJsonNode(node);
+            return ofJsonNode(Optional.ofNullable(node.get("meta")).orElse(null));
         } catch (JsonProcessingException e) {
             Utils.errPrintlnAndExit(
                     e, "Unable convert below text into a valid SempMeta structure.%n%s", input);
