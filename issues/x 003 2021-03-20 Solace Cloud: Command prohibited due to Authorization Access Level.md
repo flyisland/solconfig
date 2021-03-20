@@ -30,3 +30,10 @@ POST /msgVpns/demovpn/clientProfiles
 
 ## Cause analysis
 
+## Solution
+
+I decide do nothing about this issue, because:
+
+1. There is no information about which objects or attributes is prohibited to change due t Authorization Access Level, at least I could not find it in the SEMPv2 specification or at the https://docs.solace.com/
+1. I don't want to hardcode which objects or attributes is prohibited to change
+1. At the end, it's the end user's responsibility to make sure the config file is correct for the Solace Cloud instance.
