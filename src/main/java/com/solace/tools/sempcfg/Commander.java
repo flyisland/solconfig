@@ -101,13 +101,13 @@ public class Commander {
     }
 
     private ConfigBroker getConfigBrokerFromFile(Path confPath) {
-        ConfigBroker configBroker = new ConfigBroker();
+        ConfigBroker configFromFile = new ConfigBroker();
         Map<String, Object> map = SempClient.readMapFromJsonFile(confPath);
-        configBroker.addChildrenFromMap(map);
-        configBroker.sortChildren();
-        configBroker.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
-        configBroker.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
-        return configBroker;
+        configFromFile.addChildrenFromMap(map);
+        configFromFile.sortChildren();
+        configFromFile.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
+        configFromFile.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
+        return configFromFile;
     }
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
