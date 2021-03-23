@@ -24,4 +24,8 @@ public class ConfigBroker extends ConfigObject{
     public String getOpaquePassword() {
         return (String) attributes.get(SempSpec.OPAQUE_PASSWORD);
     }
+
+    public SempVersion getSempVersion(){
+        return (SempVersion) attributes.get(SempSpec.SEMP_VERSION);
+    }
 }
