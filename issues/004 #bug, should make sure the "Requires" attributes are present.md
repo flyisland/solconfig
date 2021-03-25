@@ -4,6 +4,8 @@
 
 [attachments/vpn.json](attachments/vpn.json)
 
+Even the attribute "tlsEnabled" is already set in the file, we'll still get below error.
+
 ```commandline
 java -jar build/libs/sempcfg.jar update ../rdp_demo/vpn.json
 POST /msgVpns/RDP/restDeliveryPoints OK
@@ -34,8 +36,8 @@ POST /msgVpns/RDP/restDeliveryPoints/demo/restConsumers
 ## Cause analysis
 
 1. the update() method calls removeAttributesWithDefaultValue() method
-1. the default value of "tlsEnabled" is false, and was removed
+1. the default value of "tlsEnabled" is false, so it was removed
 
 ## Solution
 
-
+need to find out those **required** attributes and keep them in the payload.
