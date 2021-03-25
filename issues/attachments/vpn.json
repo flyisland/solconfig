@@ -1,0 +1,82 @@
+{
+    "sempVersion": "2.19",
+    "msgVpns": [
+      {
+        "authenticationBasicProfileName": "",
+        "authenticationBasicType": "internal",
+        "enabled": true,
+        "maxMsgSpoolUsage": 1000,
+        "msgVpnName": "RDP",
+        "aclProfiles": [
+          {
+            "aclProfileName": "default",
+            "clientConnectDefaultAction": "allow",
+            "publishTopicDefaultAction": "allow",
+            "subscribeTopicDefaultAction": "allow"
+          }
+        ],
+        "clientProfiles": [
+          {
+            "allowBridgeConnectionsEnabled": true,
+            "allowGuaranteedEndpointCreateEnabled": true,
+            "allowGuaranteedMsgReceiveEnabled": true,
+            "allowGuaranteedMsgSendEnabled": true,
+            "clientProfileName": "default"
+          }
+        ],
+        "clientUsernames": [
+          {
+            "clientUsername": "default",
+            "enabled": true
+          }
+        ],
+        "queues": [
+          {
+            "egressEnabled": true,
+            "ingressEnabled": true,
+            "permission": "consume",
+            "queueName": "replyQ",
+            "subscriptions": [
+                {
+                  "subscriptionTopic": "test/reply"
+                }
+              ]
+            },
+          {
+            "egressEnabled": true,
+            "ingressEnabled": true,
+            "permission": "consume",
+            "queueName": "requestQ",
+            "subscriptions": [
+              {
+                "subscriptionTopic": "test/request"
+              }
+            ]
+          }
+        ],
+        "restDeliveryPoints": [
+          {
+            "enabled": true,
+            "restDeliveryPointName": "demo",
+            "service": "REST",
+            "vendor": "Custom",
+            "queueBindings": [
+              {
+                "postRequestTarget": "/request",
+                "queueBindingName": "requestQ"
+              }
+            ],
+            "restConsumers": [
+              {
+                "enabled": true,
+                "remoteHost": "host.docker.internal",
+                "remotePort": 9999,
+                "tlsEnabled": false,
+                "restConsumerName": "mock"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
