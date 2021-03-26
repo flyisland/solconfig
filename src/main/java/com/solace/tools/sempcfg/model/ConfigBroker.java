@@ -26,6 +26,6 @@ public class ConfigBroker extends ConfigObject{
     }
 
     public SempVersion getSempVersion(){
-        return (SempVersion) attributes.get(SempSpec.SEMP_VERSION);
+        return  new SempVersion((String) attributes.get(SempSpec.SEMP_VERSION));
     }
 }
