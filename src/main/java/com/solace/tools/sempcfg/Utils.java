@@ -17,26 +17,6 @@ public class Utils {
         return items[items.length-1].split("\\?")[0];
     }
 
-    public static  <T> Optional<T> jsonSafeGetValue(JsonNode jsonNode, Class<T> valueType, String ... names) {
-        Optional<JsonNode> node = jsonSafeGetNode(jsonNode, names);
-
-        return node.map(n -> {
-            try {
-                return objectMapper.treeToValue(n, valueType);
-            } catch (JsonProcessingException e) {
-                return null;
-            }
-        });
-    }
-
-    private static Optional<JsonNode> jsonSafeGetNode(JsonNode jsonNode, String[] names) {
-        var node = Optional.of(jsonNode);
-        for (String name : names) {
-            node = node.map(n -> n.get(name));
-        }
-        return node;
-    }
-
     public static Optional<String> getFirstMatch(String input, Pattern re) {
         var m = re.matcher(input);
         if (m.find()) {
