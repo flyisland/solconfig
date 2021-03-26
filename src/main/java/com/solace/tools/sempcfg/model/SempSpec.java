@@ -19,7 +19,6 @@ public class SempSpec {
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
     @Getter private static SempVersion sempVersion;
 
-    @Getter private String specPath;
     @Getter private boolean deprecated;
     private Map<String, List<String>> attributes;
     @Getter private Map<String, Object> defaultValues;
@@ -35,7 +34,6 @@ public class SempSpec {
 
     private static SempSpec brokerSpec() {
         var spec = new SempSpec();
-        spec.specPath = BROKER_SPEC_PATH;
         spec.attributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
         spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
@@ -46,7 +44,7 @@ public class SempSpec {
 
     private static void buildSempSpec(String parentObjectPath, String collectionName){
          var spec = SempSpec.of(parentObjectPath, collectionName);
-        sempSpecMap.put(spec.specPath, spec);
+        sempSpecMap.put(generateSpecPath( parentObjectPath + "/" + collectionName), spec);
 
         var objectPath = jsonSpec.getObjectPath(parentObjectPath + "/" + collectionName);
         spec.childrenNames.forEach(name -> buildSempSpec(objectPath, name));
@@ -58,7 +56,6 @@ public class SempSpec {
         var objectPath = jsonSpec.getObjectPath(collectionPath);
         jsonSpec.assertPathExist(collectionPath);
 
-        spec.specPath = generateSpecPath(collectionPath);
         spec.deprecated = jsonSpec.isDeprecatedCollection(collectionPath);
         spec.attributes = jsonSpec.findAttributes(collectionPath);
         spec.defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
