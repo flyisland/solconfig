@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import com.solace.tools.sempcfg.Utils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -123,8 +124,7 @@ public class JsonSpecTest {
     void testFindSpecialAttributes(String path, String expected) throws JsonProcessingException {
         var m1 = jsonSpec.findAttributes(path);
         var m2 = objectMapper.readValue(expected, Map.class);
-        assertEquals(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m2),
-                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(m1));
+        assertEquals(Utils.toPrettyJson(m2), Utils.toPrettyJson(m1));
     }
 
     @ParameterizedTest

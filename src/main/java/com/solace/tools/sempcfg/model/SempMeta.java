@@ -76,11 +76,7 @@ public class SempMeta {
 
     @Override
     public String toString() {
-        try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return e.toString();
-        }
+        return Utils.toPrettyJson(this);
     }
 
     public static SempMeta ofString(String input) {
