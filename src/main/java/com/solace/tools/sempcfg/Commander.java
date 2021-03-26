@@ -107,8 +107,21 @@ public class Commander {
         configFromFile.sortChildren();
         configFromFile.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
         configFromFile.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
+        compareSempVersion(configFromFile);
         return configFromFile;
     }
+
+    private void compareSempVersion(ConfigBroker configFromFile){
+        if (configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) > 0) {
+            System.out.printf("This sempVersion [%s] of the config file is newer than the broker's [%s], some objects/attributes may be not AVAILABLE!%n",
+                    configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
+        } else if(configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) < 0){
+            System.out.printf("This sempVersion [%s] of the config file is older than the broker's [%s], some objects/attributes may be DEPRECATED!%n",
+                    configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
+        }
+    }
+
+
 
     private void exitOnObjectsNotExist(String resourceType, String[] objectNames) {
         checkObjectsExistence(resourceType, Arrays.asList(objectNames), false);
