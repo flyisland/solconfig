@@ -215,4 +215,7 @@ public class Commander {
         }
     }
 
+    public void printSpec() {
+        System.out.println(SempSpec.toPrettyString());
+    }
 }

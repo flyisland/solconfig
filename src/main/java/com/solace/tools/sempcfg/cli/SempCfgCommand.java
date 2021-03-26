@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
             DeleteCommand.class,
             CreateCommand.class,
             UpdateCommand.class,
+            PrintSpecCommand.class,
             CommandLine.HelpCommand.class
         },
         showDefaultValues = true)

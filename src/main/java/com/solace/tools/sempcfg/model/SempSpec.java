@@ -1,5 +1,6 @@
 package com.solace.tools.sempcfg.model;
 
+import com.solace.tools.sempcfg.Utils;
 import lombok.Getter;
 
 import java.util.*;
@@ -97,5 +98,12 @@ public class SempSpec {
         }else {
             return new LinkedList<>();
         }
+    }
+
+    public static String toPrettyString() {
+        HashMap<String, Object> out = new HashMap<>();
+        out.put(SEMP_VERSION, sempVersion.getText());
+        out.put("sempSpecs", sempSpecMap);
+        return Utils.toPrettyJson(out);
     }
 }

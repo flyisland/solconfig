@@ -56,4 +56,14 @@ public class Utils {
 
         return symmetricDiff;
     }
+
+    public static String toPrettyJson(Object obj) {
+        String result = null;
+        try {
+            result = Utils.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            errPrintlnAndExit(e, "Unable to convert the object into the json format.");
+        }
+        return result;
+    }
 }
