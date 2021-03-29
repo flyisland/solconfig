@@ -225,7 +225,7 @@ Map:
         return getAttributesWithDefaultValueFromJProperties(propMap);
     }
 
-    protected Map<String, Map<String, ?>> getDefinitionProperties(String collectionPath){
+    protected String getSempClassName(String collectionPath) {
         var refPath = "$.paths." + collectionPath + ".post.parameters[?(@.name=='body')].schema.$ref";
         List<String> ref = jsonPathRead(refPath, List.class);
 
@@ -235,8 +235,13 @@ Map:
             return null;
         }
 
-        // "#/definitions/MsgVpn" -> "$.definitions.MsgVpn.properties"
-        var propertiesPath = ref.get(0).replace("#", "$").replace("/", ".") + ".properties";
+        // "#/definitions/MsgVpn" -> "MsgVpn"
+        var temp = ref.get(0).split("/");
+        return temp[temp.length - 1];
+    }
+
+    protected Map<String, Map<String, ?>> getDefinitionProperties(String collectionPath){
+        var propertiesPath = String.format("$.definitions.%s.properties", getSempClassName(collectionPath));
         Map<String, Map<String, ?>> result = jsonPathRead(propertiesPath, Map.class);
         if (Objects.isNull(result)){
             Utils.errPrintlnAndExit("Unable to find path %s in the SEMPv2 specification.", propertiesPath);
