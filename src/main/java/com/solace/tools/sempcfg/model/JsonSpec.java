@@ -178,7 +178,38 @@ Map:
         return result;
     }
 
-    private String getDescriptionOfAction(String path, HTTPMethod method) {
+    protected Map<AttributeCombinationKey, List<String>> findAttributesCombinationsFromDescription(String description) {
+        var table = description.lines()
+                .map(line -> line.split("\\|", -1))
+                .filter(array -> array.length==4) // Class|Attribute|Requires|Conflicts
+                .map(Arrays::asList)
+                .collect(Collectors.toList());
+
+        var result = new TreeMap<AttributeCombinationKey, List<String>>();
+        if (table.size() == 0) {
+            // return empty Map
+            return result;
+        }
+
+        List<String> attributes;
+        for (int j = 2; j < table.size(); j++) { // start from third row
+            List<String> line = table.get(j);
+            attributes = Arrays.asList(line.get(2).split(",").clone());
+            if (attributes.size()>0 && attributes.get(0).length()>0){
+                result.put(new AttributeCombinationKey(line.get(0), line.get(1), AttributeCombinationKey.TYPE.Requires),
+                        attributes);
+            }
+            attributes = Arrays.asList(line.get(3).split(",").clone());
+            if (attributes.size()>0 && attributes.get(0).length()>0){
+                result.put(new AttributeCombinationKey(line.get(0), line.get(1), AttributeCombinationKey.TYPE.Conflicts),
+                        attributes);
+            }
+        }
+
+        return result;
+    }
+
+    protected String getDescriptionOfAction(String path, HTTPMethod method) {
         var descriptionPath = String.format("$.paths.%s.%s.description",
                 path, method.toSEMPMethod());
         return jsonPathRead(descriptionPath, "");

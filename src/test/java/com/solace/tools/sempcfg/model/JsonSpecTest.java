@@ -155,4 +155,45 @@ public class JsonSpecTest {
     void testGetChildrenNames(String objectPath, String expected) {
         assertEquals(expected, jsonSpec.getChildrenNames(objectPath).toString());
     }
+
+    @ParameterizedTest
+    @MethodSource("testFindAttributesCombinationsFromDescriptionProvider")
+    void testFindAttributesCombinationsFromDescription(String path, String expected) {
+        var description = jsonSpec.getDescriptionOfAction(path, HTTPMethod.POST);
+        var result = jsonSpec.findAttributesCombinationsFromDescription(description);
+        assertEquals(expected, Utils.toPrettyJson(result));
+    }
+
+    static Stream<Arguments> testFindAttributesCombinationsFromDescriptionProvider() {
+        return Stream.of(
+                arguments("/msgVpns", "{\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThresholdByValue', attributeName='clearValue', type=Requires}\" : [ \"setValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThresholdByValue', attributeName='setValue', type=Requires}\" : [ \"clearValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='clearPercent', type=Conflicts}\" : [ \"clearValue\", \" setValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='clearPercent', type=Requires}\" : [ \"setPercent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='clearValue', type=Conflicts}\" : [ \"clearPercent\", \" setPercent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='clearValue', type=Requires}\" : [ \"setValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='setPercent', type=Conflicts}\" : [ \"clearValue\", \" setValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='setPercent', type=Requires}\" : [ \"clearPercent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='setValue', type=Conflicts}\" : [ \"clearPercent\", \" setPercent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='EventThreshold', attributeName='setValue', type=Requires}\" : [ \"clearValue\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='authenticationBasicProfileName', type=Requires}\" : [ \"authenticationBasicType\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='authorizationProfileName', type=Requires}\" : [ \"authorizationType\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='eventPublishTopicFormatMqttEnabled', type=Requires}\" : [ \"eventPublishTopicFormatSmfEnabled\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='eventPublishTopicFormatSmfEnabled', type=Requires}\" : [ \"eventPublishTopicFormatMqttEnabled\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='replicationBridgeAuthenticationBasicClientUsername', type=Requires}\" : [ \"replicationBridgeAuthenticationBasicPassword\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='replicationBridgeAuthenticationBasicPassword', type=Requires}\" : [ \"replicationBridgeAuthenticationBasicClientUsername\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='replicationBridgeAuthenticationClientCertPassword', type=Requires}\" : [ \"replicationBridgeAuthenticationClientCertContent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpn', attributeName='replicationEnabledQueueBehavior', type=Requires}\" : [ \"replicationEnabled\" ]\n" +
+                        "}"),
+                arguments("/msgVpns/{msgVpnName}/restDeliveryPoints", "{ }"),
+                arguments("/msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers", "{\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpnRestDeliveryPointRestConsumer', attributeName='authenticationClientCertPassword', type=Requires}\" : [ \"authenticationClientCertContent\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpnRestDeliveryPointRestConsumer', attributeName='authenticationHttpBasicPassword', type=Requires}\" : [ \"authenticationHttpBasicUsername\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpnRestDeliveryPointRestConsumer', attributeName='authenticationHttpBasicUsername', type=Requires}\" : [ \"authenticationHttpBasicPassword\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpnRestDeliveryPointRestConsumer', attributeName='remotePort', type=Requires}\" : [ \"tlsEnabled\" ],\n" +
+                        "  \"AttributeCombinationKey{sempClassName='MsgVpnRestDeliveryPointRestConsumer', attributeName='tlsEnabled', type=Requires}\" : [ \"remotePort\" ]\n" +
+                        "}")
+        );
+    }
 }
