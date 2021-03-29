@@ -6,9 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+
+## [1.0.3] - 2021-03-29
+### Added
 - Compare the Semp Version before apply the configuration
 - Add 'spec' subcommand to show the analyzed SEMPv2 specification
-- fix [issue 004](issues/x%20004%20%23bug,%20should%20make%20sure%20the%20%22Requires%22%20attributes%20are%20present.md)
+  
+### Fixed
+- [issue 004](issues/x%20004%20%23bug,%20should%20make%20sure%20the%20%22Requires%22%20attributes%20are%20present.md)
 
 
 ## [1.0.2] - 2021-03-18

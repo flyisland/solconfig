@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.solace.tools.sempcfg'
-version '1.0.2'
+version '1.0.3'
 def longVersion = version + ", Build time: "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
 
 repositories {
