@@ -3,13 +3,21 @@ package com.solace.tools.sempcfg.model;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class SempSpecTest {
     @BeforeAll
@@ -43,4 +51,21 @@ public class SempSpecTest {
         assertEquals(expected, SempSpec.getTopResourceIdentifierKey(topName));
     }
 
+    @ParameterizedTest
+    @MethodSource("testGetRequiresAttributeWithDefaultValueProvider")
+    void testGetRequiresAttributeWithDefaultValue(String specPath, Set<String> attributes, Map<String, Object> expected){
+        var sempSpec = SempSpec.sempSpecMap.get(specPath);
+        var result = sempSpec.getRequiresAttributeWithDefaultValue(attributes);
+        assertEquals(expected, result);
+    }
+
+    static Stream<Arguments> testGetRequiresAttributeWithDefaultValueProvider() {
+        return Stream.of(
+                arguments("/msgVpns/restDeliveryPoints/restConsumers", Set.of("remotePort", "tlsEnabled"), Map.of()),
+                arguments("/msgVpns/restDeliveryPoints/restConsumers", Set.of("remotePort"), Map.of("tlsEnabled", false)),
+                arguments("/msgVpns/restDeliveryPoints/restConsumers", Set.of("tlsEnabled"), Map.of("remotePort", 8080)),
+                arguments("/msgVpns/restDeliveryPoints/restConsumers", Set.of("restConsumerName"), Map.of()),
+                arguments("/msgVpns/restDeliveryPoints/restConsumers", Set.of(), Map.of())
+        );
+    }
 }

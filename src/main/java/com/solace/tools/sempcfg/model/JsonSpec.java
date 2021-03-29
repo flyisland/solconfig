@@ -178,6 +178,11 @@ Map:
         return result;
     }
 
+    protected Map<AttributeCombinationKey, List<String>> findAttributesCombinations(String collectionPath){
+        var description = getDescriptionOfAction(collectionPath, HTTPMethod.POST);
+        return findAttributesCombinationsFromDescription(description);
+    }
+
     protected Map<AttributeCombinationKey, List<String>> findAttributesCombinationsFromDescription(String description) {
         var table = description.lines()
                 .map(line -> line.split("\\|", -1))

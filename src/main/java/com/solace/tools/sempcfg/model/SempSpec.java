@@ -23,6 +23,8 @@ public class SempSpec {
     private Map<String, List<String>> attributes;
     @Getter private Map<String, Object> defaultValues;
     @Getter private List<String> childrenNames;
+    private String sempClassName;
+    private Map<AttributeCombinationKey, List<String>> attributeCombinations;
 
     public static void setupByString(String jsonString) {
         jsonSpec = JsonSpec.ofString(jsonString);
@@ -60,6 +62,8 @@ public class SempSpec {
         spec.attributes = jsonSpec.findAttributes(collectionPath);
         spec.defaultValues = jsonSpec.getMapOfAttributesWithDefaultValue(collectionPath);
         spec.childrenNames = jsonSpec.getChildrenNames(objectPath);
+        spec.sempClassName = jsonSpec.getSempClassName(collectionPath);
+        spec.attributeCombinations = jsonSpec.findAttributesCombinations(collectionPath);
 
         return spec;
     }
@@ -102,5 +106,20 @@ public class SempSpec {
         out.put(SEMP_VERSION, sempVersion.getText());
         out.put("sempSpecs", sempSpecMap);
         return Utils.toPrettyJson(out);
+    }
+
+    public Map<String, Object> getRequiresAttributeWithDefaultValue(Set<String> attributeNames) {
+        var result = new HashMap<String, Object>();
+
+        for (String attributeName : attributeNames) {
+            var key = new AttributeCombinationKey(sempClassName, attributeName, AttributeCombinationKey.TYPE.Requires);
+            Optional.ofNullable(attributeCombinations.get(key)).stream()
+                    .flatMap(Collection::stream)
+                    .filter(attr -> !attributeNames.contains(attr)) // is it already existed in the payload?
+                    .filter(attr -> defaultValues.containsKey(attr)) // does it has default value?
+                    .forEach(attr -> result.put(attr, defaultValues.get(attr)));
+        }
+
+        return result;
     }
 }
