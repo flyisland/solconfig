@@ -182,12 +182,12 @@ public class ConfigObject {
             var attributesToRemove = sempSpec.getAttributeNames(type);
             attributesToRemove.forEach(attrName -> attributes.remove(attrName));
         }
-        children.values().forEach(list -> list.forEach(configObject -> configObject.removeAttributes(types)));
+        forEachChild(configObject -> configObject.removeAttributes(types));
     }
 
     public void removeAttributesWithDefaultValue() {
         attributes.entrySet().removeAll(sempSpec.getDefaultValues().entrySet());
-        children.values().forEach(list -> list.forEach(ConfigObject::removeAttributesWithDefaultValue));
+        forEachChild(ConfigObject::removeAttributesWithDefaultValue);
     }
 
     public void checkAttributeCombinations() {
@@ -203,9 +203,7 @@ public class ConfigObject {
     }
 
     public void forEachChild(Consumer<ConfigObject> action) {
-        getChildren().values().stream()
-                .flatMap(Collection::stream)
-                .forEach(action);
+        children.values().forEach(list -> list.forEach(action));
     }
 
     public void generateDeleteCommands(RestCommandList commandList) {
