@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Compare the Semp Version before apply the configuration
+- Add 'spec' subcommand to show the analyzed SEMPv2 specification
 
 
 ## [1.0.2] - 2021-03-18
