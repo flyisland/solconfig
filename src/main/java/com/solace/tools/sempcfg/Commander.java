@@ -200,8 +200,8 @@ public class Commander {
                     AttributeType.DEPRECATED,
                     AttributeType.BROKER_SPECIFIC);
             cb.removeAttributesWithDefaultValue();
+            cb.checkAttributeCombinations();
         });
-        configFile.checkAttributeCombinations();
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();
