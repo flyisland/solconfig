@@ -41,6 +41,7 @@ public class SempSpec {
         spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
         spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
                 List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
+        spec.attributeCombinations = Map.of();
         return spec;
     }
 

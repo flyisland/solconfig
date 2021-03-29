@@ -190,6 +190,12 @@ public class ConfigObject {
         children.values().forEach(list -> list.forEach(ConfigObject::removeAttributesWithDefaultValue));
     }
 
+    public void checkAttributeCombinations() {
+        var requiresAttributesWithDefalutValue = sempSpec.getRequiresAttributeWithDefaultValue(attributes.keySet());
+        attributes.putAll(requiresAttributesWithDefalutValue);
+        forEachChild(ConfigObject::checkAttributeCombinations);
+    }
+
     @SneakyThrows
     @Override
     public String toString() {

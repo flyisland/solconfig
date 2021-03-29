@@ -90,6 +90,7 @@ public class Commander {
 
     public void create(Path confPath) {
         ConfigBroker configBroker = getConfigBrokerFromFile(confPath);
+        configBroker.checkAttributeCombinations();
         sempClient.setOpaquePassword(configBroker.getOpaquePassword());
         if (!curlOnly){
             exitOnObjectsAlreadyExist(configBroker);
@@ -199,6 +200,7 @@ public class Commander {
                     AttributeType.BROKER_SPECIFIC);
             cb.removeAttributesWithDefaultValue();
         });
+        configFile.checkAttributeCombinations();
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();
