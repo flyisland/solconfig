@@ -190,6 +190,19 @@ public class ConfigObject {
         forEachChild(ConfigObject::removeAttributesWithDefaultValue);
     }
 
+    /**
+     * For example, below is the description of POST action of URI: /msgVpns/{msgVpnName}/restDeliveryPoints/{restDeliveryPointName}/restConsumers,
+     * means that if attribute `remotePort` is present in the payload, then attribute `tlsEnabled` is required in the payload too.
+     *
+     *| Class                               | Attribute                        | Requires                        | Conflicts |
+     * | :---------------------------------- | :------------------------------- | :------------------------------ | :-------- |
+     * | MsgVpnRestDeliveryPointRestConsumer | authenticationClientCertPassword | authenticationClientCertContent |
+     * | MsgVpnRestDeliveryPointRestConsumer | authenticationHttpBasicPassword  | authenticationHttpBasicUsername |
+     * | MsgVpnRestDeliveryPointRestConsumer | authenticationHttpBasicUsername  | authenticationHttpBasicPassword |
+     * | MsgVpnRestDeliveryPointRestConsumer | remotePort                       | tlsEnabled                      |
+     * | MsgVpnRestDeliveryPointRestConsumer | tlsEnabled                       | remotePort                      |
+     */
+
     public void checkAttributeCombinations() {
         var requiresAttributesWithDefalutValue = sempSpec.getRequiresAttributeWithDefaultValue(attributes.keySet());
         attributes.putAll(requiresAttributesWithDefalutValue);
