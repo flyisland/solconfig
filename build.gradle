@@ -5,7 +5,7 @@ plugins {
     id "io.freefair.lombok" version "5.3.0"
 }
 
-group 'com.solace.tools.sempcfg'
+group 'com.solace.tools.solconfig'
 version '1.0.3'
 def longVersion = version + ", Build time: "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
 
@@ -23,7 +23,7 @@ java {
 jar {
     archiveFileName = rootProject.name+".jar"
     manifest {
-        attributes "Main-Class": "com.solace.tools.sempcfg.App",
+        attributes "Main-Class": "com.solace.tools.solconfig.App",
                 'Implementation-Title': rootProject.name,
                 'Implementation-Version': longVersion
     }
