@@ -4,9 +4,9 @@
 
 Use the "backup" command to export the configuration of objects on a PS+ Broker into a single JSON, then use the "create" or "update" command to restore the configuration.
 
-For example, you could run `./sempcfg vpn Demo` to show the whole configuration on the console, or run `./sempcfg vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./sempcfg -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
+For example, you could run `./solconfig vpn Demo` to show the whole configuration on the console, or run `./solconfig vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./solconfig -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
 
-Then run `./sempcfg -H http://another-broker:8080 create Demo.json` to create the same Message VPN on another broker.
+Then run `./solconfig -H http://another-broker:8080 create Demo.json` to create the same Message VPN on another broker.
 
 ## Installation
 
@@ -14,27 +14,22 @@ Then run `./sempcfg -H http://another-broker:8080 create Demo.json` to create th
 
 Make sure you have [JDK 11](https://adoptopenjdk.net/) or above installed.
 
-```commandline
-git clone https://github.com/flyisland/sempcfg
-cd sempcfg
+```shell
+git clone https://github.com/flyisland/solconfig
+cd solconfig
 ./gradlew build
-java -jar build/libs/sempcfg.jar help
+java -jar build/libs/solconfig.jar help
 ```
 
-### Native Image
-
-Install [Native Image](https://www.graalvm.org/reference-manual/native-image/) first, then run `./native-image.sh`, it will create a native image `./sempcfg` which could be executed independently without JDK installed. 
-
-### [Download](https://github.com/flyisland/sempcfg/releases)
-
+### [Download](https://github.com/flyisland/solconfig/releases)
 
 ## Help
 
-Run `sempcfg help` and `sempcfg help sub-command` to check the help message carefully before you use it.
+Run `solconfig help` and `solconfig help sub-command` to check the help message carefully before you use it.
 
-```commandline
-./sempcfg help
-Usage: sempcfg [-hkV] [--curl-only] [--cacert=<cacert>] [-H=<adminHost>]
+```text
+$ java -jar solconfig.jar help
+Usage: solconfig [-hkV] [--curl-only] [--cacert=<cacert>] [-H=<adminHost>]
                [-p=<adminPwd>] [-u=<adminUser>] [COMMAND]
 Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2
 protocol. Use the 'backup' command to export the configuration of objects on a
@@ -69,14 +64,15 @@ Commands:
             especially for the "default" VPN or the VPN of the Solace Cloud
             Service instance, since you can only update them.
 
+  spec    Print the analyzed SEMPv2 specification
   help    Displays help information about the specified command
 ```
 
 ### backup
 
-```commandline
-./sempcfg help backup
-Usage: sempcfg backup [-O=<opaquePassword>] <resourceType> <objectNames>...
+```text
+$ java -jar solconfig.jar help backup
+Usage: solconfig backup [-O=<opaquePassword>] <resourceType> <objectNames>...
 Export the whole configuration of objects into a single JSON
       <resourceType>     Type of the exported object [cluster, vpn]
       <objectNames>...   One or more object names, , "*" means all
@@ -87,9 +83,9 @@ Export the whole configuration of objects into a single JSON
 
 ### delete
 
-```commandline
-./sempcfg help delete
-Usage: sempcfg delete <resourceType> <objectName>
+```text
+$ java -jar solconfig.jar help delete
+Usage: solconfig delete <resourceType> <objectName>
 Delete the specified objects
       <resourceType>   Type of the object to delete [cluster, vpn]
       <objectName>     Object name to remove
@@ -97,9 +93,9 @@ Delete the specified objects
 
 ### update
 
-```commandline
-./sempcfg help update
-Usage: sempcfg update <confPath>
+```text
+$ java -jar solconfig.jar help update
+Usage: solconfig update <confPath>
 Update the existing objects to make them the same as the configuration file
 
 Be careful, it will DELETE existing objects like Queues or Client Usernames,

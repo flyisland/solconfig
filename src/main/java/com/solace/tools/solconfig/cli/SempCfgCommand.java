@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-@Command(name = "sempcfg", mixinStandardHelpOptions = true,
+@Command(name = "solconfig", mixinStandardHelpOptions = true,
         versionProvider = SempCfgCommand.BuildVersion.class,
         description = "Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol. " +
                 "Use the 'backup' command to export the configuration of objects on a PS+  Broker into a single JSON, " +
