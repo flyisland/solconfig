@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 
+## [1.1.0] - 2021-04-01
+
+Rename from 'sempcfg' to 'solconfig'.
+
 ## [1.0.3] - 2021-03-29
 ### Added
 - Compare the Semp Version before apply the configuration
