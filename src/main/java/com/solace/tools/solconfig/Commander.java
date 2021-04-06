@@ -226,14 +226,19 @@ public class Commander {
         System.out.println("## spec");
         printSpec();
         var path = "examples/template/demo_vpn.json";
+
         System.out.println("## create "+path);
         create(Path.of(path));
         var type = "msgVpns";
         var vpn = new String[] {"Demo"};
+
         System.out.printf("## backup %s %s%n", type, vpn[0]);
         backup(type, vpn);
-        System.out.println("## delete "+path);
+
+        System.out.println("## update "+path);
         update(Path.of("examples/template/demo_vpn.json"));
+
+        System.out.printf("## delete %s %s%n", type, vpn[0]);
         delete(type, vpn);
     }
 }
