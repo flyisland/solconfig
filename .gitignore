@@ -39,4 +39,3 @@ out/
 lombok.config
 /sempcfg
 /solconfig
-/src/main/resources/META-INF/native-image
