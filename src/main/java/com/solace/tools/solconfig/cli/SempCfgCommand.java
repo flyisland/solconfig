@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
             CreateCommand.class,
             UpdateCommand.class,
             PrintSpecCommand.class,
+            TestCommand.class,
             CommandLine.HelpCommand.class
         },
         showDefaultValues = true)

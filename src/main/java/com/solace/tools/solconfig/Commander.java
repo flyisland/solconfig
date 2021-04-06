@@ -221,4 +221,19 @@ public class Commander {
     public void printSpec() {
         System.out.println(SempSpec.toPrettyString());
     }
+
+    public void integrationTest() {
+        System.out.println("## spec");
+        printSpec();
+        var path = "examples/template/demo_vpn.json";
+        System.out.println("## create "+path);
+        create(Path.of(path));
+        var type = "msgVpns";
+        var vpn = new String[] {"Demo"};
+        System.out.printf("## backup %s %s%n", type, vpn[0]);
+        backup(type, vpn);
+        System.out.println("## delete "+path);
+        update(Path.of("examples/template/demo_vpn.json"));
+        delete(type, vpn);
+    }
 }
