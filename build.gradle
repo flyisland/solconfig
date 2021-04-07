@@ -14,6 +14,11 @@ repositories {
     jcenter()
 }
 
+task nativeAgent(type:Exec) {
+    commandLine 'mkdir', '-p', './src/main/resources/META-INF/native-image/solconfig'
+    commandLine 'java', '-agentlib:native-image-agent=config-output-dir=./src/main/resources/META-INF/native-image/solconfig', '-jar', 'build/libs/solconfig.jar', 'test'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
