@@ -52,11 +52,15 @@ public class SempSpec {
                 return null;
             }
         }
+
+        public static Collection<String> fullNames() {
+            return map.values();
+        }
      }
 
     public static void setupByString(String jsonString) {
         jsonSpec = JsonSpec.ofString(jsonString);
-        TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
+        RES_ABBR.fullNames().forEach(s -> buildSempSpec("", s));
 
         sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
         sempVersion = new SempVersion(jsonSpec.getSempVersionText());
@@ -66,7 +70,7 @@ public class SempSpec {
         var spec = new SempSpec();
         spec.attributes = new HashMap<>();
         spec.defaultValues = new HashMap<>();
-        spec.childrenNames = new LinkedList<>(TOP_RESOURCES.values());
+        spec.childrenNames = new LinkedList<>(RES_ABBR.fullNames());
         spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
                 List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
         spec.attributeCombinations = Map.of();
@@ -107,13 +111,13 @@ public class SempSpec {
     }
 
     public static String getTopResourceIdentifierKey(String resourceName) {
-        if (TOP_RESOURCES.containsValue(resourceName)){
+        if (RES_ABBR.fullNames().contains(resourceName)){
             return sempSpecMap.get("/"+resourceName).
                     getAttributeNames(AttributeType.IDENTIFYING).get(0);
         }else{
             throw new IllegalArgumentException(
                     String.format("%s is NOT one of [%s]!",
-                            resourceName, TOP_RESOURCES.values()));
+                            resourceName, RES_ABBR.fullNames()));
         }
     }
 
