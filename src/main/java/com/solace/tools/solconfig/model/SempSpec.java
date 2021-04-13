@@ -4,6 +4,7 @@ import com.solace.tools.solconfig.Utils;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SempSpec {
     public static  final String BROKER_SPEC_PATH = "";
@@ -30,12 +31,26 @@ public class SempSpec {
         vpn, cluster;
 
         private static Map<RES_ABBR, String> map = new HashMap<>();
+        private static Map<String, RES_ABBR> reversedMap;
         static {
             map.put(vpn, "msgVpns");
             map.put(cluster, "dmrClusters");
+
+            reversedMap = map.entrySet().stream()
+                    .collect(Collectors.toMap(kv -> kv.getValue(), kv -> kv.getKey()));
         }
+
         public String getFullName() {
             return map.get(this);
+        }
+
+        public static RES_ABBR ofFullName(String fullName) {
+            if (reversedMap.containsKey(fullName)) {
+                return reversedMap.get(fullName);
+            }else {
+                Utils.errPrintlnAndExit("Unknown resource type: %s", fullName);
+                return null;
+            }
         }
      }
 

@@ -154,13 +154,9 @@ public class Commander {
         if (resultSet.isEmpty()) {
             return;
         }
-        var type = SempSpec.TOP_RESOURCES.entrySet().stream()
-                .filter(e -> e.getValue().equals(resourceTypeFullName))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse("");
-        Utils.errPrintlnAndExit((Exception) null, "Resource %s[%s] %s exist!",
-                type,
+        var typeAbbr = SempSpec.RES_ABBR.ofFullName(resourceTypeFullName);
+        Utils.errPrintlnAndExit("Resource %s[%s] %s exist!",
+                typeAbbr,
                 String.join(", ", resultSet),
                 existOn ? "already" : "doesn't");
     }
