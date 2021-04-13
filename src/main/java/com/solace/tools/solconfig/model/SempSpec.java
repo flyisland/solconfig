@@ -7,8 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SempSpec {
-    public static  final String BROKER_SPEC_PATH = "";
-    public static final Map<String, String> TOP_RESOURCES = Map.of("vpn", "msgVpns", "cluster", "dmrClusters");
+    public static final String BROKER_SPEC_PATH = "";
     public static final String SEMP_VERSION = "sempVersion";
     public static final String OPAQUE_PASSWORD = "opaquePassword";
     public static final String DEFAULT_OBJECT_NAME = "default";
