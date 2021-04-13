@@ -145,8 +145,8 @@ public class Commander {
         }
     }
 
-    private void checkObjectsExistence(String resourceType, List<String> objectNames, boolean existOn) {
-        var objects = sempClient.checkIfObjectsExist(resourceType, objectNames);
+    private void checkObjectsExistence(String resourceTypeFullName, List<String> objectNames, boolean existOn) {
+        var objects = sempClient.checkIfObjectsExist(resourceTypeFullName, objectNames);
         var resultSet = objects.stream()
                 .filter(e -> e.getValue() == existOn)
                 .map(Map.Entry::getKey)
@@ -155,7 +155,7 @@ public class Commander {
             return;
         }
         var type = SempSpec.TOP_RESOURCES.entrySet().stream()
-                .filter(e -> e.getValue().equals(resourceType))
+                .filter(e -> e.getValue().equals(resourceTypeFullName))
                 .map(Map.Entry::getKey)
                 .findFirst()
                 .orElse("");

@@ -237,11 +237,14 @@ public class SempClient {
         }
     }
 
-    public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceType, List<String> objectNames){
+    /**
+     * To check if the list of object name of resourceTypeFullName exist in the broker already
+     */
+    public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceTypeFullName, List<String> objectNames){
         var absUriList = objectNames.stream()
                 .filter(n -> !n.equals("*"))
                 .map(objectName -> Map.entry(objectName,
-                        String.format("/%s/%s", resourceType, objectName)))
+                        String.format("/%s/%s", resourceTypeFullName, objectName)))
                 .collect(Collectors.toList());
 
         Map<String, Boolean> result = new HashMap<>();
