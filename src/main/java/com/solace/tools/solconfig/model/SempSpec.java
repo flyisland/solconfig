@@ -26,10 +26,10 @@ public class SempSpec {
     private String sempClassName;
     private Map<AttributeCombinationKey, List<String>> attributeCombinations;
 
-    public enum TOP_RES_ENUM {
+    public enum RES_ABBR {
         vpn, cluster;
 
-        private static Map<TOP_RES_ENUM, String> map = new HashMap<>();
+        private static Map<RES_ABBR, String> map = new HashMap<>();
         static {
             map.put(vpn, "msgVpns");
             map.put(cluster, "dmrClusters");

@@ -8,7 +8,7 @@ import com.solace.tools.solconfig.model.SempSpec;
 public class DeleteCommand extends SubCommand {
     @CommandLine.Parameters(index = "0",
             description = "Type of the object to delete [${COMPLETION-CANDIDATES}]")
-    private SempSpec.TOP_RES_ENUM resourceType;
+    private SempSpec.RES_ABBR resourceType;
     @CommandLine.Parameters(index = "1", description = "Object name to remove")
     private String objectName;
 
