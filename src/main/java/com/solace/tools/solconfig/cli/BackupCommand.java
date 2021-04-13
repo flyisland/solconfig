@@ -29,7 +29,7 @@ public class BackupCommand extends SubCommand {
     protected Integer execute() {
         Commander commander = parentCommand.commander;
         commander.getSempClient().setOpaquePassword(opaquePassword);
-        commander.backup(SempSpec.TOP_RES_ENUM.get(resourceType), objectNames);
+        commander.backup(resourceType.getFullName(), objectNames);
         return 0;
     }
 }

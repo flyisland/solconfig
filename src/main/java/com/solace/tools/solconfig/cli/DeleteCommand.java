@@ -15,7 +15,7 @@ public class DeleteCommand extends SubCommand {
     @Override
     protected Integer execute() {
         Commander commander = parentCommand.commander;
-        commander.delete(SempSpec.TOP_RES_ENUM.get(resourceType), new String[]{objectName});
+        commander.delete(resourceType.getFullName(), new String[]{objectName});
         return 0;
     }
 }

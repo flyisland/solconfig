@@ -34,9 +34,8 @@ public class SempSpec {
             map.put(vpn, "msgVpns");
             map.put(cluster, "dmrClusters");
         }
-
-        public static String get(TOP_RES_ENUM key) {
-            return map.get(key);
+        public String getFullName() {
+            return map.get(this);
         }
      }
 
