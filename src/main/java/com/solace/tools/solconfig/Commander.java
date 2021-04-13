@@ -166,6 +166,9 @@ public class Commander {
                 checkObjectsExistence(obj.getCollectionName(), List.of(obj.getObjectId()), false));
     }
 
+    /**
+     * Generate a ConfigBroker object which has the same top objects as the input configFile
+     */
     private ConfigBroker generateConfigFromBroker(ConfigBroker configFile) {
         ConfigBroker configBroker = new ConfigBroker();
         configBroker.setSempVersion(SempSpec.getSempVersion());
