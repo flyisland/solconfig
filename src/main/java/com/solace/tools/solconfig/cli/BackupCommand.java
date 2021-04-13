@@ -8,9 +8,9 @@ import java.util.*;
 
 @CommandLine.Command(name = "backup", description = "Export the whole configuration of objects into a single JSON")
 public class BackupCommand extends SubCommand {
-    @CommandLine.Parameters(index = "0", completionCandidates = ResourceTypeCandidates.class,
+    @CommandLine.Parameters(index = "0",
             description = "Type of the exported object [${COMPLETION-CANDIDATES}]")
-    private String resourceType;
+    private SempSpec.TOP_RES_ENUM resourceType;
     @CommandLine.Parameters(index = "1..*", arity = "1..*", description = "One or more object names, , \"*\" means all")
     private String[] objectNames;
     @CommandLine.Option(names = {"-O", "---opaque-password"},
@@ -29,7 +29,7 @@ public class BackupCommand extends SubCommand {
     protected Integer execute() {
         Commander commander = parentCommand.commander;
         commander.getSempClient().setOpaquePassword(opaquePassword);
-        commander.backup(SempSpec.TOP_RESOURCES.get(resourceType), objectNames);
+        commander.backup(SempSpec.TOP_RES_ENUM.get(resourceType), objectNames);
         return 0;
     }
 }

@@ -26,6 +26,20 @@ public class SempSpec {
     private String sempClassName;
     private Map<AttributeCombinationKey, List<String>> attributeCombinations;
 
+    public enum TOP_RES_ENUM {
+        vpn, cluster;
+
+        private static Map<TOP_RES_ENUM, String> map = new HashMap<>();
+        static {
+            map.put(vpn, "msgVpns");
+            map.put(cluster, "dmrClusters");
+        }
+
+        public static String get(TOP_RES_ENUM key) {
+            return map.get(key);
+        }
+     }
+
     public static void setupByString(String jsonString) {
         jsonSpec = JsonSpec.ofString(jsonString);
         TOP_RESOURCES.values().forEach(s -> buildSempSpec("", s));
