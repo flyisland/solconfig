@@ -20,11 +20,11 @@ public class SempSpec {
     @Getter private static SempVersion sempVersion;
 
     @Getter private boolean deprecated;
-    private Map<String, List<String>> attributes;
+    @Getter private Map<String, List<String>> attributes;
     @Getter private Map<String, Object> defaultValues;
     @Getter private List<String> childrenNames;
-    private String sempClassName;
-    private Map<AttributeCombinationKey, List<String>> attributeCombinations;
+    @Getter private String sempClassName;
+    @Getter private Map<AttributeCombinationKey, List<String>> attributeCombinations;
 
     public enum RES_ABBR {
         vpn, cluster;
@@ -67,8 +67,8 @@ public class SempSpec {
 
     private static SempSpec brokerSpec() {
         var spec = new SempSpec();
-        spec.attributes = new HashMap<>();
-        spec.defaultValues = new HashMap<>();
+        spec.attributes = new TreeMap<>();
+        spec.defaultValues = new TreeMap<>();
         spec.childrenNames = new LinkedList<>(RES_ABBR.fullNames());
         spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
                 List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));

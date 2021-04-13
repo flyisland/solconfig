@@ -150,14 +150,14 @@ Map:
         input.put(AttributeType.IDENTIFYING.toString(), uriIds);
     }
 
-    private HashMap<String, List<String>> findSpecialAttributesFromDescription(String description) {
+    private TreeMap<String, List<String>> findSpecialAttributesFromDescription(String description) {
         var table = description.lines()
                 .map(line -> line.split("\\|", -1))
                 .filter(array -> array.length>=5)
                 .map(Arrays::asList)
                 .collect(Collectors.toList());
 
-        var result = new HashMap<String, List<String>>();
+        var result = new TreeMap<String, List<String>>();
         if (table.size() == 0) {
             // return empty Map
             return result;
@@ -255,7 +255,7 @@ Map:
     }
 
     protected Map<String, Object> getAttributesWithDefaultValueFromJProperties(Map<String, Map<String, ?>> propMap) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new TreeMap<>();
         propMap.forEach((attr, def)->{
             if (!def.containsKey("description")) return;
             String description = (String) def.get("description");

@@ -100,24 +100,24 @@ public class JsonSpecTest {
     @ParameterizedTest
     @CsvSource({
             "/msgVpns/{msgVpnName}/aclProfiles/{aclProfileName}/subscribeTopicExceptions, '{\n" +
-                    "  \"Read-Only\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
                     "  \"ALL\" : [ \"aclProfileName\", \"msgVpnName\", \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
-                    "  \"Parent-Identifiers\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
-                    "  \"Required\" : [ \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
-                    "  \"Opaque\" : [ ],\n" +
                     "  \"Identifying\" : [ \"subscribeTopicExceptionSyntax\", \"subscribeTopicException\" ],\n" +
+                    "  \"Opaque\" : [ ],\n" +
+                    "  \"Parent-Identifiers\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
+                    "  \"Read-Only\" : [ \"aclProfileName\", \"msgVpnName\" ],\n" +
+                    "  \"Required\" : [ \"subscribeTopicException\", \"subscribeTopicExceptionSyntax\" ],\n" +
                     "  \"Write-Only\" : [ ]\n" +
                     "}'",
             "'/msgVpns/{msgVpnName}/bridges/{bridgeName},{bridgeVirtualRouter}/remoteMsgVpns', '{\n" +
-                    "  \"Read-Only\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
-                    "  \"Requires-Disable\" : [ \"clientUsername\", \"compressedDataEnabled\", \"egressFlowWindowSize\", \"password\", \"tlsEnabled\" ],\n" +
-                    "  \"ALL\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"clientUsername\", \"compressedDataEnabled\", \"connectOrder\", \"egressFlowWindowSize\", \"enabled\", \"msgVpnName\", \"password\", \"queueBinding\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\", \"tlsEnabled\", \"unidirectionalClientProfile\" ],\n"+
-                    "  \"Parent-Identifiers\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\" ],\n" +
-                    "  \"Required\" : [ \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
+                    "  \"ALL\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"clientUsername\", \"compressedDataEnabled\", \"connectOrder\", \"egressFlowWindowSize\", \"enabled\", \"msgVpnName\", \"password\", \"queueBinding\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\", \"tlsEnabled\", \"unidirectionalClientProfile\" ],\n" +
                     "  \"Deprecated\" : [ ],\n" +
-                    "  \"Opaque\" : [ \"password\" ],\n" +
                     "  \"Identifying\" : [ \"remoteMsgVpnName\", \"remoteMsgVpnLocation\", \"remoteMsgVpnInterface\" ],\n" +
+                    "  \"Opaque\" : [ \"password\" ],\n" +
+                    "  \"Parent-Identifiers\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\" ],\n" +
+                    "  \"Read-Only\" : [ \"bridgeName\", \"bridgeVirtualRouter\", \"msgVpnName\", \"remoteMsgVpnInterface\", \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
+                    "  \"Required\" : [ \"remoteMsgVpnLocation\", \"remoteMsgVpnName\" ],\n" +
+                    "  \"Requires-Disable\" : [ \"clientUsername\", \"compressedDataEnabled\", \"egressFlowWindowSize\", \"password\", \"tlsEnabled\" ],\n" +
                     "  \"Write-Only\" : [ \"password\" ]\n" +
                     "}'"
     })
