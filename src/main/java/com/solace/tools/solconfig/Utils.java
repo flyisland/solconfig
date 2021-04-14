@@ -1,7 +1,10 @@
 package com.solace.tools.solconfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -59,6 +62,21 @@ public class Utils {
         String result = null;
         try {
             result = Utils.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            errPrintlnAndExit(e, "Unable to convert the object into the json format.");
+        }
+        return result;
+    }
+
+    public static String toPrettyJsonMultiLineArray(Object obj) {
+        String result = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            DefaultPrettyPrinter prettyPrinter = new DefaultPrettyPrinter();
+            prettyPrinter.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+            result = objectMapper.writer(prettyPrinter).writeValueAsString(obj);
         } catch (JsonProcessingException e) {
             errPrintlnAndExit(e, "Unable to convert the object into the json format.");
         }

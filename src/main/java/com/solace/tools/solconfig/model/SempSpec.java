@@ -137,7 +137,7 @@ public class SempSpec {
         HashMap<String, Object> out = new HashMap<>();
         out.put(SEMP_VERSION, sempVersion.getText());
         out.put("sempSpecs", sempSpecMap);
-        return Utils.toPrettyJson(out);
+        return Utils.toPrettyJsonMultiLineArray(out);
     }
 
     public Map<String, Object> getRequiresAttributeWithDefaultValue(Set<String> attributeNames) {
