@@ -14,6 +14,10 @@ public class SempSpec {
     public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
     public static final String ENABLED_ATTRIBUTE_NAME = "enabled";
     public static final List<String> SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD = List.of("/dmrClusters/links/remoteAddresses");
+    private static final Map<String, List<String>> HARD_CODE_REQUIRES_DISABLE = new HashMap<>();
+    static {
+        HARD_CODE_REQUIRES_DISABLE.put("/msgVpns", List.of("restTlsServerCertValidateNameEnabled"));
+    }
 
     private static JsonSpec jsonSpec;
     protected static Map<String, SempSpec> sempSpecMap = new TreeMap<>();
@@ -63,6 +67,14 @@ public class SempSpec {
 
         sempSpecMap.put(BROKER_SPEC_PATH, brokerSpec());
         sempVersion = new SempVersion(jsonSpec.getSempVersionText());
+        hardcodeSetup();
+    }
+
+    private static void hardcodeSetup() {
+        HARD_CODE_REQUIRES_DISABLE.forEach((specPath, list) -> {
+            var Requires_Disable = sempSpecMap.get(specPath).attributes.get(AttributeType.REQUIRES_DISABLE.toString());
+            Requires_Disable.addAll(list);
+        });
     }
 
     private static SempSpec brokerSpec() {

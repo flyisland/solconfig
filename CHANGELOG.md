@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - issue 005: should valid the resource type of `backup` and `delete` subcommand
 - exit the program while `delete` command with returned code other than `NOT_ALLOWED` or `CONFIGDB_OBJECT_DEPENDENCY`
 - use java.net.URI instead of URLEncoder.encode, since the latter will translate space into "+" instead of "%20"
+- disable the message-vpn before update attribute `restTlsServerCertValidateNameEnabled`
 
 ## [1.1.1] - 2021-04-06
 ### Added

@@ -24,3 +24,5 @@ Just update the VPN with attribute restTlsServerCertValidateNameEnabled set to t
 Although attribute `restTlsServerCertValidateNameEnabled` is not a "Requires-Disable" attribute of object Message-vpn, but it indeed requires the Message-vpn (or rest-delivery-point or rest-consumer) to be disabled first to update it.
 
 ## Solution
+
+Hardcode this relationship, so this tool will know to disable the message-vpn before update attribute `restTlsServerCertValidateNameEnabled`
