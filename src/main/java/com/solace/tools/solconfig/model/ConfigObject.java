@@ -2,12 +2,12 @@ package com.solace.tools.solconfig.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.solace.tools.solconfig.RestCommandList;
+import com.solace.tools.solconfig.Utils;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import com.solace.tools.solconfig.Utils;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -131,7 +131,14 @@ public class ConfigObject {
     public String getObjectId() {
         var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
-                .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
+                .map(s -> {
+                    try {
+                        return new URI(null, null, s, null).toASCIIString();
+                    } catch (URISyntaxException e) {
+                        Utils.errPrintlnAndExit(e, "");
+                        return "";
+                    }
+                })
                 .collect(Collectors.toList());
         return String.join(",", idList);
     }
