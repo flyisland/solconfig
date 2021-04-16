@@ -56,12 +56,11 @@ public class RestCommandList {
                 Utils.err("OK%n");
             } else  {
                 int semp_code = meta.getError().getCode();
-                if (cmd.method == HTTPMethod.DELETE){
-                    if(semp_code == SEMPError.NOT_ALLOWED.getValue() ||
-                            semp_code == SEMPError.CONFIGDB_OBJECT_DEPENDENCY.getValue()) {
-                        Utils.err("%s, retry later%n", SEMPError.ofInt(semp_code));
-                        retryCommands.add(cmd);
-                    }
+                if (cmd.method == HTTPMethod.DELETE &&
+                    (semp_code == SEMPError.NOT_ALLOWED.getValue() ||
+                            semp_code == SEMPError.CONFIGDB_OBJECT_DEPENDENCY.getValue())) {
+                    Utils.err("%s, retry later%n", SEMPError.ofInt(semp_code));
+                    retryCommands.add(cmd);
                 } else if (cmd.method == HTTPMethod.POST &&
                         semp_code == SEMPError.ALREADY_EXISTS.getValue()) {
                     Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
