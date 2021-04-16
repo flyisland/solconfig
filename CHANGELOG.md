@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- add more output of `spec` subcommand
 
 ### Fixed
 - issue 005: should valid the resource type of `backup` and `delete` subcommand
