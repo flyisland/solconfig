@@ -6,6 +6,73 @@ Use the "backup" command to export the configuration of objects on a PS+ Broker 
 
 For example, you could run `./solconfig vpn Demo` to show the whole configuration on the console, or run `./solconfig vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./solconfig -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
 
+```text
+# java -jar build/libs/solconfig.jar backup vpn RDP
+{
+  "sempVersion": "2.19",
+  "msgVpns": [
+    {
+      "authenticationBasicProfileName": "",
+      "authenticationBasicType": "internal",
+      "enabled": true,
+      ...
+      "msgVpnName": "RDP",
+      ...
+      "aclProfiles": [
+        {
+          "aclProfileName": "default",
+          "clientConnectDefaultAction": "allow",
+          "publishTopicDefaultAction": "allow",
+          "subscribeTopicDefaultAction": "allow"
+        }
+      ],
+      ...
+      "queues": [
+        {
+          "egressEnabled": true,
+          "eventBindCountThreshold": {"clearPercent":60,"setPercent":80},
+          "eventMsgSpoolUsageThreshold": {"clearPercent":60,"setPercent":80},
+          "eventRejectLowPriorityMsgLimitThreshold": {"clearPercent":60,"setPercent":80},
+          "ingressEnabled": true,
+          "permission": "consume",
+          "queueName": "aws Queue",
+          "subscriptions": [
+            {
+              "subscriptionTopic": "aws"
+            }
+          ]
+        },
+      ],
+      "restDeliveryPoints": [
+        {
+          "enabled": true,
+          "restDeliveryPointName": "aws",
+          "service": "API Gateway",
+          "vendor": "AWS",
+          "queueBindings": [
+            {
+              "postRequestTarget": "/initializer",
+              "queueBindingName": "aws Queue"
+            }
+          ],
+          "restConsumers": [
+            {
+              "enabled": true,
+              "remoteHost": "xxxxx.execute-api.ap-southeast-1.amazonaws.com",
+              "remotePort": 443,
+              "restConsumerName": "aws REST Consumer",
+              "tlsEnabled": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+            
+
+```
+
 Then run `./solconfig -H http://another-broker:8080 create Demo.json` to create the same Message VPN on another broker.
 
 ## Installation
