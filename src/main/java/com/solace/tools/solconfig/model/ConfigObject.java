@@ -139,6 +139,7 @@ public class ConfigObject {
                         return "";
                     }
                 })
+                .map(s -> s.replaceAll("/", "%2F"))
                 .collect(Collectors.toList());
         return String.join(",", idList);
     }
