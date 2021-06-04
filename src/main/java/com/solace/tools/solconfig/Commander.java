@@ -114,11 +114,17 @@ public class Commander {
     }
 
     private void compareSempVersion(ConfigBroker configFromFile){
+        if (configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) == 0)
+            return;;
+        if(Objects.nonNull(configFromFile.getOpaquePassword())){
+            Utils.errPrintlnAndExit("OpaquePassword is only capable when the sempVersion [%s] of the config file is same as the broker's [%s].",
+                    configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
+        }
         if (configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) > 0) {
-            System.out.printf("This sempVersion [%s] of the config file is newer than the broker's [%s], some objects/attributes may be not AVAILABLE!%n",
+            System.out.printf("The sempVersion [%s] of the config file is newer than the broker's [%s], some objects/attributes may be not AVAILABLE!%n",
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
         } else if(configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) < 0){
-            System.out.printf("This sempVersion [%s] of the config file is older than the broker's [%s], some objects/attributes may be DEPRECATED!%n",
+            System.out.printf("The sempVersion [%s] of the config file is older than the broker's [%s], some objects/attributes may be DEPRECATED!%n",
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
         }
     }
