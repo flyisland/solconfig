@@ -4,7 +4,7 @@
 
 Use the "backup" command to export the configuration of objects on a PS+ Broker into a single JSON, then use the "create" or "update" command to restore the configuration.
 
-For example, you could run `./solconfig vpn Demo` to show the whole configuration on the console, or run `./solconfig vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./solconfig -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
+For example, you could run `./solconfig backup vpn Demo` to show the whole configuration on the console, or run `./solconfig backup vpn Demo > Demo.json` to save the configuration into a json file, use opaque password like `./solconfig backup -O 12345678 vpn Demo` if you want to back up the sensitive information like "password".
 
 ```text
 # java -jar build/libs/solconfig.jar backup vpn RDP
@@ -88,6 +88,8 @@ cd solconfig
 java -jar build/libs/solconfig.jar help
 ```
 ### Native Image
+
+**CAUTION:** If you encounter into any issues while using native image, please try the jar version before you submit an issues, thanks.
 
 You could build `solconfig` as native image by following below steps:
 
