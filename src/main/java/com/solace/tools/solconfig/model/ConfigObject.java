@@ -6,8 +6,7 @@ import com.solace.tools.solconfig.Utils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -131,17 +130,23 @@ public class ConfigObject {
     public String getObjectId() {
         var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 .map(id -> attributes.get(id).toString())
-                .map(s -> {
-                    try {
-                        return new URI(null, null, s, null).toASCIIString();
-                    } catch (URISyntaxException e) {
-                        Utils.errPrintlnAndExit(e, "");
-                        return "";
-                    }
-                })
-                .map(s -> s.replaceAll("/", "%2F"))
+                .map(s -> percentEncoding(s))
                 .collect(Collectors.toList());
         return String.join(",", idList);
+    }
+
+    static String percentEncoding(String input){
+        var bytes = input.getBytes(StandardCharsets.UTF_8);
+        StringBuilder out = new StringBuilder(bytes.length);
+        for (byte b : bytes){
+            if((b>= '0' && b<='9') || (b>= 'A' && b<='Z') || (b>= 'a' && b<='z') ||
+            b == '.' || b == '-' || b == '_'){
+                out.append((char)b);
+                continue;
+            }
+            out.append(String.format("%%%02X", b));
+        }
+        return out.toString();
     }
 
     /**
