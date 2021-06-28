@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+### Fixed
 
+## [1.1.3] - 2021-06-28
 ### Fixed
 - fix: create percentEncoding() method to encode identifying property.
 
