@@ -6,7 +6,8 @@ import com.solace.tools.solconfig.model.SempSpec;
 
 import java.util.*;
 
-@CommandLine.Command(name = "backup", description = "Export the whole configuration of objects into a single JSON")
+@CommandLine.Command(name = "backup", description = "Export the whole configuration of objects into a single JSON",
+        showDefaultValues = true)
 public class BackupCommand extends SubCommand {
     @CommandLine.Parameters(index = "0",
             description = "Type of the exported object [${COMPLETION-CANDIDATES}]")
@@ -16,6 +17,9 @@ public class BackupCommand extends SubCommand {
     @CommandLine.Option(names = {"-O", "---opaque-password"},
             description = "The opaquePassword for receiving and updating opaque properties like the password of Client Usernames")
     private String opaquePassword;
+    @CommandLine.Option(names = {"-D", "--keep-default"}, description = "Whether to Keep attributes with a default value")
+    private boolean isKeepDefault = false;
+
 
     @Override
     public String toString() {
@@ -29,7 +33,7 @@ public class BackupCommand extends SubCommand {
     protected Integer execute() {
         Commander commander = parentCommand.commander;
         commander.getSempClient().setOpaquePassword(opaquePassword);
-        commander.backup(resourceType.getFullName(), objectNames);
+        commander.backup(resourceType.getFullName(), objectNames, isKeepDefault);
         return 0;
     }
 }

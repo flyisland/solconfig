@@ -23,15 +23,17 @@ public class Commander {
         SempSpec.setupByString(sempClient.getBrokerSpec());
     }
 
-    public void backup(String resourceType, String[] objectNames){
+    public void backup(String resourceType, String[] objectNames, boolean isKeepDefault){
         exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
 
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
-        configBroker.removeAttributesWithDefaultValue();
+        if (isKeepDefault) {
+            configBroker.removeAttributesWithDefaultValue();
+        }
         configBroker.checkAttributeCombinations(); // keep requires attribute for backup
-        System.out.println(configBroker.toString());
+        System.out.println(configBroker);
     }
 
     public void delete(String resourceType, String[] objectNames) {
@@ -115,7 +117,7 @@ public class Commander {
 
     private void compareSempVersion(ConfigBroker configFromFile){
         if (configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) == 0)
-            return;;
+            return;
         if(Objects.nonNull(configFromFile.getOpaquePassword())){
             Utils.errPrintlnAndExit("OpaquePassword is only capable when the sempVersion [%s] of the config file is same as the broker's [%s].",
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
@@ -238,7 +240,7 @@ public class Commander {
         var vpn = new String[] {"Demo"};
 
         System.out.printf("## backup %s %s%n", type, vpn[0]);
-        backup(type, vpn);
+        backup(type, vpn, false);
 
         System.out.println("## update "+path);
         update(Path.of("examples/template/demo_vpn.json"));

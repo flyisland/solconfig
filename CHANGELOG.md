@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- add "--keep-default" option to `backup` command to indicate whether to Keep attributes with a default value.
 ### Fixed
 
 ## [1.1.3] - 2021-06-28
