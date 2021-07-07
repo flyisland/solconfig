@@ -3,7 +3,7 @@ package com.solace.tools.solconfig.cli;
 import com.solace.tools.solconfig.Commander;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "spec", description = "Print the analyzed SEMPv2 specification")
+@CommandLine.Command(name = "spec", description = "Print the analyzed SEMPv2 specification", hidden = true)
 public class PrintSpecCommand extends SubCommand {
 
     @Override

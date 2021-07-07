@@ -147,7 +147,6 @@ Commands:
             especially for the "default" VPN or the VPN of the Solace Cloud
             Service instance, since you can only update them.
 
-  spec    Print the analyzed SEMPv2 specification
   help    Displays help information about the specified command
 ```
 
@@ -159,6 +158,7 @@ Usage: solconfig backup [-O=<opaquePassword>] <resourceType> <objectNames>...
 Export the whole configuration of objects into a single JSON
       <resourceType>     Type of the exported object [cluster, vpn]
       <objectNames>...   One or more object names, , "*" means all
+  -D, --keep-default     Whether to Keep attributes with a default value
   -O, ---opaque-password=<opaquePassword>
                          The opaquePassword for receiving and updating opaque
                            properties like the password of Client Usernames
