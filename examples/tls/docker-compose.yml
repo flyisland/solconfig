@@ -22,13 +22,13 @@ services:
       #Web transport over TLS
       #- '443:443'
       #MQTT Default VPN
-      - '1883:1883'
+      - 1883:1883
       #AMQP Default VPN over TLS
       #- '5671:5671'
       #AMQP Default VPN
       #- '5672:5672'
       #MQTT Default VPN over WebSockets
-      #- '8000:8000'
+      - 8000:8000
       #MQTT Default VPN over WebSockets / TLS
       #- '8443:8443'
       #MQTT Default VPN over TLS
