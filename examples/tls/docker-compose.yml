@@ -18,7 +18,7 @@ services:
       # Solace CLI SSH/SFTP
       - 2222:2222
       #Web transport
-      - "80:80"
+      - "8008:8008"
       #Web transport over TLS
       - "443:443"
       #MQTT Default VPN
