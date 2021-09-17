@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - add "--keep-default" option to `backup` command to indicate whether to Keep attributes with a default value.
 ### Fixed
+- fix: accept semp version like "2.11.00091010036", check https://github.com/flyisland/solconfig/issues/3
 
 ## [1.1.3] - 2021-06-28
 ### Fixed

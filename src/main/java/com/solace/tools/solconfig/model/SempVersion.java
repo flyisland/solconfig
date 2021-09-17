@@ -16,7 +16,9 @@ public class SempVersion implements Comparable<SempVersion>{
         }
         this.text = version;
         String[] v = version.split("\\.");
-        if (v.length !=2) {
+
+        // both "2.22" and "2.11.00091010036" are legal version, check https://github.com/flyisland/solconfig/issues/3
+        if (v.length < 2) {
             Utils.errPrintlnAndExit(new IllegalArgumentException(version+" is an illegal SEMPv2 version."),"Unable to new a SempVersion object");
         }
         try {
