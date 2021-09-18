@@ -199,7 +199,10 @@ Since version 9.6.x (sempVersion 2.17), with a password is provided in the opaqu
 
 The backup output is now 100 percent as same as the configuration on the PS+ broker, and the same opaquePassword is used to restore the configuration. So you could restore them with the same opaquePassword.
 
-The opaquePassword is only supported over HTTPS, and must be between 8 and 128 characters inclusive!
+**CAUTION:**
+1. The opaquePassword is only supported over **HTTPS**, and must be between **8** and **128** characters inclusive!
+1. The broker to which the request is being sent must have the **same major and minor SEMP version** as the broker that produced the opaque attribute values.
+
 
 ## Template support
 
