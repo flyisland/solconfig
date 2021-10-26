@@ -8,7 +8,7 @@
         </encoder>
     </appender>
 
-    <logger name="semp.cfg" level="${LOGGING_LEVEL:-error}">
+    <logger name="com.solace.tools.solconfig" level="${SOLCONFIG_LOGGING_LEVEL:-error}">
         <appender-ref ref="STDOUT" />
     </logger>
 
