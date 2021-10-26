@@ -29,7 +29,7 @@ public class Commander {
 
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
-        if (isKeepDefault) {
+        if (! isKeepDefault) {
             configBroker.removeAttributesWithDefaultValue();
         }
         configBroker.checkAttributeCombinations(); // keep requires attribute for backup
