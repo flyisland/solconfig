@@ -7,8 +7,11 @@ import lombok.Setter;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Commander {
+    final Logger logger = LoggerFactory.getLogger(Commander.class);
     @Getter private SempClient sempClient;
     @Setter private boolean curlOnly;
 
@@ -81,7 +84,7 @@ public class Commander {
                 if (sempResponse.isEmpty()){
                     return;
                 }
-
+                logger.debug("{} ->\n{}", e.getValue(), sempResponse.toString());
                 List<Map<String, Object>> data = sempResponse.getData();
                 List<Map<String, String>> links = sempResponse.getLinks();
                 for (int i = 0; i < data.size(); i++) {
