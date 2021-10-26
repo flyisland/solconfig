@@ -129,7 +129,15 @@ public class ConfigObject {
      */
     public String getObjectId() {
         var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
-                .map(id -> attributes.get(id).toString())
+                .map(id -> {
+                    var idObj =attributes.get(id);
+                    // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
+                    if (Objects.isNull(idObj)) {
+                        return "";
+                    } else {
+                        return idObj.toString();
+                    }
+                })
                 .map(s -> percentEncoding(s))
                 .collect(Collectors.toList());
         return String.join(",", idList);

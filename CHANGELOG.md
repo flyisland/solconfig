@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fix: opposite action of "--keep-default" option of `backup` command
 - fix: accept `adminHost` end with "/"
+- feature: output debug information via environment variables `SOLCONFIG_LOGGING_LEVEL` set to "debug"
+- fix: fix: some objects like like "/msgVpns/bridges/remoteMsgVpns", have identifying attributes might not be required attributes
 
 ## [1.1.4] - 2021-09-18
 ### Added
