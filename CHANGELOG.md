@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ### Fixed
 - fix: opposite action of "--keep-default" option of `backup` command
+- fix: accept `adminHost` end with "/"
 
 ## [1.1.4] - 2021-09-18
 ### Added

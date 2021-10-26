@@ -60,6 +60,11 @@ public class SempCfgCommand implements Callable<Integer> {
                 Utils.errPrintlnAndExit("Path %s doesn't exist or is un-readable!", path.toAbsolutePath());
             }
         });
+
+        if (adminHost.endsWith("/")){
+            adminHost = adminHost.substring(0, adminHost.length()-1);
+        }
+
         commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd, insecure, cacert));
         commander.setCurlOnly(curlOnly);
     }
