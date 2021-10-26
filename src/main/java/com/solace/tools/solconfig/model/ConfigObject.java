@@ -129,16 +129,9 @@ public class ConfigObject {
      */
     public String getObjectId() {
         var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
-                .map(id -> {
-                    var idObj =attributes.get(id);
-                    // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
-                    if (Objects.isNull(idObj)) {
-                        return "";
-                    } else {
-                        return idObj.toString();
-                    }
-                })
-                .map(s -> percentEncoding(s))
+                // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
+                .map(id -> Optional.ofNullable(attributes.get(id)).orElse("").toString())
+                .map(ConfigObject::percentEncoding)
                 .collect(Collectors.toList());
         return String.join(",", idList);
     }
