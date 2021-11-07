@@ -128,12 +128,13 @@ public class ConfigObject {
      * @return the obj-id
      */
     public String getObjectId() {
-        var idList = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
+        var result = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
+                // If an identifying attribues is absent, use a empty string
                 .map(id -> Optional.ofNullable(attributes.get(id)).orElse("").toString())
                 .map(ConfigObject::percentEncoding)
-                .collect(Collectors.toList());
-        return String.join(",", idList);
+                .collect(Collectors.joining(","));
+        return result;
     }
 
     static String percentEncoding(String input){
