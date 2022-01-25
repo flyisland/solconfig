@@ -47,6 +47,8 @@ services:
       - "55003:55003"
       #SMF over TLS
       - "55443:55443"
+      # Health Check
+      - "5550:5550"
     volumes:
       - "./:/run/secrets"
     environment:
