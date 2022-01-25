@@ -220,7 +220,7 @@ public class SempClient {
     private static String freeMakerToString(Path confPath) {
         try {
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-            cfg.setDirectoryForTemplateLoading(confPath.getParent().toFile());
+            cfg.setDirectoryForTemplateLoading(confPath.toAbsolutePath().getParent().toFile());
             cfg.setDefaultEncoding("UTF-8");
             cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
             cfg.setLogTemplateExceptions(false);
