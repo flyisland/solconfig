@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Fixed
+
+## [1.1.5] - 2022-02-07
+### Added
+### Fixed
+- [fix](https://github.com/flyisland/solconfig/commit/37129cf04f4b2fbccf54a8510736c2b5a5ae291a): Got NullPointerException while applying `create` or `backup` commands with only a file name with no folder prefix.
 - fix: opposite action of "--keep-default" option of `backup` command
 - fix: accept `adminHost` end with "/"
 - feature: output debug information via environment variables `SOLCONFIG_LOGGING_LEVEL` set to "debug"
-- fix: fix: some objects like like "/msgVpns/bridges/remoteMsgVpns", have identifying attributes might not be required attributes
+- fix: some objects like like "/msgVpns/bridges/remoteMsgVpns", have identifying attributes might not be required attributes
 
 ## [1.1.4] - 2021-09-18
 ### Added
