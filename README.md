@@ -1,4 +1,4 @@
-# Backing Up and Restoring Solace PubSub+ Broker Configuration with SEMPv2 protocol
+# Backup and Restore Solace PubSub+ Broker Configuration with SEMPv2 protocol
 
 ## Usage
 
