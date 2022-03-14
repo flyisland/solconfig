@@ -3,14 +3,22 @@ package com.solace.tools.solconfig.model;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.solace.tools.solconfig.RestCommandList;
 import com.solace.tools.solconfig.Utils;
-import lombok.Getter;
-import lombok.SneakyThrows;
-
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 public class ConfigObject {
     @Getter private final String collectionName;
@@ -137,13 +145,13 @@ public class ConfigObject {
         return result;
     }
 
-    static String percentEncoding(String input){
+    static String percentEncoding(String input) {
         var bytes = input.getBytes(StandardCharsets.UTF_8);
         StringBuilder out = new StringBuilder(bytes.length);
-        for (byte b : bytes){
-            if((b>= '0' && b<='9') || (b>= 'A' && b<='Z') || (b>= 'a' && b<='z') ||
-            b == '.' || b == '-' || b == '_'){
-                out.append((char)b);
+        for (byte b : bytes) {
+            if ((b >= '0' && b <= '9') || (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z') ||
+                    b == '.' || b == '-' || b == '_') {
+                out.append((char) b);
                 continue;
             }
             out.append(String.format("%%%02X", b));
@@ -253,15 +261,40 @@ public class ConfigObject {
     }
 
     public void addChildrenFromMap(Map<String, Object> input) {
+        checkIllegalAttributes(input);
         var childrenNames = sempSpec.getChildrenNames();
-        childrenNames.forEach(childName-> Optional.ofNullable(input.get(childName)).ifPresent(list->{
+        childrenNames.forEach(childName -> Optional.ofNullable(input.get(childName)).ifPresent(list -> {
             var childrenList = (List<Map<String, Object>>) list;
-            childrenList.forEach( childMap -> {
+            childrenList.forEach(childMap -> {
                 var child = addChild(childName, childMap);
                 child.addChildrenFromMap(childMap);
             });
         }));
+    }
 
+    private void checkIllegalAttributes(Map<String, Object> input) {
+        var inputKeys = input.keySet();
+        var legalAttributes = Stream.of(sempSpec.getChildrenNames(), sempSpec.getAttributeNames(AttributeType.ALL))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+
+        inputKeys.stream()
+                .filter(name -> !legalAttributes.contains(name))
+                .findAny()
+                .ifPresent(attributeName -> {
+                    var errorMsg = String.format("'%s/%s->%s' is an illegal attribute!", specPath, getObjectId(),
+                            attributeName);
+                    Utils.errPrintlnAndExit(new IllegalArgumentException(errorMsg), errorMsg);
+                });
+
+        sempSpec.getAttributeNames(AttributeType.REQUIRED).stream()
+                .filter(required -> !inputKeys.contains(required))
+                .findAny()
+                .ifPresent(attributeName -> {
+                    var errorMsg = String.format("Missing required attribute '%s' of '%s/%s'!", attributeName, specPath,
+                            getObjectId());
+                    Utils.errPrintlnAndExit(new IllegalArgumentException(errorMsg), errorMsg);
+                });
     }
 
     public void generateCreateCommands(RestCommandList commandList) {
@@ -327,17 +360,21 @@ public class ConfigObject {
         requiresDisableChangeChildren = generateUpdateChildrenCommands(
                 deleteCommandList, newChildren, oldChildren, c-> c.generateDeleteCommands(deleteCommandList),requiresDisableChangeChildren);
 
-        if(requiresDisableChangeChildren) {
+        if (requiresDisableChangeChildren) {
             // means this object has already been disabled, update it to reflect the status
             attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
         var requiresDisableUpdateAttributes = ifRequiresDisableBeforeUpdateAttributes(newObj);
-        if (requiresDisableUpdateAttributes){
+        if (requiresDisableUpdateAttributes) {
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
-        if (!attributes.entrySet().equals(newObj.attributes.entrySet()) &&
-                newObj.attributes.size() > 0) {
+
+        if ((boolean) newObj.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false)) {
+            System.out.println("HAHA");
+        }
+
+        if (!attributes.entrySet().equals(newObj.attributes.entrySet())) {
             var payload = newObj.toJsonStringAttributeOnly();
             updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
         }
@@ -347,7 +384,7 @@ public class ConfigObject {
                     deleteCommandList, updateCommandList, createCommandList, enableCommandList);
         }
 
-        if(requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
+        if (requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
             // enable this object at last
             enableCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));

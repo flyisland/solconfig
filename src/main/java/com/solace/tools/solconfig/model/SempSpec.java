@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SempSpec {
+    public static final String SKIP_THIS_OBJECT = "skipThisObject";
     public static final String BROKER_SPEC_PATH = "";
     public static final String SEMP_VERSION = "sempVersion";
     public static final String OPAQUE_PASSWORD = "opaquePassword";
@@ -83,6 +84,8 @@ public class SempSpec {
         spec.defaultValues = new TreeMap<>();
         spec.childrenNames = new LinkedList<>(RES_ABBR.fullNames());
         spec.attributes.put(AttributeType.BROKER_SPECIFIC.toString(),
+                List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
+        spec.attributes.put(AttributeType.ALL.toString(),
                 List.of(SempSpec.SEMP_VERSION, SempSpec.OPAQUE_PASSWORD));
         spec.attributeCombinations = Map.of();
         return spec;
