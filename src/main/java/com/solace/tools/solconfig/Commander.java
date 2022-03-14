@@ -197,7 +197,7 @@ public class Commander {
         return configBroker;
     }
 
-    public void update(Path confPath) {
+    public void update(Path confPath, boolean isNoDelete) {
         ConfigBroker configFile = getConfigBrokerFromFile(confPath);
         exitOnObjectsNotExist(configFile);
 
@@ -219,8 +219,11 @@ public class Commander {
         var enableCommandList = new RestCommandList();
         configBroker.generateUpdateCommands(configFile, deleteCommandList, updateCommandList, createCommandList, enableCommandList);
 
-        var allCommands = createCommandList.addAll(updateCommandList)
-                .addAll(deleteCommandList).addAll(enableCommandList);
+        var allCommands = createCommandList.addAll(updateCommandList);
+        if (!isNoDelete){
+            allCommands.addAll(deleteCommandList);
+        }
+        allCommands.addAll(enableCommandList);
         if (allCommands.sieze()>0){
             allCommands.execute(sempClient, curlOnly);
         }else {
@@ -246,7 +249,7 @@ public class Commander {
         backup(type, vpn, false);
 
         System.out.println("## update "+path);
-        update(Path.of("examples/template/demo_vpn.json"));
+        update(Path.of("examples/template/demo_vpn.json"), false);
 
         System.out.printf("## delete %s %s%n", type, vpn[0]);
         delete(type, vpn);

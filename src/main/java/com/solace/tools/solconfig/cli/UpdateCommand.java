@@ -13,6 +13,9 @@ import java.nio.file.Path;
         "\n" +
         "This \"update\" command is a good complement to \"create\" command, especially for the \"default\" VPN or the VPN of the Solace Cloud Service instance, since you can only update them.\n")
 public class UpdateCommand extends SubCommand {
+    @CommandLine.Option(names = "--no-delete", description = "Do NOT perform DELETE actions, only new objects and update existed objects")
+    private boolean isNoDelete = false;
+
     @CommandLine.Parameters(index = "0", description = "Configuration file")
     private Path confPath;
 
@@ -25,7 +28,7 @@ public class UpdateCommand extends SubCommand {
         }
 
         Commander commander = parentCommand.commander;
-        commander.update(confPath);
+        commander.update(confPath, isNoDelete);
         return 0;
     }
 }
