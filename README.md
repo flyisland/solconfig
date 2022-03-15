@@ -189,6 +189,8 @@ the "default" VPN or the VPN of the Solace Cloud Service instance, since you
 can only update them.
 
       <confPath>   Configuration file
+      --no-delete   Do NOT perform DELETE actions, only new objects and update
+                      existed objects
 ```
 
 ## Opaque Password

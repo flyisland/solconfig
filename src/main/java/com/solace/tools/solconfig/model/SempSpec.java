@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SempSpec {
-    public static final String SKIP_THIS_OBJECT = "skipThisObject";
+    public static final String SKIP_THIS_OBJECT = "__skipThisObject";
     public static final String BROKER_SPEC_PATH = "";
     public static final String SEMP_VERSION = "sempVersion";
     public static final String OPAQUE_PASSWORD = "opaquePassword";
@@ -111,6 +111,7 @@ public class SempSpec {
         spec.childrenNames = jsonSpec.getChildrenNames(objectPath);
         spec.sempClassName = jsonSpec.getSempClassName(collectionPath);
         spec.attributeCombinations = jsonSpec.findAttributesCombinations(collectionPath);
+        spec.attributes.get(AttributeType.ALL.toString()).add(SempSpec.SKIP_THIS_OBJECT);
 
         return spec;
     }

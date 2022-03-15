@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- add add "__skipThisObject" attribute to skip objects while performing `update` command
 ### Fixed
 
 ## [1.1.5] - 2022-02-07

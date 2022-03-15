@@ -370,13 +370,11 @@ public class ConfigObject {
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
 
-        if ((boolean) newObj.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false)) {
-            System.out.println("HAHA");
-        }
-
-        if (!attributes.entrySet().equals(newObj.attributes.entrySet())) {
-            var payload = newObj.toJsonStringAttributeOnly();
-            updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
+        if (! (boolean) newObj.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false)) {
+            if (!attributes.entrySet().equals(newObj.attributes.entrySet())) {
+                var payload = newObj.toJsonStringAttributeOnly();
+                updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
+            }
         }
 
         for (int i = 0; i < oldChildren.size(); i++) {
