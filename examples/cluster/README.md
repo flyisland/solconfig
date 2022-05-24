@@ -8,9 +8,9 @@ We'll create a DMR Cluster consist of two brokers, the `Local` and the `Remote`,
     | Local +--------->+ Remote |
     +-------+          +--------+
 
-## Variables - vars.j2
+## Variables - vars.ftl
 
-First, update the file `vars.j2` according to your setup.
+First, update the file `vars.ftl` according to your setup.
 
     <#assign dmrClusterName="cluster-test" >
     <#assign authenticationBasicPassword = "default" >
