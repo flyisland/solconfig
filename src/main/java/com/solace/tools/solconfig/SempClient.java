@@ -264,5 +264,7 @@ public class SempClient {
         return result.entrySet();
     }
 
-
+    public boolean isCloudInstance(){
+        return this.baseUrl.contains("messaging.solace.cloud");
+    }
 }

@@ -399,7 +399,9 @@ public class ConfigObject {
                             SempSpec.ENABLED_ATTRIBUTE_NAME, false));
                 }
 
-                action.accept(diffItem);
+                if (! (boolean) diffItem.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false)) {
+                    action.accept(diffItem);
+                }
                 newIt.remove();
             }
         }
@@ -409,5 +411,12 @@ public class ConfigObject {
     public void sortChildren() {
         getChildren().values().forEach(l -> l.sort(Comparator.comparing(ConfigObject::getObjectId)));
         forEachChild(ConfigObject::sortChildren);
+    }
+
+    public void ignoreObjectsForCloudInstance() {
+        if (SempSpec.SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE.contains(specPath)){
+            attributes.put(SempSpec.SKIP_THIS_OBJECT, true);
+        }
+        forEachChild(ConfigObject::ignoreObjectsForCloudInstance);
     }
 }

@@ -50,7 +50,7 @@ public class Commander {
     }
 
     /**
-     * Geenerate a ConfigBroker object from the PS+ broker
+     * Generate a ConfigBroker object from the PS+ broker
      * @param resourceType of one resource type
      * @param objectNames of multiple objects
      * @return a new ConfigBroker object
@@ -212,6 +212,13 @@ public class Commander {
             cb.removeAttributesWithDefaultValue();
             cb.checkAttributeCombinations();
         });
+
+        if (sempClient.isCloudInstance()) {
+            // this is a cloud instance, so ignore the objects could not be updated by SEMPv2
+            logger.warn("Targeted broker is on Solace Cloud, objects {} will be ignored",
+                    SempSpec.SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE);
+            configFile.ignoreObjectsForCloudInstance();
+        }
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();

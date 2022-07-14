@@ -13,6 +13,7 @@ public class SempSpec {
     public static final String OPAQUE_PASSWORD = "opaquePassword";
     public static final String DEFAULT_OBJECT_NAME = "default";
     public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
+    public static final List<String> SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE = List.of("/msgVpns", "/msgVpns/clientProfiles");
     public static final String ENABLED_ATTRIBUTE_NAME = "enabled";
     public static final List<String> SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD = List.of("/dmrClusters/links/remoteAddresses");
     private static final Map<String, List<String>> HARD_CODE_REQUIRES_DISABLE = new HashMap<>();
@@ -41,7 +42,7 @@ public class SempSpec {
             map.put(cluster, "dmrClusters");
 
             reversedMap = map.entrySet().stream()
-                    .collect(Collectors.toMap(kv -> kv.getValue(), kv -> kv.getKey()));
+                    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
         }
 
         public String getFullName() {
