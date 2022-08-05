@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Fixed
+- fix, if Targeted broker is on Solace Cloud, some objects will be ignored. With Solace Cloud, objects Authentication, CA, and ClientProfiles should be managed by the Solace Cloud API
+- fix, add "/msgVpns/restDeliveryPoints/restConsumers/oauthJwtClaims" to the SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD list
 
 ## [1.1.6] - 2022-03-28
 ### Added

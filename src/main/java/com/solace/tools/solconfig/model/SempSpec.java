@@ -15,7 +15,7 @@ public class SempSpec {
     public static final List<String> SPEC_PATHS_OF_DEFAULT_OBJECT = List.of("/msgVpns", "/msgVpns/aclProfiles", "/msgVpns/clientProfiles", "/msgVpns/clientUsernames");
     public static final List<String> SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE = List.of("/msgVpns", "/msgVpns/clientProfiles");
     public static final String ENABLED_ATTRIBUTE_NAME = "enabled";
-    public static final List<String> SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD = List.of("/dmrClusters/links/remoteAddresses");
+    public static final List<String> SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD = List.of("/msgVpns/restDeliveryPoints/restConsumers/oauthJwtClaims", "/dmrClusters/links/remoteAddresses");
     private static final Map<String, List<String>> HARD_CODE_REQUIRES_DISABLE = new HashMap<>();
     static {
         HARD_CODE_REQUIRES_DISABLE.put("/msgVpns", List.of("restTlsServerCertValidateNameEnabled"));
