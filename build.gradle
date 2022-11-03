@@ -12,6 +12,7 @@ def longVersion = version + ", Build time: "+ new SimpleDateFormat("yyyy-MM-dd H
 repositories {
     // Use JCenter for resolving dependencies.
     jcenter()
+    mavenCentral()
 }
 
 task nativeAgent(type:Exec) {
@@ -41,17 +42,17 @@ jar {
 
 dependencies {
     // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 
     // Use JUnit Jupiter Engine for testing.
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 
     // This dependency is used by the application.
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
-    implementation 'info.picocli:picocli:4.6.1'
-    annotationProcessor 'info.picocli:picocli-codegen:4.6.1'
-    implementation 'ch.qos.logback:logback-classic:1.3.0-alpha5'
-    implementation 'com.jayway.jsonpath:json-path:2.5.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
+    implementation 'info.picocli:picocli:4.7.0'
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.0'
+    implementation 'ch.qos.logback:logback-classic:1.4.4'
+    implementation 'com.jayway.jsonpath:json-path:2.7.0'
     implementation 'org.freemarker:freemarker:2.3.31'
 }
 
