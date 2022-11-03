@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.solace.tools.solconfig'
-version '1.1.6'
+version '1.1.7'
 def longVersion = version + ", Build time: "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
 
 repositories {
