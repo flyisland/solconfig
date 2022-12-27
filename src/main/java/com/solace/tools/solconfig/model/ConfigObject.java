@@ -138,7 +138,7 @@ public class ConfigObject {
     public String getObjectId() {
         var result = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
-                // If an identifying attribues is absent, use a empty string
+                // If an identifying attributes is absent, use an empty string
                 .map(id -> Optional.ofNullable(attributes.get(id)).orElse("").toString())
                 .map(ConfigObject::percentEncoding)
                 .collect(Collectors.joining(","));
@@ -188,6 +188,10 @@ public class ConfigObject {
      * @return if this object is a reserved object.
      */
     public boolean isReservedObject() {
+        if (this.specPath.equals("/msgVpns/queues/subscriptions")){
+            // subscription "#noexport/>"
+            return false;
+        }
         return getObjectId().startsWith("%23");
     }
 
@@ -227,8 +231,8 @@ public class ConfigObject {
      */
 
     public void checkAttributeCombinations() {
-        var requiresAttributesWithDefalutValue = sempSpec.getRequiresAttributeWithDefaultValue(attributes.keySet());
-        attributes.putAll(requiresAttributesWithDefalutValue);
+        var requiresAttributeWithDefaultValue = sempSpec.getRequiresAttributeWithDefaultValue(attributes.keySet());
+        attributes.putAll(requiresAttributeWithDefaultValue);
         forEachChild(ConfigObject::checkAttributeCombinations);
     }
 

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Fixed
+- fix: don't treat subscriptions start with "#" as reserved Object
 
 ## [1.1.7]
 ### Added
