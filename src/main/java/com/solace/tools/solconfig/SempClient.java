@@ -1,16 +1,15 @@
 package com.solace.tools.solconfig;
 
-import com.solace.tools.solconfig.model.*;
+import com.solace.tools.solconfig.model.HTTPMethod;
+import com.solace.tools.solconfig.model.SEMPError;
+import com.solace.tools.solconfig.model.SempMeta;
+import com.solace.tools.solconfig.model.SempResponse;
+import com.solace.tools.solconfig.model.SempSpec;
+import com.solace.tools.solconfig.model.SempVersion;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import lombok.Getter;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.Authenticator;
@@ -30,10 +29,24 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SempClient {
+    private final Logger logger = LoggerFactory.getLogger(SempClient.class);
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     public static final int HTTP_OK = 200;
 
@@ -197,11 +210,13 @@ public class SempClient {
         }
         var body = Optional.ofNullable(response)
                 .map(HttpResponse::body);
-            if (body.isEmpty() || body.get().isEmpty()) {
-                Utils.errPrintlnAndExit((Exception) null,
-                        "%s %s returns empty body",
-                        method, absUri);
-            }
+        if (body.isEmpty() || body.get().isEmpty()) {
+            Utils.errPrintlnAndExit((Exception) null,
+                    "%s %s returns empty body",
+                    method, absUri);
+        }
+        logger.debug("{} {}\n{}\n{}", method.toUpperCase(), absUri,
+                Objects.isNull(payload) || payload.isEmpty() ?"":payload, body.get());
         return body.orElse(null);
     }
 
