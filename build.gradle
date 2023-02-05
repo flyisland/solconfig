@@ -6,8 +6,13 @@ plugins {
 }
 
 group 'com.solace.tools.solconfig'
-version '1.1.7'
-def longVersion = version + ", Build time: "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())
+
+def longVersion(){
+    var lastTag = 'git describe --abbrev=0 --tags'.execute().text.trim()
+    //%ci - committer date, ISO 8601-like format
+    var lastCommit = 'git log -1 --pretty=%h~%ci'.execute().text.trim()
+    lastTag+", commit: "+lastCommit + ", built: "+ new SimpleDateFormat("yyyy-MM-dd HH:mm:ss X").format(new Date())
+}
 
 repositories {
     mavenCentral()
@@ -29,7 +34,7 @@ jar {
     manifest {
         attributes "Main-Class": "com.solace.tools.solconfig.App",
                 'Implementation-Title': rootProject.name,
-                'Implementation-Version': longVersion
+                'Implementation-Version': longVersion()
     }
 
     from {
