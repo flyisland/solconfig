@@ -2,7 +2,7 @@ import java.text.SimpleDateFormat
 
 plugins {
     id "java"
-    id "io.freefair.lombok" version "5.3.0"
+    id "io.freefair.lombok" version "6.6.3"
 }
 
 group 'com.solace.tools.solconfig'
