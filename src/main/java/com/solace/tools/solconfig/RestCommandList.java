@@ -54,11 +54,16 @@ public class RestCommandList {
             var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
             if (meta.getResponseCode() == 200) {
                 Utils.err("OK%n");
-            } else  {
+            } else {
                 int semp_code = meta.getError().getCode();
                 if (cmd.method == HTTPMethod.DELETE &&
-                    (semp_code == SEMPError.NOT_ALLOWED.getValue() ||
-                            semp_code == SEMPError.CONFIGDB_OBJECT_DEPENDENCY.getValue())) {
+                        (semp_code == SEMPError.NOT_ALLOWED.getValue() ||
+                                semp_code == SEMPError.CONFIGDB_OBJECT_DEPENDENCY.getValue())) {
+                    Utils.err("%s, retry later%n", SEMPError.ofInt(semp_code));
+                    retryCommands.add(cmd);
+                } else if (cmd.method == HTTPMethod.POST && // add new object
+                        semp_code == SEMPError.NOT_FOUND.getValue()) { // means that the new object depends on some
+                                                                       // objects that does not exist
                     Utils.err("%s, retry later%n", SEMPError.ofInt(semp_code));
                     retryCommands.add(cmd);
                 } else if (cmd.method == HTTPMethod.POST &&
@@ -70,7 +75,8 @@ public class RestCommandList {
                 }
             }
         }
-        if (! retryCommands.isEmpty()) execute(sempClient, retryCommands);
+        if (!retryCommands.isEmpty())
+            execute(sempClient, retryCommands);
     }
 
     private String toCurlScript(SempClient sempClient) {

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 ### Fixed
 - fix: don't treat subscriptions start with "#" as reserved Object
+- fix: retry the POST action if its dependencies are not found
 
 ## [1.1.7]
 ### Added
