@@ -132,6 +132,7 @@ restore the configuration.
   -u, --admin-user=<adminUser>
                            The username of the management user
                              Default: admin
+      --use-template       Whether to support templating                             
   -V, --version            Print version information and exit.
 Commands:
   backup  Export the whole configuration of objects into a single JSON
@@ -208,4 +209,7 @@ The backup output is now 100 percent as same as the configuration on the PS+ bro
 
 ## Template support
 
-Please check the [example](examples/template) for more details.
+When running the program with the "--use-template" option, template support will be provided for the input JSON file. Please check the [example](examples/template) for more details.
+
+**CAUTION:**
+- The syntax of [Substitution Expressions](https://docs.solace.com/Messaging/Substitution-Expressions-Overview.htm) conflicts with the template. Therefore, you should not enable the templating support while there are Substitution Expressions in the JSON file.

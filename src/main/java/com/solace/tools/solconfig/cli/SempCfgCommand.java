@@ -47,6 +47,9 @@ public class SempCfgCommand implements Callable<Integer> {
     @Option(names = "--curl-only", description = "Print curl commands only, no effect on 'backup' command")
     private boolean curlOnly = false;
 
+    @Option(names = "--use-template", description = "Whether to support templating")
+    private boolean useTemplate = false;
+
     @CommandLine.Spec  CommandLine.Model.CommandSpec spec;
     @Override
     public Integer call() {
@@ -67,6 +70,7 @@ public class SempCfgCommand implements Callable<Integer> {
 
         commander = Commander.ofSempClient(new SempClient(adminHost, adminUser, adminPwd, insecure, cacert));
         commander.setCurlOnly(curlOnly);
+        commander.setUseTemplate(useTemplate);
     }
 
     @Override

@@ -221,9 +221,13 @@ public class SempClient {
     }
 
 
-    public static Map<String, Object> readMapFromJsonFile(Path confPath) {
+    public static Map<String, Object> readMapFromJsonFile(Path confPath, boolean useTemplate) {
         try {
-            return (Map<String, Object>)Utils.objectMapper.readValue(freeMakerToString(confPath), Map.class);
+            if(useTemplate){
+                return (Map<String, Object>)Utils.objectMapper.readValue(freeMakerToString(confPath), Map.class);
+            }else{
+                return (Map<String, Object>)Utils.objectMapper.readValue(Files.readString(confPath), Map.class);
+            }
         } catch (IOException e) {
             Utils.errPrintlnAndExit(e,
                     "File %s is not a valid configuration json file!",
