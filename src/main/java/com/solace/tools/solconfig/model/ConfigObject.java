@@ -145,12 +145,19 @@ public class ConfigObject {
         return result;
     }
 
+    /**
+     * [Reserved Characters](https://docs.solace.com/Admin/SEMP/SEMP-API-Protocol.htm)
+     * > It is recommended that you encode all characters outside of the unreserved character set for event broker
+     * > configuration object identifying attributes.
+     * @param input
+     * @return
+     */
     static String percentEncoding(String input) {
         var bytes = input.getBytes(StandardCharsets.UTF_8);
         StringBuilder out = new StringBuilder(bytes.length);
         for (byte b : bytes) {
             if ((b >= '0' && b <= '9') || (b >= 'A' && b <= 'Z') || (b >= 'a' && b <= 'z') ||
-                    b == '.' || b == '-' || b == '_') {
+                    b == '.' || b == '-' || b == '_' || b == '~') {
                 out.append((char) b);
                 continue;
             }
