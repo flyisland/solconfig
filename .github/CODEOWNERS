@@ -1,0 +1,3 @@
+* @SolaceDev/maas-platform
+helm-chart/maas-core @SolaceDev/maas-continuous
+.github/workflows/ @SolaceDev/maas-continuous

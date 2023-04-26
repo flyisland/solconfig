@@ -1,0 +1,28 @@
+name: build-develop
+
+on:
+  push:
+    branches:
+      - 'develop'
+
+jobs:
+  build-develop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/} | sed -e 's/\//_/g')"
+          echo "::set-output name=sha_short::$(echo ${GITHUB_SHA::10})"
+
+      - name: Set Release version env variable
+        run: |
+          echo "RELEASE_VERSION=${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_branch.outputs.sha_short }}" >> $GITHUB_ENV
+
+      - name: Build and Publish package
+        run: ./gradlew -Pversion="${{ env.RELEASE_VERSION }}-SNAPSHOT" build publish --refresh-dependencies
+        env:
+          GITHUB_USERNAME: ${{ secrets.PACKAGES_ADMIN_USER }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_ADMIN_TOKEN }}

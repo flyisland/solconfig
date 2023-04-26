@@ -1,0 +1,48 @@
+name: Release and Publish
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      releaseVersion:
+        type: string
+        description: "the maas-pubsubplus-configs release version to create, example: 1.0.0"
+        required: true
+      githubRelease:
+        type: boolean
+        description: Create github release
+        required: true
+        default: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Release package
+        run: ./gradlew -Pversion="${{ github.event.inputs.releaseVersion }}" build publish --refresh-dependencies
+        env:
+          GITHUB_USERNAME: ${{ secrets.PACKAGES_ADMIN_USER }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_ADMIN_TOKEN }}
+
+      - name: Changelog
+        uses: Bullrich/generate-release-changelog@master
+        id: Changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Create github release
+        if: github.event.inputs.githubRelease
+        id: create_github_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: v${{ github.event.inputs.releaseVersion }}
+          release_name: v${{ github.event.inputs.releaseVersion }}
+          body: |
+            ${{ steps.Changelog.outputs.changelog }}
+          draft: false
+          prerelease: false

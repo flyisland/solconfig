@@ -1,0 +1,27 @@
+name: build-pr
+
+on:
+  pull_request:
+    types: [ 'opened', 'edited', 'reopened', 'synchronize' ]
+
+jobs:
+  build-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Extract PR title
+        id: extract_branch
+        run: |
+          echo "##[set-output name=branch;]$(echo PR-${{ github.event.pull_request.number }})"
+          echo "::set-output name=sha_short::$(echo ${GITHUB_SHA::10})"
+
+      - name: Set Release version env variable
+        run: |
+          echo "RELEASE_VERSION=${{ steps.extract_branch.outputs.branch }}-${{ steps.extract_branch.outputs.sha_short }}" >> $GITHUB_ENV
+
+      - name: Build and Publish package
+        run: gradle -Pversion="${{ env.RELEASE_VERSION }}-SNAPSHOT" build publish
+        env:
+          GITHUB_USERNAME: ${{ secrets.PACKAGES_ADMIN_USER }}
+          GITHUB_TOKEN: ${{ secrets.PACKAGES_ADMIN_TOKEN }}

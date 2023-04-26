@@ -1,6 +1,7 @@
 package com.solace.tools.solconfig;
 
 import com.solace.tools.solconfig.model.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,8 @@ import org.slf4j.LoggerFactory;
 
 public class Commander {
     final Logger logger = LoggerFactory.getLogger(Commander.class);
-    @Getter private SempClient sempClient;
+    @Getter @Setter
+    private SempClient sempClient;
     @Setter private boolean curlOnly;
     @Setter private boolean useTemplate;
 
@@ -27,7 +29,7 @@ public class Commander {
         SempSpec.setupByString(sempClient.getBrokerSpec());
     }
 
-    public void backup(String resourceType, String[] objectNames, boolean isKeepDefault){
+    public ConfigBroker backup(String resourceType, String[] objectNames, boolean isKeepDefault){
         exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
 
@@ -37,7 +39,7 @@ public class Commander {
             configBroker.removeAttributesWithDefaultValue();
         }
         configBroker.checkAttributeCombinations(); // keep requires attribute for backup
-        System.out.println(configBroker);
+        return configBroker;
     }
 
     public void delete(String resourceType, String[] objectNames) {

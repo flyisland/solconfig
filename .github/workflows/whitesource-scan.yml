@@ -1,0 +1,24 @@
+name: whitesource-scan
+on:
+  push:
+    branches:
+      - develop # or the name of your main branch
+
+jobs:
+  whitesource-scan:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Run Whitesource Action
+        uses: TheAxZim/Whitesource-Scan-Action@v1.0.0
+        with:
+          wssURL: https://saas.whitesourcesoftware.com/agent
+          apiKey: ${{ secrets.WSS_API_KEY }}
+          productName: 'maas'
+          projectName: 'maas-pubsubplus-configs'

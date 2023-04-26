@@ -210,6 +210,25 @@ The backup output is now 100 percent as same as the configuration on the PS+ bro
 ## Template support
 
 When running the program with the "--use-template" option, template support will be provided for the input JSON file. Please check the [example](examples/template) for more details.
+- The syntax of [Substitution Expressions](https://docs.solace.com/Messaging/Substitution-Expressions-Overview.htm) conflicts with the template. Therefore, you should not enable the templating support while there are Substitution Expressions in the JSON file.
 
 **CAUTION:**
 - The syntax of [Substitution Expressions](https://docs.solace.com/Messaging/Substitution-Expressions-Overview.htm) conflicts with the template. Therefore, you should not enable the templating support while there are Substitution Expressions in the JSON file.
+
+
+## Release maas-pubsubplus-configs library
+### Pre-requisites
+* Validate that the develop artifacts contains no new vulnerabilities in whitesource:
+  * https://saas.whitesourcesoftware.com/Wss/WSS.html#!project;id=9453472
+
+To release maas-pubsubplus-configs, head over to the [release action in github](https://github.com/SolaceDev/maas-pubsubplus-configs/actions/workflows/release.yaml)
+* Click on **Run Wokflow**
+* Select the branch you want to release, ex: develop
+* Input the release version to create and publish, ex: 1.0.0
+* Uncheck **Create github release** if you want to skip creating a tag and github release (Recommend to leave this on)
+* Click on **Run Workflow**
+
+**CAUTION:**
+
+We should always release from develop branch unless we want to get a patch version released
+
