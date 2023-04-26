@@ -42,11 +42,10 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SempClient {
-    private final Logger logger = LoggerFactory.getLogger(SempClient.class);
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     public static final int HTTP_OK = 200;
 
@@ -126,6 +125,8 @@ public class SempClient {
         if (Optional.ofNullable(opaquePassword).map(String::isEmpty).orElse(true)) {
             return;
         }
+        SempSpec.setupByString(this.getBrokerSpec());
+
         if (SempSpec.getSempVersion().compareTo(new SempVersion("2.17")) < 0) {
             Utils.errPrintlnAndExit("The SEMPv2 version of this broker is %s, Opaque Password is only supported since version 9.6(sempVersion 2.17)",
                     SempSpec.getSempVersion());
@@ -215,7 +216,7 @@ public class SempClient {
                     "%s %s returns empty body",
                     method, absUri);
         }
-        logger.debug("{} {}\n{}\n{}", method.toUpperCase(), absUri,
+        log.debug("{} {}\n{}\n{}", method.toUpperCase(), absUri,
                 Objects.isNull(payload) || payload.isEmpty() ?"":payload, body.get());
         return body.orElse(null);
     }
@@ -274,6 +275,10 @@ public class SempClient {
             } else if (meta.getError().getCode() == SEMPError.NOT_FOUND.getValue()) {
                 result.put(entry.getKey(), false);
             } else {
+                String uri = meta.getRequest().getUri();
+                if (uri != null && uri.contains("Password=")) {
+                    meta.getRequest().setUri(uri.replaceAll("Password=[^$]*", "Password=***"));
+                }
                 Utils.errPrintlnAndExit((Exception) null, "%s %s%n%s%n",
                         HTTPMethod.GET,
                         entry.getValue(),
@@ -284,6 +289,6 @@ public class SempClient {
     }
 
     public boolean isCloudInstance(){
-        return this.baseUrl.contains("messaging.solace.cloud");
+        return this.baseUrl.contains("messaging.solace.cloud") ||  this.baseUrl.contains("messaging.maasgo.net") |  this.baseUrl.contains("messaging.mymaas.net");
     }
 }

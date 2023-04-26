@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,7 @@ import static com.solace.tools.solconfig.Utils.objectMapper;
 public class JsonSpecTest {
     private static JsonSpec jsonSpec;
     private static Object jsonDocument;
+    Logger log = Logger.getLogger(JsonSpecTest.class.getName());
 
     @BeforeAll
     static void setup() throws IOException {
@@ -135,7 +137,7 @@ public class JsonSpecTest {
     })
     void testJsonPath(String path){
         Configuration conf = Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS);
-        System.out.println(path + " -> " + JsonPath.using(conf).parse(jsonDocument).read(path));
+        log.info(path + " -> " + JsonPath.using(conf).parse(jsonDocument).read(path));
     }
 
 

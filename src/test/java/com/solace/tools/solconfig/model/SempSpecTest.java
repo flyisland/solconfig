@@ -12,12 +12,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class SempSpecTest {
+    Logger log = Logger.getLogger(SempSpecTest.class.getName());
+
     @BeforeAll
     static void setup() throws IOException {
         var jsonString = Files.readString(Path.of(JsonSpecTest.class.getResource("/semp-v2-config-2.19.json").getPath()));
@@ -37,7 +40,7 @@ public class SempSpecTest {
 
     @Test
     void testOfJsonNode() {
-        SempSpec.sempSpecMap.keySet().forEach(System.out::println);
+        SempSpec.sempSpecMap.keySet().forEach(log::info);
     }
 
     @ParameterizedTest

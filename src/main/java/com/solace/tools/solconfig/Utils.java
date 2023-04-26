@@ -5,12 +5,16 @@ import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.solace.tools.solconfig.model.SolConfigException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.regex.Pattern;
 
+@Slf4j
 public class Utils {
     public static ObjectMapper objectMapper = new ObjectMapper();
+    public static Properties properties = PropertiesLoader.loadProperties("application.properties");
 
     // TODO: move to SempSpec class
     public static String getCollectionNameFromUri(String uri){
@@ -28,11 +32,11 @@ public class Utils {
     }
 
     public static void log(String text) {
-        System.err.println(text);
+        log.info(text);
     }
 
     public static void err(String format, Object... args) {
-        System.err.printf(format, args);
+        log.error(String.format(format, args));
     }
 
     public static void errPrintlnAndExit(String format, Object... args) {
@@ -41,9 +45,11 @@ public class Utils {
 
     public static void errPrintlnAndExit(Exception e, String format, Object... args) {
         err(format, args);
-        err("%n");
         if (Objects.nonNull(e)) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
+        }
+        if (!isExitOnErrors()) {
+            throw new SolConfigException("Error when executing solConfig command: " + String.format(format, args), e);
         }
         System.exit(1);
     }
@@ -81,5 +87,12 @@ public class Utils {
             errPrintlnAndExit(e, "Unable to convert the object into the json format.");
         }
         return result;
+    }
+
+    public static boolean isExitOnErrors() {
+        if ("true".equalsIgnoreCase(properties.getProperty("solace.tools.solconfig.exitOnErrors"))) {
+            return true;
+        }
+        return false;
     }
 }

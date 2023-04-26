@@ -1,18 +1,17 @@
 package com.solace.tools.solconfig;
 
 import com.solace.tools.solconfig.model.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Commander {
-    final Logger logger = LoggerFactory.getLogger(Commander.class);
     @Getter @Setter
     private SempClient sempClient;
     @Setter private boolean curlOnly;
@@ -25,11 +24,13 @@ public class Commander {
         return commander;
     }
 
-    private void setupSempSpec() {
+    public void setupSempSpec() {
         SempSpec.setupByString(sempClient.getBrokerSpec());
     }
 
     public ConfigBroker backup(String resourceType, String[] objectNames, boolean isKeepDefault){
+        log.info("Starting broker config backup: resourceType={}, objectNames={}, isKeepDefault={}",
+                resourceType, objectNames, isKeepDefault);
         exitOnObjectsNotExist(resourceType, objectNames);
         ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
 
@@ -109,6 +110,16 @@ public class Commander {
         commandList.execute(sempClient, curlOnly);
     }
 
+    private ConfigBroker getConfigBrokerFromMap(Map<String, Object> map) {
+        ConfigBroker configFromFile = new ConfigBroker();
+        configFromFile.addChildrenFromMap(map);
+        configFromFile.sortChildren();
+        configFromFile.setSempVersion(new SempVersion((String) map.get(SempSpec.SEMP_VERSION)));
+        configFromFile.setOpaquePassword((String) map.get((SempSpec.OPAQUE_PASSWORD)));
+        compareSempVersion(configFromFile);
+        return configFromFile;
+    }
+
     private ConfigBroker getConfigBrokerFromFile(Path confPath) {
         ConfigBroker configFromFile = new ConfigBroker();
         Map<String, Object> map = SempClient.readMapFromJsonFile(confPath, this.useTemplate);
@@ -128,10 +139,10 @@ public class Commander {
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
         }
         if (configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) > 0) {
-            System.out.printf("The sempVersion [%s] of the config file is newer than the broker's [%s], some objects/attributes may be not AVAILABLE!%n",
+            log.debug("The sempVersion [{}] of the config file is newer than the broker's [{}], some objects/attributes may be not AVAILABLE!",
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
         } else if(configFromFile.getSempVersion().compareTo(SempSpec.getSempVersion()) < 0){
-            System.out.printf("The sempVersion [%s] of the config file is older than the broker's [%s], some objects/attributes may be DEPRECATED!%n",
+            log.debug("The sempVersion [{}] of the config file is older than the broker's [{}], some objects/attributes may be DEPRECATED!",
                     configFromFile.getSempVersion().getText(), SempSpec.getSempVersion().getText());
         }
     }
@@ -159,6 +170,7 @@ public class Commander {
     }
 
     private void checkObjectsExistence(String resourceTypeFullName, List<String> objectNames, boolean existOn) {
+        log.info("Checking if {} {} exist", resourceTypeFullName, objectNames);
         var objects = sempClient.checkIfObjectsExist(resourceTypeFullName, objectNames);
         var resultSet = objects.stream()
                 .filter(e -> e.getValue() == existOn)
@@ -199,12 +211,15 @@ public class Commander {
         return configBroker;
     }
 
-    public void update(Path confPath, boolean isNoDelete) {
-        ConfigBroker configFile = getConfigBrokerFromFile(confPath);
+    public Map<String, Object> diff(Map<String, Object> map) {
+        ConfigBroker configFile = getConfigBrokerFromMap(map);
         exitOnObjectsNotExist(configFile);
+        return diff(configFile);
+    }
 
-        sempClient.setOpaquePassword(configFile.getOpaquePassword());
+    public Map<String, Object> diff(ConfigBroker configFile) {
         ConfigBroker configBroker = generateConfigFromBroker(configFile);
+        sempClient.setOpaquePassword(configFile.getOpaquePassword());
         List.of(configFile, configBroker).forEach(cb->{
             cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
             cb.removeAttributes(
@@ -215,12 +230,44 @@ public class Commander {
             cb.checkAttributeCombinations();
         });
 
-        if (sempClient.isCloudInstance()) {
-            // this is a cloud instance, so ignore the objects could not be updated by SEMPv2
-            logger.warn("Targeted broker is on Solace Cloud, objects {} will be ignored",
-                    SempSpec.SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE);
-            configFile.ignoreObjectsForCloudInstance();
-        }
+        var deleteCommandList = new RestCommandList();
+        var createCommandList = new RestCommandList();
+        var updateCommandList = new RestCommandList();
+        var enableCommandList = new RestCommandList();
+        configBroker.generateUpdateCommands(configFile, deleteCommandList, updateCommandList, createCommandList, enableCommandList);
+
+        Map<String, Object> diff = new HashMap<>();
+        diff.put("create", createCommandList);
+        diff.put("update", updateCommandList);
+        diff.put("delete", deleteCommandList);
+        diff.put("enable", enableCommandList);
+        return diff;
+    }
+
+    public void update(Map<String, Object> map, boolean isNoDelete) {
+        ConfigBroker configFile = getConfigBrokerFromMap(map);
+        exitOnObjectsNotExist(configFile);
+        update(configFile, isNoDelete);
+    }
+
+    public void update(Path confPath, boolean isNoDelete){
+        ConfigBroker configFile = getConfigBrokerFromFile(confPath);
+        exitOnObjectsNotExist(configFile);
+        update(configFile, isNoDelete);
+    }
+
+    public void update(ConfigBroker configFile, boolean isNoDelete) {
+        ConfigBroker configBroker = generateConfigFromBroker(configFile);
+        sempClient.setOpaquePassword(configFile.getOpaquePassword());
+        List.of(configFile, configBroker).forEach(cb->{
+            cb.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
+            cb.removeAttributes(
+                    AttributeType.PARENT_IDENTIFIERS,
+                    AttributeType.DEPRECATED,
+                    AttributeType.BROKER_SPECIFIC);
+            cb.removeAttributesWithDefaultValue();
+            cb.checkAttributeCombinations();
+        });
 
         var deleteCommandList = new RestCommandList();
         var createCommandList = new RestCommandList();
@@ -233,34 +280,34 @@ public class Commander {
             allCommands.addAll(deleteCommandList);
         }
         allCommands.addAll(enableCommandList);
-        if (allCommands.sieze()>0){
+        if (allCommands.size()>0){
             allCommands.execute(sempClient, curlOnly);
         }else {
-            Utils.errPrintlnAndExit("Configuration file %s is identical to the existing objects.", confPath.toAbsolutePath());
+            Utils.errPrintlnAndExit("Configurations are identical to the existing objects.");
         }
     }
 
     public void printSpec() {
-        System.out.println(SempSpec.toPrettyString());
+        log.debug(SempSpec.toPrettyString());
     }
 
     public void integrationTest() {
-        System.out.println("## spec");
+        log.debug("## spec");
         printSpec();
         var path = "examples/template/demo_vpn.json";
 
-        System.out.println("## create "+path);
+        log.debug("## create {}", path);
         create(Path.of(path));
         var type = "msgVpns";
         var vpn = new String[] {"Demo"};
 
-        System.out.printf("## backup %s %s%n", type, vpn[0]);
+        log.debug("## backup {} {}", type, vpn[0]);
         backup(type, vpn, false);
 
-        System.out.println("## update "+path);
+        log.debug("## update {}", path);
         update(Path.of("examples/template/demo_vpn.json"), false);
 
-        System.out.printf("## delete %s %s%n", type, vpn[0]);
+        log.debug("## delete {} {}", type, vpn[0]);
         delete(type, vpn);
     }
 }

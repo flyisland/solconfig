@@ -2,12 +2,16 @@ package com.solace.tools.solconfig;
 
 import com.solace.tools.solconfig.model.HTTPMethod;
 import com.solace.tools.solconfig.model.SEMPError;
+import com.solace.tools.solconfig.model.SolConfigException;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class RestCommandList {
+
     class Command {
         private HTTPMethod method;
         private String resourcePath;
@@ -41,7 +45,7 @@ public class RestCommandList {
 
     public void execute(SempClient sempClient, boolean curlOnly) {
         if (curlOnly) {
-            System.out.println(toCurlScript(sempClient));
+            log.debug(toCurlScript(sempClient));
         } else {
             execute(sempClient, this.commands);
         }
@@ -71,6 +75,10 @@ public class RestCommandList {
                     Utils.err("%s%n", SEMPError.ALREADY_EXISTS);
                 } else {
                     Utils.err("%n%s%s%n", Objects.nonNull(cmd.payload) ? cmd.payload + "\n" : "", meta.toString());
+                    if (!Utils.isExitOnErrors()) {
+                        throw new SolConfigException("Error executing command list: " +
+                                String.format("%n%s%s%n", Objects.nonNull(cmd.payload) ? cmd.payload + "\n" : "", meta));
+                    }
                     System.exit(1);
                 }
             }
@@ -104,7 +112,7 @@ public class RestCommandList {
         return this;
     }
 
-    public int sieze() {
+    public int size() {
         return commands.size();
     }
 }
