@@ -49,7 +49,7 @@ public class Utils {
             log.error(e.getMessage(), e);
         }
         if (!isExitOnErrors()) {
-            throw new SolConfigException("Error when executing solConfig command: " + String.format(format, args), e);
+            throw new SolConfigException("Error when executing broker config command: " + String.format(format, args), e);
         }
         System.exit(1);
     }
