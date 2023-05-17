@@ -189,17 +189,17 @@ public class ConfigObject {
     }
 
     /**
-     * Names starting with '#' are reserved. Reserved object can not be created or delete by users.
+     * Names starting with '#' under some resources are reserved.
+     * Reserved object can not be created or delete by users.
      * %23 is the url encoded '#'
      *
      * @return if this object is a reserved object.
      */
     public boolean isReservedObject() {
-        if (this.specPath.equals("/msgVpns/queues/subscriptions")){
-            // subscription "#noexport/>"
-            return false;
+        if(SempSpec.SPEC_PATHS_OF_RESERVED_OBJECT.contains(this.specPath)){
+            return getObjectId().startsWith("%23");
         }
-        return getObjectId().startsWith("%23");
+        return false;
     }
 
     public boolean isDefaultObject() {
