@@ -54,10 +54,10 @@ public class RestCommandList {
     private void execute(SempClient sempClient, List<Command> commandList) {
         List<Command> retryCommands = new LinkedList<>();
         for (Command cmd : commandList) {
-            Utils.err("%s %s ", cmd.method.name(), cmd.resourcePath);
+            Utils.log(String.format("%s %s ", cmd.method.name(), cmd.resourcePath));
             var meta = sempClient.sendAndGetMeta(cmd.method.name(), cmd.resourcePath, cmd.payload);
             if (meta.getResponseCode() == 200) {
-                Utils.err("OK%n");
+                Utils.log("OK");
             } else {
                 int semp_code = meta.getError().getCode();
                 if (cmd.method == HTTPMethod.DELETE &&

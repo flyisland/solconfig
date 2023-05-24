@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.solace.tools.solconfig.RestCommandList;
 import com.solace.tools.solconfig.Utils;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -20,7 +22,11 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import static com.solace.tools.solconfig.Utils.properties;
+
 public class ConfigObject {
+    public static final String PATH_DELIMITER = "/";
+    public static final String JSON_KEY_VALUE_FORMATTER = "{\"%s\":%b}";
     @Getter private final String collectionName;
     protected TreeMap<String, Object> attributes;
     @Getter private final TreeMap<String, List<ConfigObject>> children;
@@ -28,6 +34,10 @@ public class ConfigObject {
     private SempSpec sempSpec;
     private String collectionPath;
     private String objectPath="";
+
+    private final String reservedObjectsStartsWith = properties.getProperty("solace.tools.solconfig.objects.reserved.startsWith");
+    private final String excludeFromReservedObjects = properties.getProperty("solace.tools.solconfig.objects.reserved.excludeList");
+    private final String excludeFromReservedObjectIds = properties.getProperty("solace.tools.solconfig.objects.reserved.excludeObjectIdList");
 
     public ConfigObject(){
         this(null);
@@ -41,13 +51,13 @@ public class ConfigObject {
 
     public ConfigObject addChild(String collectionName, Map<String, Object> attributes) {
         ConfigObject child = new ConfigObject(collectionName);
-        child.setSpecPath(specPath + "/" + child.collectionName);
+        child.setSpecPath(specPath + PATH_DELIMITER + child.collectionName);
         for (String name : child.sempSpec.getAttributeNames(AttributeType.ALL)) {
             Optional.ofNullable(attributes.get(name))
                     .ifPresent(v -> child.attributes.put(name, v));
         }
-        child.collectionPath = objectPath + "/" + collectionName;
-        child.objectPath = child.collectionPath + "/" + child.getObjectId();
+        child.collectionPath = objectPath + PATH_DELIMITER + collectionName;
+        child.objectPath = child.collectionPath + PATH_DELIMITER + child.getObjectId();
         children.computeIfAbsent(child.collectionName, k -> new LinkedList<>()).add(child);
         return child;
     }
@@ -99,9 +109,7 @@ public class ConfigObject {
                 Utils.errPrintlnAndExit(e, "Unable to convert %s: %s to JSON format.",
                         name, attributes.get(name));
             }
-            if (names.hasNext()) {
-                sb.append(",");
-            } else if (!attributeOnly && hasChildren()) {
+            if (names.hasNext() || (!attributeOnly && hasChildren())) {
                 sb.append(",");
             }
             sb.append("\n");
@@ -136,21 +144,18 @@ public class ConfigObject {
      * @return the obj-id
      */
     public String getObjectId() {
-        var result = sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
+        return sempSpec.getAttributeNames(AttributeType.IDENTIFYING).stream()
                 // Identifying attributes might not be required attributes, like "/msgVpns/bridges/remoteMsgVpns"
                 // If an identifying attributes is absent, use an empty string
                 .map(id -> Optional.ofNullable(attributes.get(id)).orElse("").toString())
                 .map(ConfigObject::percentEncoding)
                 .collect(Collectors.joining(","));
-        return result;
     }
 
     /**
      * [Reserved Characters](https://docs.solace.com/Admin/SEMP/SEMP-API-Protocol.htm)
      * > It is recommended that you encode all characters outside of the unreserved character set for event broker
      * > configuration object identifying attributes.
-     * @param input
-     * @return
      */
     static String percentEncoding(String input) {
         var bytes = input.getBytes(StandardCharsets.UTF_8);
@@ -195,11 +200,39 @@ public class ConfigObject {
      * @return if this object is a reserved object.
      */
     public boolean isReservedObject() {
-        if (this.specPath.equals("/msgVpns/queues/subscriptions")){
-            // subscription "#noexport/>"
-            return false;
+        List<String> excludeFromReservedObjectList = new ArrayList<>();
+        List<String> excludeFromReservedObjectIdsList = new ArrayList<>();
+
+        // process list of objects to mark as non reserved
+        if(!excludeFromReservedObjects.isBlank()) {
+            excludeFromReservedObjectList = Arrays.asList(excludeFromReservedObjects.split(","));
         }
-        return getObjectId().startsWith("%23");
+
+        // process list of object id's to mark as non reserved
+        if(!excludeFromReservedObjectIds.isBlank()) {
+            excludeFromReservedObjectIdsList = Arrays.asList(excludeFromReservedObjectIds.split(","));
+        }
+
+        return isReservedObject(getObjectId(), this.specPath, excludeFromReservedObjectList, excludeFromReservedObjectIdsList);
+    }
+
+    public boolean isReservedObject(String objectId, String specPath,
+                                    List<String> excludeFromReservedObjectList,
+                                    List<String> excludeFromReservedObjectIdsList) {
+
+        boolean isReserved = false;
+        String specObjectPath = specPath + PATH_DELIMITER + objectId;
+
+        if(!reservedObjectsStartsWith.isBlank()) {
+            isReserved = objectId.startsWith(reservedObjectsStartsWith);
+        }
+        if(!excludeFromReservedObjectList.isEmpty()) {
+            isReserved = isReserved && excludeFromReservedObjectList.stream().noneMatch(specPath::equals);
+        }
+        if(!excludeFromReservedObjectIdsList.isEmpty()) {
+            isReserved = isReserved && excludeFromReservedObjectIdsList.stream().noneMatch(specObjectPath::equals);
+        }
+        return isReserved;
     }
 
     public boolean isDefaultObject() {
@@ -256,7 +289,7 @@ public class ConfigObject {
     public void generateDeleteCommands(RestCommandList commandList) {
         var requiresDisable = ifRequiresDisableBeforeChangeChildren();
         if(requiresDisable) {
-            commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+            commandList.append(HTTPMethod.PATCH, objectPath, String.format(JSON_KEY_VALUE_FORMATTER,
                     SempSpec.ENABLED_ATTRIBUTE_NAME, false));
         }
 
@@ -323,7 +356,7 @@ public class ConfigObject {
         forEachChild(configObject -> configObject.generateCreateCommands(commandList));
 
         if(requiresDisable) {
-            commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+            commandList.append(HTTPMethod.PATCH, objectPath, String.format(JSON_KEY_VALUE_FORMATTER,
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
     }
@@ -334,7 +367,7 @@ public class ConfigObject {
             return false;
         }
         for (String s : children.keySet()) {
-            if (SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD.contains(specPath+"/"+s)) {
+            if (SempSpec.SPEC_PATHS_OF_REQUIRES_DISABLE_CHILD.contains(specPath+ PATH_DELIMITER +s)) {
                 return true;
             }
         }
@@ -347,8 +380,8 @@ public class ConfigObject {
             return false;
         }
         var mergeSet = Utils.symmetricDiff(attributes.entrySet(), newObj.attributes.entrySet());
-        var Requires_Disable = sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE);
-        return mergeSet.stream().anyMatch(e -> Requires_Disable.contains(e.getKey()));
+        var requiresDisable = sempSpec.getAttributeNames(AttributeType.REQUIRES_DISABLE);
+        return mergeSet.stream().anyMatch(e -> requiresDisable.contains(e.getKey()));
     }
 
 
@@ -381,11 +414,9 @@ public class ConfigObject {
             newObj.attributes.put(SempSpec.ENABLED_ATTRIBUTE_NAME, false);
         }
 
-        if (! (boolean) newObj.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false)) {
-            if (!attributes.entrySet().equals(newObj.attributes.entrySet())) {
-                var payload = newObj.toJsonStringAttributeOnly();
-                updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
-            }
+        if (!(boolean) newObj.attributes.getOrDefault(SempSpec.SKIP_THIS_OBJECT, false) && !attributes.entrySet().equals(newObj.attributes.entrySet())) {
+            var payload = newObj.toJsonStringAttributeOnly();
+            updateCommandList.append(HTTPMethod.PUT, objectPath, payload);
         }
 
         for (int i = 0; i < oldChildren.size(); i++) {
@@ -395,7 +426,7 @@ public class ConfigObject {
 
         if (requiresDisableUpdateAttributes || requiresDisableChangeChildren) {
             // enable this object at last
-            enableCommandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+            enableCommandList.append(HTTPMethod.PATCH, objectPath, String.format(JSON_KEY_VALUE_FORMATTER,
                     SempSpec.ENABLED_ATTRIBUTE_NAME, true));
         }
     }
@@ -406,7 +437,7 @@ public class ConfigObject {
             if (l1.stream().noneMatch(configObject -> configObject.objectPath.equals(diffItem.objectPath))) {
                 if (!requiresDisableChangeChildren && ifRequiresParentDisableBeforeChange(diffItem.specPath)){
                     requiresDisableChangeChildren = true;
-                    commandList.append(HTTPMethod.PATCH, objectPath, String.format("{\"%s\":%b}",
+                    commandList.append(HTTPMethod.PATCH, objectPath, String.format(JSON_KEY_VALUE_FORMATTER,
                             SempSpec.ENABLED_ATTRIBUTE_NAME, false));
                 }
 
@@ -422,12 +453,5 @@ public class ConfigObject {
     public void sortChildren() {
         getChildren().values().forEach(l -> l.sort(Comparator.comparing(ConfigObject::getObjectId)));
         forEachChild(ConfigObject::sortChildren);
-    }
-
-    public void ignoreObjectsForCloudInstance() {
-        if (SempSpec.SPEC_PATHS_OF_OBJECTS_OF_CLOUD_INSTANCE.contains(specPath)){
-            attributes.put(SempSpec.SKIP_THIS_OBJECT, true);
-        }
-        forEachChild(ConfigObject::ignoreObjectsForCloudInstance);
     }
 }
