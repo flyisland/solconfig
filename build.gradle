@@ -45,7 +45,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 
     // This dependency is used by the application.
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
     implementation 'info.picocli:picocli:4.7.0'
     annotationProcessor 'info.picocli:picocli-codegen:4.7.0'
     compileOnly 'ch.qos.logback:logback-classic:1.4.5'
