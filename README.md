@@ -82,7 +82,7 @@ Then run `./solconfig -H http://another-broker:8080 create Demo.json` to create 
 Make sure you have [JDK 11](https://adoptopenjdk.net/) or above installed.
 
 ```shell
-git clone https://github.com/flyisland/solconfig
+git clone https://github.com/SolaceDev/maas-pubsubplus-configs
 cd solconfig
 ./gradlew build
 java -jar build/libs/solconfig.jar help
@@ -104,7 +104,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0.2 (build 11.0.10+8-jvmci-21.0-b06, mi
 
 3. Run `./native-image.sh`, it will create a native image `./solconfig` which could be executed independently without JDK installed.
 
-### [Download](https://github.com/flyisland/solconfig/releases)
+### [Download](https://github.com/SolaceDev/maas-pubsubplus-configs/releases)
 
 ## Help
 
