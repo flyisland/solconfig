@@ -78,7 +78,9 @@ public class SempSpec {
     private static void hardcodeSetup() {
         HARD_CODE_REQUIRES_DISABLE.forEach((specPath, list) -> {
             var Requires_Disable = sempSpecMap.get(specPath).attributes.get(AttributeType.REQUIRES_DISABLE.toString());
-            Requires_Disable.addAll(list);
+            if(Requires_Disable != null) {
+                Requires_Disable.addAll(list);
+            }
         });
     }
 

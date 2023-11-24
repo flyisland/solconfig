@@ -130,7 +130,9 @@ Map:
                 result.put(k, mPatch.get(k));
             }
         });
-        sortOutSpecialAttributes(collectionPath, result);
+        if(!result.isEmpty()){
+            sortOutSpecialAttributes(collectionPath, result);
+        }
         result.put(AttributeType.ALL.toString(), getAttributeNames(collectionPath));
         return result;
     }
