@@ -10,6 +10,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.Authenticator;
@@ -45,6 +46,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -54,18 +56,22 @@ public class SempClient {
     private static final String CONFIG_BASE_PATH = "/SEMP/v2/config";
     public static final int HTTP_OK = 200;
 
-    @Getter private final String baseUrl;
-    @Getter private final String adminUser;
-    @Getter private final String adminPwd;
-    @Getter private String opaquePassword;
+    @Getter
+    private final String baseUrl;
+    @Getter
+    private final String adminUser;
+    @Getter
+    private final String adminPwd;
+    @Getter
+    private String opaquePassword;
     private final HttpClient httpClient;
 
     public SempClient(String adminUrl, String adminUser, String adminPwd, boolean insecure, Path cacert) {
-        this.baseUrl = adminUrl+ CONFIG_BASE_PATH;
+        this.baseUrl = adminUrl + CONFIG_BASE_PATH;
         this.adminUser = adminUser;
         this.adminPwd = adminPwd;
 
-        var b =  HttpClient.newBuilder();
+        var b = HttpClient.newBuilder();
         if (insecure) {
             Optional.ofNullable(getInscureSSLContext()).ifPresent(b::sslContext);
         } else if (Objects.nonNull(cacert)) {
@@ -115,9 +121,10 @@ public class SempClient {
             }
         };
 
-        try{
+        try {
             var sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
+            return sslContext;
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             Utils.errPrintlnAndExit(e, "Unable init the SSLContext!");
         }
@@ -137,7 +144,8 @@ public class SempClient {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustManagerFactory.getTrustManagers(), null);
             return sslContext;
-        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+        } catch (CertificateException | IOException | NoSuchAlgorithmException | KeyStoreException |
+                 KeyManagementException e) {
             Utils.errPrintlnAndExit(e, "Path %s is not a valid certification!", crtFile.toAbsolutePath());
         }
         return null;
@@ -177,19 +185,20 @@ public class SempClient {
     /**
      * If the collection is large, this method will follow the "nextPageUri" field
      * in the response to continually fetch all results.
+     *
      * @param absUri MUST be a collection path
      * @return a SempRespone with all data and links from the absUri
      */
-    public SempResponse getCollectionWithAbsoluteUri(String absUri){
+    public SempResponse getCollectionWithAbsoluteUri(String absUri) {
         List<SempResponse> responseList = new LinkedList<>();
         Optional<String> nextPageUri = Optional.of(absUri);
-        while (nextPageUri.isPresent()){
+        while (nextPageUri.isPresent()) {
             SempResponse resp = SempResponse.ofString(sendWithAbsoluteURI("GET", uriAddOpaquePassword(nextPageUri.get()), null));
             responseList.add(resp);
             nextPageUri = resp.getNextPageUri();
         }
         // Combine all paging results into one SempResponse
-        var result = responseList.stream().reduce((r1, r2)->{
+        var result = responseList.stream().reduce((r1, r2) -> {
             r1.getData().addAll(r2.getData());
             r1.getLinks().addAll(r2.getLinks());
             r1.setMeta(r2.getMeta());
@@ -198,8 +207,8 @@ public class SempClient {
         return result.orElse(null);
     }
 
-    public String buildAbsoluteUri(String resourcePath){
-        return baseUrl+resourcePath;
+    public String buildAbsoluteUri(String resourcePath) {
+        return baseUrl + resourcePath;
     }
 
     /**
@@ -227,7 +236,7 @@ public class SempClient {
         HttpResponse<String> response = null;
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (InterruptedException|IOException e) {
+        } catch (InterruptedException | IOException e) {
             Utils.errPrintlnAndExit(e, "%s %s with playload:%n%s%n%s",
                     method.toUpperCase(), absUri, payload, e.toString());
         }
@@ -239,17 +248,17 @@ public class SempClient {
                     method, absUri);
         }
         log.debug("{} {}\n{}\n{}", method.toUpperCase(), absUri,
-                Objects.isNull(payload) || payload.isEmpty() ?"":payload, body.get());
+                Objects.isNull(payload) || payload.isEmpty() ? "" : payload, body.get());
         return body.orElse(null);
     }
 
 
     public static Map<String, Object> readMapFromJsonFile(Path confPath, boolean useTemplate) {
         try {
-            if(useTemplate){
-                return (Map<String, Object>)Utils.objectMapper.readValue(freeMakerToString(confPath), Map.class);
-            }else{
-                return (Map<String, Object>)Utils.objectMapper.readValue(Files.readString(confPath), Map.class);
+            if (useTemplate) {
+                return (Map<String, Object>) Utils.objectMapper.readValue(freeMakerToString(confPath), Map.class);
+            } else {
+                return (Map<String, Object>) Utils.objectMapper.readValue(Files.readString(confPath), Map.class);
             }
         } catch (IOException e) {
             Utils.errPrintlnAndExit(e,
@@ -282,7 +291,7 @@ public class SempClient {
     /**
      * To check if the list of object name of resourceTypeFullName exist in the broker already
      */
-    public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceTypeFullName, List<String> objectNames){
+    public Set<Map.Entry<String, Boolean>> checkIfObjectsExist(String resourceTypeFullName, List<String> objectNames) {
         var absUriList = objectNames.stream()
                 .filter(n -> !n.equals("*"))
                 .map(objectName -> Map.entry(objectName,
@@ -290,7 +299,7 @@ public class SempClient {
                 .collect(Collectors.toList());
 
         Map<String, Boolean> result = new HashMap<>();
-        absUriList.forEach( entry->{
+        absUriList.forEach(entry -> {
             var meta = sendAndGetMeta(HTTPMethod.GET.toSEMPMethod(), entry.getValue(), null);
             if (meta.getResponseCode() == HTTP_OK) {
                 result.put(entry.getKey(), true);
@@ -310,7 +319,7 @@ public class SempClient {
         return result.entrySet();
     }
 
-    public boolean isCloudInstance(){
-        return this.baseUrl.contains("messaging.solace.cloud") ||  this.baseUrl.contains("messaging.maasgo.net") |  this.baseUrl.contains("messaging.mymaas.net");
+    public boolean isCloudInstance() {
+        return this.baseUrl.contains("messaging.solace.cloud") || this.baseUrl.contains("messaging.maasgo.net") | this.baseUrl.contains("messaging.mymaas.net");
     }
 }
