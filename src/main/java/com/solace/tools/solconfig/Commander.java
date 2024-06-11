@@ -32,8 +32,9 @@ public class Commander {
         log.info("Starting broker config backup: resourceType={}, objectNames={}, isKeepDefault={}",
                 resourceType, objectNames, isKeepDefault);
         exitOnObjectsNotExist(resourceType, objectNames);
+        log.info("Generating broker config");
         ConfigBroker configBroker = generateConfigFromBroker(resourceType, objectNames);
-
+        log.info("removing children objects");
         configBroker.removeChildrenObjects(ConfigObject::isReservedObject, ConfigObject::isDeprecatedObject);
         configBroker.removeAttributes(AttributeType.PARENT_IDENTIFIERS, AttributeType.DEPRECATED);
         if (! isKeepDefault) {
@@ -84,6 +85,8 @@ public class Commander {
             .filter(e -> !e.getKey().equals("uri"))
             .forEach(e -> {
                 String collectionName = Utils.getCollectionNameFromUri(e.getValue());
+                // there will probably be a lot of these logs
+                log.debug("Fetching Collection: {}", collectionName);
                 var sempResponse = sempClient.getCollectionWithAbsoluteUri(e.getValue());
                 if (sempResponse.isEmpty()){
                     return;
