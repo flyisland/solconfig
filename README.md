@@ -1,3 +1,11 @@
+Dear people,
+
+First of all, I would like to thank everyone for their support and love for this project. This project is a personal work I developed at Solace to help others like me who want to migrate Solace configurations across different environments quickly.
+
+Unfortunately, Solace has decided to terminate my employment contract, and in the future, I will not have enough time and energy to maintain this project. If anyone is willing to continue supporting the project, please feel free to fork it. Thank you very much. 
+
+**I'll be archiving this project soon.**
+
 # Backup and Restore Solace PubSub+ Broker Configuration with SEMPv2 protocol
 
 ## Usage
